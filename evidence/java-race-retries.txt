@@ -1,0 +1,5 @@
+GL account create race: 5 rounds x 10 identical concurrent creates (GLAccountExternalIdIntegrationTest#concurrentIdenticalCreatesResolveToOneAccount)
+Result: all 50 requests HTTP 200, one account id per round (see java-integration-tests.log).
+
+Inserts that lost the unique-constraint race and were retried by Fineract's command retry:
+  36 unique constraint "acc_gl_account_gl_code_key"

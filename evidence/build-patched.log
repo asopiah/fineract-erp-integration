@@ -1,0 +1,676 @@
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy UP-TO-DATE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :
+matching ref: TAG - 1.15.0
+  ref configuration: TAG - pattern: (\d+\.\d+\.\d+)
+    version: ${describe.tag.version.major}.${describe.tag.version.minor}.${describe.tag.version.patch}
+    describeTagPattern: .*(\d+\.\d+\.\d+).*
+    describeTagFirstParent: false
+
+project version: 1.15.0
+
+> Task :fineract-avro-schemas:preprocessAvroSchemas UP-TO-DATE
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
+> Task :fineract-command-audit:processResources UP-TO-DATE
+> Task :fineract-document:processResources NO-SOURCE
+> Task :fineract-command-jdbc:processResources UP-TO-DATE
+> Task :fineract-avro-schemas:spotlessJson UP-TO-DATE
+> Task :fineract-avro-schemas:spotlessJsonApply UP-TO-DATE
+> Task :fineract-avro-schemas:buildJavaSdk UP-TO-DATE
+> Task :fineract-command:compileJava UP-TO-DATE
+> Task :fineract-validation:compileJava UP-TO-DATE
+> Task :fineract-avro-schemas:compileJava UP-TO-DATE
+> Task :fineract-command:processResources UP-TO-DATE
+> Task :fineract-command:classes UP-TO-DATE
+> Task :fineract-validation:processResources UP-TO-DATE
+> Task :fineract-validation:classes UP-TO-DATE
+> Task :fineract-command:jar UP-TO-DATE
+> Task :fineract-avro-schemas:processResources UP-TO-DATE
+> Task :fineract-avro-schemas:classes UP-TO-DATE
+> Task :fineract-validation:jar UP-TO-DATE
+> Task :fineract-avro-schemas:jar UP-TO-DATE
+> Task :fineract-command-audit:compileJava UP-TO-DATE
+> Task :fineract-command-audit:classes UP-TO-DATE
+> Task :fineract-command-audit:jar UP-TO-DATE
+> Task :fineract-command-jdbc:compileJava UP-TO-DATE
+> Task :fineract-command-jdbc:classes UP-TO-DATE
+> Task :fineract-command-jdbc:jar UP-TO-DATE
+> Task :fineract-mix:processResources NO-SOURCE
+
+> Task :fineract-core:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
+
+> Task :fineract-rates:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
+
+> Task :fineract-tax:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
+
+> Task :fineract-tax:processResources NO-SOURCE
+> Task :fineract-rates:processResources UP-TO-DATE
+> Task :fineract-report:processResources NO-SOURCE
+
+> Task :fineract-cob:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 managed classes from 2 modules
+
+> Task :fineract-cob:processResources NO-SOURCE
+
+> Task :fineract-charge:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
+
+> Task :fineract-charge:processResources UP-TO-DATE
+> Task :fineract-core:compileJava UP-TO-DATE
+> Task :fineract-core:processResources NO-SOURCE
+> Task :fineract-core:classes UP-TO-DATE
+> Task :fineract-core:jar UP-TO-DATE
+> Task :fineract-tax:compileJava UP-TO-DATE
+> Task :fineract-tax:classes UP-TO-DATE
+> Task :fineract-tax:jar UP-TO-DATE
+> Task :fineract-cob:compileJava UP-TO-DATE
+> Task :fineract-cob:classes UP-TO-DATE
+> Task :fineract-cob:jar UP-TO-DATE
+> Task :fineract-charge:compileJava UP-TO-DATE
+> Task :fineract-charge:classes UP-TO-DATE
+> Task :fineract-charge:jar UP-TO-DATE
+
+> Task :fineract-accounting:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
+
+> Task :fineract-rates:compileJava UP-TO-DATE
+> Task :fineract-rates:classes UP-TO-DATE
+> Task :fineract-rates:jar UP-TO-DATE
+> Task :fineract-accounting:compileJava UP-TO-DATE
+> Task :fineract-accounting:processResources UP-TO-DATE
+> Task :fineract-accounting:classes UP-TO-DATE
+
+> Task :fineract-branch:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
+
+> Task :fineract-branch:processResources UP-TO-DATE
+> Task :fineract-document:compileJava UP-TO-DATE
+> Task :fineract-document:classes UP-TO-DATE
+> Task :fineract-document:jar UP-TO-DATE
+> Task :fineract-report:compileJava UP-TO-DATE
+> Task :fineract-report:classes UP-TO-DATE
+> Task :fineract-report:jar UP-TO-DATE
+> Task :fineract-mix:compileJava UP-TO-DATE
+> Task :fineract-mix:classes UP-TO-DATE
+> Task :fineract-mix:jar UP-TO-DATE
+> Task :fineract-accounting:jar
+> Task :fineract-branch:compileJava UP-TO-DATE
+> Task :fineract-branch:classes UP-TO-DATE
+> Task :fineract-branch:jar UP-TO-DATE
+
+> Task :fineract-security:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-security with 42 managed classes from 2 modules
+
+> Task :fineract-security:compileJava UP-TO-DATE
+> Task :fineract-security:processResources NO-SOURCE
+> Task :fineract-security:classes UP-TO-DATE
+> Task :fineract-security:jar UP-TO-DATE
+
+> Task :fineract-savings:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
+
+> Task :fineract-savings:compileJava UP-TO-DATE
+> Task :fineract-savings:processResources UP-TO-DATE
+> Task :fineract-savings:classes UP-TO-DATE
+> Task :fineract-savings:jar UP-TO-DATE
+
+> Task :fineract-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-loan with 114 managed classes from 7 modules
+
+> Task :fineract-loan:compileJava UP-TO-DATE
+> Task :fineract-loan:processResources UP-TO-DATE
+> Task :fineract-loan:classes UP-TO-DATE
+> Task :fineract-loan:jar UP-TO-DATE
+
+> Task :fineract-investor:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-investor with 122 managed classes from 8 modules
+
+> Task :fineract-investor:compileJava UP-TO-DATE
+> Task :fineract-investor:processResources UP-TO-DATE
+> Task :fineract-investor:classes UP-TO-DATE
+> Task :fineract-investor:jar UP-TO-DATE
+
+> Task :fineract-progressive-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-progressive-loan with 117 managed classes from 8 modules
+
+> Task :fineract-progressive-loan:compileJava UP-TO-DATE
+> Task :fineract-progressive-loan:processResources UP-TO-DATE
+> Task :fineract-progressive-loan:classes UP-TO-DATE
+> Task :fineract-progressive-loan:jar UP-TO-DATE
+
+> Task :fineract-working-capital-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-working-capital-loan with 139 managed classes from 8 modules
+
+> Task :fineract-working-capital-loan:compileJava UP-TO-DATE
+
+> Task :fineract-loan-origination:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-loan-origination with 142 managed classes from 9 modules
+
+> Task :fineract-working-capital-loan:processResources UP-TO-DATE
+> Task :fineract-working-capital-loan:classes UP-TO-DATE
+> Task :fineract-loan-origination:processResources UP-TO-DATE
+> Task :fineract-working-capital-loan:jar UP-TO-DATE
+> Task :fineract-loan-origination:compileJava UP-TO-DATE
+> Task :fineract-loan-origination:classes UP-TO-DATE
+> Task :fineract-loan-origination:jar UP-TO-DATE
+
+> Task :fineract-provider:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
+
+> Task :fineract-provider:compileJava UP-TO-DATE
+> Task :fineract-provider:generateGitProperties
+> Task :fineract-provider:generateRebelMain UP-TO-DATE
+> Task :fineract-provider:processResources UP-TO-DATE
+> Task :fineract-provider:classes
+> Task :fineract-provider:prepareInputYaml UP-TO-DATE
+> Task :fineract-provider:resolve
+> Task :fineract-provider:resolveMainClassName UP-TO-DATE
+> Task :fineract-provider:bootJar
+
+> Task :fineract-provider:jibDockerBuild
+
+Containerizing application to Docker daemon as [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m...
+Base image 'azul/zulu-openjdk-alpine:21' does not use a specific image digest - build may not be reproducible
+[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> building image to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> trying mirrors[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> launching application layer builders[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[8A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m> building jvm arg files layer[0m
+[1m[0m
+[9A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===                           ] 9.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[8A[0J
+[1A[1mExecuting tasks:[0m
+[1m[====                          ] 13.0% complete[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=====                         ] 17.0% complete[0m
+[1m> building project dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[======                        ] 21.0% complete[0m
+[1m> pulling base image manifest and container config[0m
+[1m> building resources layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========                      ] 25.0% complete[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1AThe base image requires auth. Trying again for azul/zulu-openjdk-alpine:21...
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry-1.docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry.hub.docker.com
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: index.docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[4A[0J
+[1AUsing base image with digest: sha256:79fcb5d91dc3864f72739c3861a057ff51289c84c92b2b2a6ea056673200db8e
+[1mExecuting tasks:[0m
+[1m[=========                     ] 30.0% complete[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========                    ] 32.5% complete[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========                    ] 32.5% complete[0m
+[1m> pulling platform-specific manifests and conta...[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========                    ] 33.8% complete[0m
+[1m> pulling platform-specific manifests and conta...[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========                    ] 33.8% complete[0m
+[1m> pull container configuration sha256:f23f898eb...[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 35.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> building image to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> scheduling obtaining base images layers[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> launching base image layer pullers[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.0% complete[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1A
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1AContainer entrypoint set to [java, -cp, @/app/jib-classpath-file, org.apache.fineract.ServerApplication]
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1AContainer program arguments set to [-Duser.home=/tmp, -Dfile.encoding=UTF-8, -Duser.timezone=UTC, -Djava.security.egd=file:/dev/./urandom]
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.0% complete[0m
+[1m> building image to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 81.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 86.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 88.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 88.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 91.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 96.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 96.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 97.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 97.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 98.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============================] 98.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============================] 99.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============================] 99.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1A
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1ABuilt image to Docker daemon as [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+
+[Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 22s
+96 actionable tasks: 20 executed, 76 up-to-date
+EXIT=0

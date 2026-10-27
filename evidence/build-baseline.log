@@ -1,0 +1,1066 @@
+openjdk version "17.0.14" 2025-01-21
+OpenJDK Runtime Environment Homebrew (build 17.0.14+0)
+OpenJDK 64-Bit Server VM Homebrew (build 17.0.14+0, mixed mode, sharing)
+
+------------------------------------------------------------
+Gradle 8.14.5
+------------------------------------------------------------
+
+Build time:    2026-05-07 11:03:29 UTC
+Revision:      62345becae08b13e793521816d585102fea66398
+
+Kotlin:        2.0.21
+Groovy:        3.0.25
+Ant:           Apache Ant(TM) version 1.10.15 compiled on August 25 2024
+Launcher JVM:  21.0.9 (Microsoft 21.0.9+10-LTS)
+Daemon JVM:    /Users/sopia/Library/Java/JavaVirtualMachines/ms-21.0.9/Contents/Home (no JDK specified, using current Java home)
+OS:            Mac OS X 26.2 aarch64
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy UP-TO-DATE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :
+matching ref: TAG - 1.15.0
+  ref configuration: TAG - pattern: (\d+\.\d+\.\d+)
+    version: ${describe.tag.version.major}.${describe.tag.version.minor}.${describe.tag.version.patch}
+    describeTagPattern: .*(\d+\.\d+\.\d+).*
+    describeTagFirstParent: false
+
+project version: 1.15.0
+
+> Task :spotlessInternalRegisterDependencies
+> Task :fineract-document:processResources NO-SOURCE
+> Task :fineract-command-audit:processResources
+> Task :fineract-command-jdbc:processResources
+> Task :fineract-avro-schemas:preprocessAvroSchemas
+> Task :fineract-avro-schemas:spotlessJson
+> Task :fineract-avro-schemas:spotlessJsonApply
+
+> Task :fineract-charge:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
+
+> Task :fineract-rates:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
+
+> Task :fineract-tax:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
+
+> Task :fineract-branch:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
+
+> Task :fineract-tax:processResources NO-SOURCE
+> Task :fineract-branch:processResources
+> Task :fineract-rates:processResources
+> Task :fineract-charge:processResources
+> Task :fineract-mix:processResources NO-SOURCE
+
+> Task :fineract-accounting:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
+
+> Task :fineract-accounting:processResources
+> Task :fineract-report:processResources NO-SOURCE
+
+> Task :fineract-cob:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 managed classes from 2 modules
+
+> Task :fineract-cob:processResources NO-SOURCE
+
+> Task :fineract-core:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
+
+> Task :fineract-core:processResources NO-SOURCE
+
+> Task :fineract-investor:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-investor with 122 managed classes from 8 modules
+
+> Task :fineract-investor:processResources
+
+> Task :fineract-security:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-security with 42 managed classes from 2 modules
+
+> Task :fineract-security:processResources NO-SOURCE
+
+> Task :fineract-savings:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
+
+> Task :fineract-savings:processResources
+
+> Task :fineract-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-loan with 114 managed classes from 7 modules
+
+> Task :fineract-loan:processResources
+
+> Task :fineract-progressive-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-progressive-loan with 117 managed classes from 8 modules
+
+> Task :fineract-progressive-loan:processResources
+
+> Task :fineract-loan-origination:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-loan-origination with 142 managed classes from 9 modules
+
+> Task :fineract-loan-origination:processResources
+
+> Task :fineract-working-capital-loan:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-working-capital-loan with 139 managed classes from 8 modules
+
+> Task :fineract-working-capital-loan:processResources
+
+> Task :fineract-provider:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
+
+> Task :fineract-provider:generateGitProperties
+> Task :fineract-provider:generateRebelMain
+> Task :fineract-provider:processResources
+> Task :fineract-avro-schemas:buildJavaSdk
+> Task :fineract-validation:compileJava
+> Task :fineract-validation:processResources
+> Task :fineract-validation:classes
+> Task :fineract-validation:jar
+> Task :fineract-command:compileJava
+> Task :fineract-command:processResources
+> Task :fineract-command:classes
+> Task :fineract-command:jar
+> Task :fineract-command-audit:compileJava
+> Task :fineract-command-audit:classes
+> Task :fineract-command-audit:jar
+> Task :fineract-avro-schemas:compileJava
+> Task :fineract-avro-schemas:processResources
+> Task :fineract-avro-schemas:classes
+> Task :fineract-avro-schemas:jar
+> Task :fineract-command-jdbc:compileJava
+> Task :fineract-command-jdbc:classes
+> Task :fineract-command-jdbc:jar
+
+> Task :fineract-core:compileJava
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-core/src/main/java/org/apache/fineract/infrastructure/core/service/database/JavaType.java:364: warning: [deprecation] Date(String) in Date has been deprecated
+            case DATE -> new Date(s);
+                         ^
+1 warning
+
+> Task :fineract-core:classes
+> Task :fineract-core:jar
+> Task :fineract-tax:compileJava
+> Task :fineract-tax:classes
+> Task :fineract-tax:jar
+> Task :fineract-mix:compileJava
+> Task :fineract-mix:classes
+> Task :fineract-mix:jar
+> Task :fineract-charge:compileJava
+> Task :fineract-charge:classes
+> Task :fineract-charge:jar
+> Task :fineract-cob:compileJava
+> Task :fineract-cob:classes
+> Task :fineract-cob:jar
+> Task :fineract-accounting:compileJava
+> Task :fineract-accounting:classes
+> Task :fineract-accounting:jar
+> Task :fineract-report:compileJava
+> Task :fineract-report:classes
+> Task :fineract-report:jar
+> Task :fineract-rates:compileJava
+> Task :fineract-rates:classes
+> Task :fineract-rates:jar
+> Task :fineract-branch:compileJava
+> Task :fineract-branch:classes
+> Task :fineract-branch:jar
+> Task :fineract-savings:compileJava
+> Task :fineract-savings:classes
+> Task :fineract-savings:jar
+> Task :fineract-security:compileJava
+> Task :fineract-security:classes
+> Task :fineract-security:jar
+
+> Task :fineract-document:compileJava
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+@RequiredArgsConstructor
+^
+25 warnings
+
+> Task :fineract-document:classes
+> Task :fineract-document:jar
+> Task :fineract-loan:compileJava
+> Task :fineract-loan:classes
+> Task :fineract-loan:jar
+> Task :fineract-investor:compileJava
+> Task :fineract-investor:classes
+> Task :fineract-investor:jar
+> Task :fineract-progressive-loan:compileJava
+> Task :fineract-progressive-loan:classes
+> Task :fineract-progressive-loan:jar
+> Task :fineract-working-capital-loan:compileJava
+> Task :fineract-working-capital-loan:classes
+> Task :fineract-working-capital-loan:jar
+> Task :fineract-loan-origination:compileJava
+> Task :fineract-loan-origination:classes
+> Task :fineract-loan-origination:jar
+
+> Task :fineract-provider:compileJava
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/migration/TenantDatabaseUpgradeService.java:91: warning: [deprecation] ThreadLocalScopeManager in liquibase has been deprecated
+            Scope.setScopeManager(new ThreadLocalScopeManager());
+                                      ^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/hooks/service/HookReadPlatformServiceImpl.java:104: warning: [removal] HookEventResultSetExtractor in org.apache.fineract.infrastructure.hooks.domain has been deprecated and marked for removal
+        final HookEventResultSetExtractor extractor = new HookEventResultSetExtractor();
+              ^
+/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/hooks/service/HookReadPlatformServiceImpl.java:104: warning: [removal] HookEventResultSetExtractor in org.apache.fineract.infrastructure.hooks.domain has been deprecated and marked for removal
+        final HookEventResultSetExtractor extractor = new HookEventResultSetExtractor();
+                                                          ^
+3 warnings
+
+> Task :fineract-provider:classes
+
+> Task :fineract-provider:jibBuildTar
+
+Containerizing application to file at '/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-provider/build/jib-image.tar'...
+Base image 'azul/zulu-openjdk-alpine:21' does not use a specific image digest - build may not be reproducible
+[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> building image to tar file[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[                              ] 0.0% complete[0m
+[1m> trying mirrors[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> launching application layer builders[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m> building jvm arg files layer[0m
+[1m[0m
+[9A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[8A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m> building jvm arg files layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[9A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===                           ] 9.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[8A[0J
+[1A[1mExecuting tasks:[0m
+[1m[====                          ] 13.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building classes layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=====                         ] 17.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1AThe base image requires auth. Trying again for azul/zulu-openjdk-alpine:21...
+[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry-1.docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry.hub.docker.com
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: index.docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: docker.io
+
+Got output:
+
+credentials not found in native keychain
+
+[1mExecuting tasks:[0m
+[1m[=======                       ] 22.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m> building classes layer[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========                      ] 26.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========                      ] 26.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[5A[0J
+[1AUsing base image with digest: sha256:79fcb5d91dc3864f72739c3861a057ff51289c84c92b2b2a6ea056673200db8e
+[1mExecuting tasks:[0m
+[1m[========                      ] 26.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 28.5% complete[0m
+[1m> building dependencies layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 28.5% complete[0m
+[1m> building dependencies layer[0m
+[1m> pulling platform-specific manifests and conta...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 29.8% complete[0m
+[1m> building dependencies layer[0m
+[1m> pulling platform-specific manifests and conta...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 29.8% complete[0m
+[1m> building dependencies layer[0m
+[1m> pull container configuration sha256:f23f898eb...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========                     ] 31.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building dependencies layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> scheduling obtaining base images layers[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> launching base image layer pullers[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========                   ] 36.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[7A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 40.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============                  ] 41.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=============                 ] 41.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=============                 ] 44.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=============                 ] 44.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============                ] 48.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:d3531b7a4f217...[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[6A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 51.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 51.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 55.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:40e66a5ed5019...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1A
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1AContainer entrypoint set to [java, -cp, @/app/jib-classpath-file, org.apache.fineract.ServerApplication]
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1AContainer program arguments set to [-Duser.home=/tmp, -Dfile.encoding=UTF-8, -Duser.timezone=UTC, -Djava.security.egd=file:/dev/./urandom]
+[1mExecuting tasks:[0m
+[1m[==================            ] 60.0% complete[0m
+[1m> building image format[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.0% complete[0m
+[1m> building image to tar file[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.0% complete[0m
+[1m> writing to tar file[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1A
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1ABuilt image tarball at [36m/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/fineract-provider/build/jib-image.tar[0m
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1A
+[33mA new version of jib-gradle-plugin (3.5.4) is available (currently using 3.5.3). Update your build configuration to use the latest features and fixes!
+https://github.com/GoogleContainerTools/jib/blob/master/jib-gradle-plugin/CHANGELOG.md[0m
+
+Please see https://github.com/GoogleContainerTools/jib/blob/master/docs/privacy.md for info on disabling this update check.
+
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+
+[Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 7m 35s
+92 actionable tasks: 84 executed, 8 up-to-date
+EXIT=0
