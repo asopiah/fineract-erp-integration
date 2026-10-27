@@ -14,7 +14,8 @@ same reference, different payload      409 IDEMPOTENCY_CONFLICT
 =====================================  =================================================================
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any
 
@@ -144,7 +145,7 @@ class PartnerService:
         reserve: Reserve | None = None,
         key_taken: Callable[[], ApiError] | None = None,
     ) -> Outcome:
-        with self._session_factory() as session:
+        with self._session_factory() as session, _translating_taken_keys(key_taken):
             try:
                 claim = operation_store.claim(
                     session,
@@ -158,19 +159,11 @@ class PartnerService:
                 )
             except ReferenceReusedError as error:
                 raise ApiError(409, ErrorCode.IDEMPOTENCY_CONFLICT, str(error)) from error
-            except BusinessKeyTakenError as error:
-                if key_taken is None:
-                    raise
-                raise key_taken() from error
 
         executed = claim.is_new or self._lease_failed_for_retry(claim.operation_id)
         if executed:
-            try:
+            with _translating_taken_keys(key_taken):
                 self._executor.execute(claim.operation_id)
-            except BusinessKeyTakenError as error:
-                if key_taken is None:
-                    raise
-                raise key_taken() from error
         return self._outcome(claim.operation_id, executed)
 
     def _lease_failed_for_retry(self, operation_id: int) -> bool:
@@ -209,6 +202,17 @@ class PartnerService:
         held_by = f" by {holder.external_reference}" if holder is not None else ""
         noun = "approved" if operation_type is OperationType.LOAN_APPROVAL else "disbursed"
         return ApiError(409, code, f"loan {reference} is already {noun}{held_by}")
+
+
+@contextmanager
+def _translating_taken_keys(key_taken: Callable[[], ApiError] | None) -> Iterator[None]:
+    """A business key taken by another operation becomes the use case's own 409 (e.g. LOAN_ALREADY_DISBURSED)."""
+    try:
+        yield
+    except BusinessKeyTakenError as error:
+        if key_taken is None:
+            raise
+        raise key_taken() from error
 
 
 def pending_body(operation: Operation, detail: str) -> dict[str, Any]:
