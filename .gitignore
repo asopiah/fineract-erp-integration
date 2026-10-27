@@ -1,0 +1,15 @@
+# Upstream Fineract checkout (tag 1.15.0); the customization ships as a patch
+upstream/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local
+.DS_Store
+.env
+*.tar
