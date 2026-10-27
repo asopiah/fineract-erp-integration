@@ -33,7 +33,9 @@ integration_service = ["migrations/*.py", "migrations/*.mako", "migrations/versi
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+pythonpath = ["."]
+# Stack tests drive the running docker compose stack; select them with `-m stack`.
+addopts = "-ra --strict-markers -m 'not stack'"
 markers = [
     "stack: needs the running docker compose stack (customized Fineract and Mock ERP)",
 ]

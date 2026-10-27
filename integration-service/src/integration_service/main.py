@@ -37,8 +37,8 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
 
     app = FastAPI(title="Integration Service", version="1.0.0", description=DESCRIPTION, lifespan=lifespan)
     app.state.services = services
-    install_correlation_middleware(app)
     install_error_handlers(app)
+    install_correlation_middleware(app)  # added last, so outermost: it wraps the error rendering
 
     @app.get("/health", tags=["health"])
     def health() -> dict[str, str]:

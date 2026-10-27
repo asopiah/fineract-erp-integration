@@ -9,6 +9,7 @@ Repairs are explicit and separate: ``POST /api/admin/recovery`` re-drives pendin
 """
 
 from collections import Counter
+from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
@@ -20,10 +21,9 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from integration_service.domain.erp import ErpJournalEntry
 from integration_service.domain.fineract import FineractLoanTransaction, LoanTransactionType
-from integration_service.domain.operations import OperationType
 from integration_service.gateways.erp import ErpGateway
 from integration_service.gateways.fineract import FineractGateway
-from integration_service.models import Loan, LoanTransaction, Operation
+from integration_service.models import Loan
 
 MIRRORED_TYPES = frozenset({LoanTransactionType.DISBURSEMENT, LoanTransactionType.REPAYMENT})
 
@@ -91,22 +91,16 @@ class Reconciler:
                 "to_date": criteria.to_date.isoformat() if criteria.to_date else None,
                 "external_references": sorted(criteria.external_references) if criteria.external_references else None,
             },
-            "summary": {outcome.value: count for outcome, count in Counter(item["outcome"] for item in items).items()},
+            "summary": dict(Counter(item["outcome"] for item in items)),
             "items": items,
         }
 
     def _by_dates(self, from_date: date, to_date: date) -> tuple[dict[str, FineractSide], dict[str, ErpJournalEntry]]:
-        with self._session_factory() as session:
-            loan_references = list(
-                session.scalars(select(Loan.loan_reference).where(Loan.fineract_loan_id.isnot(None)))
-            )
-        fineract_side: dict[str, FineractSide] = {}
-        for loan_reference in loan_references:
-            loan = self._fineract.find_loan(loan_reference)
-            for transaction in loan.transactions if loan is not None else ():
-                if transaction.type in MIRRORED_TYPES and from_date <= transaction.transaction_date <= to_date:
-                    key = transaction.external_reference or f"(no external reference) {loan_reference}"
-                    fineract_side[key] = FineractSide(loan_reference, transaction)
+        fineract_side = {
+            _key(side): side
+            for side in self._fineract_transactions()
+            if from_date <= side.transaction.transaction_date <= to_date
+        }
         erp_side = {
             entry.external_reference: entry
             for entry in self._erp.list_journal_entries(from_date, to_date)
@@ -115,40 +109,31 @@ class Reconciler:
         return fineract_side, erp_side
 
     def _by_references(self, references: frozenset[str]) -> tuple[dict[str, FineractSide], dict[str, ErpJournalEntry]]:
-        with self._session_factory() as session:
-            loans_by_reference = _loans_by_reference(session, references)
-        fineract_side: dict[str, FineractSide] = {}
+        fineract_side = {_key(side): side for side in self._fineract_transactions() if _key(side) in references}
         erp_side: dict[str, ErpJournalEntry] = {}
         for reference in references:
-            loan_reference = loans_by_reference.get(reference)
-            if loan_reference is not None:
-                transaction = self._fineract.find_loan_transaction(loan_reference, reference)
-                if transaction is not None:
-                    fineract_side[reference] = FineractSide(loan_reference, transaction)
             entry = self._erp.find_journal_entry(reference)
             if entry is not None:
                 erp_side[reference] = entry
         return fineract_side, erp_side
 
+    def _fineract_transactions(self) -> Iterator[FineractSide]:
+        """Money transactions on every loan the integration originated, including ones posted directly in Fineract.
 
-def _loans_by_reference(session: Session, references: frozenset[str]) -> dict[str, str]:
-    """Which loan each money reference belongs to, from what was requested or recorded."""
-    requested = session.execute(
-        select(Operation.external_reference, Operation.loan_reference).where(
-            Operation.external_reference.in_(references),
-            Operation.type.in_((OperationType.DISBURSEMENT, OperationType.REPAYMENT)),
-        )
-    ).tuples()
-    recorded = session.execute(
-        select(LoanTransaction.external_reference, LoanTransaction.loan_reference).where(
-            LoanTransaction.external_reference.in_(references)
-        )
-    ).tuples()
-    loans: dict[str, str] = {}
-    for reference, loan_reference in [*requested, *recorded]:
-        if loan_reference is not None:
-            loans[reference] = loan_reference
-    return loans
+        Fineract finds a transaction by external id only within a loan, so each loan is read once.
+        """
+        with self._session_factory() as session:
+            in_fineract = select(Loan.loan_reference).where(Loan.fineract_loan_id.isnot(None)).order_by(Loan.id)
+            loan_references = list(session.scalars(in_fineract))
+        for loan_reference in loan_references:
+            loan = self._fineract.find_loan(loan_reference)
+            for transaction in loan.transactions if loan is not None else ():
+                if transaction.type in MIRRORED_TYPES:
+                    yield FineractSide(loan_reference, transaction)
+
+
+def _key(side: FineractSide) -> str:
+    return side.transaction.external_reference or f"(no external reference, {side.loan_reference})"
 
 
 def _item(
