@@ -1,0 +1,960 @@
+{
+  "info": {
+    "name": "Fineract ERP integration",
+    "description": "Loan lifecycle through the partner API. Run top to bottom; every run uses fresh references. The simulations (make simulate) are the primary evidence; this collection supports manual exploration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:58090"
+    },
+    {
+      "key": "token",
+      "value": "integration-local-token"
+    },
+    {
+      "key": "run",
+      "value": ""
+    },
+    {
+      "key": "loanReference",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('run')) { pm.collectionVariables.set('run', Date.now().toString(36).toUpperCase()); }"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sync GL accounts from the ERP",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/sync",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accounts",
+            "sync"
+          ]
+        },
+        "description": "Create-only; repeating it is harmless.",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create client",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "clients"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"CLI-{{run}}\",\n  \"client_uid\": \"SME-{{run}}\",\n  \"first_name\": \"Amina\",\n  \"last_name\": \"Uwase\",\n  \"activation_date\": \"2026-01-10\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create client again (replay)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "clients"
+          ]
+        },
+        "description": "Same reference and payload: the original result, 200.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"CLI-{{run}}\",\n  \"client_uid\": \"SME-{{run}}\",\n  \"first_name\": \"Amina\",\n  \"last_name\": \"Uwase\",\n  \"activation_date\": \"2026-01-10\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Find client",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/clients/SME-{{run}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "clients",
+            "SME-{{run}}"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "pm.test('active with the right name', () => { const f = pm.response.json().fineract; pm.expect(f.active).to.be.true; pm.expect(f.name_matches).to.be.true; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apply for a loan",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"APP-{{run}}\",\n  \"client_uid\": \"SME-{{run}}\",\n  \"principal\": \"5000000\",\n  \"annual_interest_rate\": \"18\",\n  \"term_months\": 12,\n  \"submitted_on\": \"2026-01-15\",\n  \"expected_disbursement_on\": \"2026-01-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));",
+              "pm.collectionVariables.set('loanReference', pm.response.json().loan_reference);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Approve",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "approve"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"APR-{{run}}\",\n  \"approved_on\": \"2026-01-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disburse",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/disburse",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "disburse"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"DISB-{{run}}\",\n  \"amount\": \"5000000\",\n  \"transaction_date\": \"2026-01-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disburse with another reference (refused)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/disburse",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "disburse"
+          ]
+        },
+        "description": "One disbursement per loan.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"DISB-{{run}}-B\",\n  \"amount\": \"5000000\",\n  \"transaction_date\": \"2026-01-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (409,)', () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Repayment 1",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/repayments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "repayments"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"REP-{{run}}-1\",\n  \"amount\": \"458400\",\n  \"transaction_date\": \"2026-02-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200, 202)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200, 202]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Repayment 2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/repayments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "repayments"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"REP-{{run}}-2\",\n  \"amount\": \"458400\",\n  \"transaction_date\": \"2026-03-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200, 202)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200, 202]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Repayment 3",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/repayments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "repayments"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"REP-{{run}}-3\",\n  \"amount\": \"458400\",\n  \"transaction_date\": \"2026-04-15\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200, 202)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200, 202]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Loan (live from Fineract)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "pm.collectionVariables.set('payoff', pm.response.json().outstanding.total);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Final payoff",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}/repayments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}",
+            "repayments"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_reference\": \"REP-{{run}}-FINAL\",\n  \"amount\": \"{{payoff}}\",\n  \"transaction_date\": \"2026-10-27\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (201, 200, 202)', () => pm.expect(pm.response.code).to.be.oneOf([201, 200, 202]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Loan is closed",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/loans/{{loanReference}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "{{loanReference}}"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "pm.test('closed', () => pm.expect(pm.response.json().status).to.eql('CLOSED'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "What happened to the final payoff",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/transactions/REP-{{run}}-FINAL",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "transactions",
+            "REP-{{run}}-FINAL"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reconcile this loan's transactions",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/reconciliation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reconciliation"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"external_references\": [\n    \"DISB-{{run}}\",\n    \"REP-{{run}}-1\",\n    \"REP-{{run}}-2\",\n    \"REP-{{run}}-3\",\n    \"REP-{{run}}-FINAL\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "pm.test('all matched', () => pm.expect(pm.response.json().summary).to.eql({MATCHED: 5}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operations needing a human",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/operations?status=NEEDS_RECONCILIATION",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "operations"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "NEEDS_RECONCILIATION"
+            }
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Run recovery now",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "X-Correlation-ID",
+            "value": "postman-{{run}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/recovery",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "recovery"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status (200,)', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
