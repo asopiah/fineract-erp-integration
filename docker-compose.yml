@@ -84,5 +84,49 @@ services:
       timeout: 3s
       retries: 20
 
+  integration-service:
+    build: ./integration-service
+    image: fineract-erp/integration-service:local
+    # A crash (simulation J5) is followed by a restart; the startup recovery sweep finishes interrupted operations.
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      fineract:
+        condition: service_healthy
+      mock-erp:
+        condition: service_healthy
+    environment:
+      INTEGRATION_DATABASE_URL: postgresql+psycopg://integration:integration@postgres:5432/integration
+      INTEGRATION_API_TOKEN: ${INTEGRATION_API_TOKEN:-integration-local-token}
+      INTEGRATION_FINERACT_URL: http://fineract:8080/fineract-provider/api/v1
+      INTEGRATION_FINERACT_USERNAME: integration_api
+      INTEGRATION_FINERACT_PASSWORD: ${FINERACT_API_PASSWORD:-Integration#2026}
+      INTEGRATION_ERP_URL: http://mock-erp:8000
+      INTEGRATION_ERP_API_TOKEN: ${ERP_API_TOKEN:-erp-local-token}
+      INTEGRATION_LEASE_SECONDS: "20"
+      INTEGRATION_FAULT_INJECTION_ENABLED: ${FAULT_INJECTION_ENABLED:-true}
+    ports:
+      - "${INTEGRATION_HOST_PORT:-58090}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  # One-shot: configures the empty Fineract (office, currency, role, user, GL sync, loan product). Idempotent.
+  bootstrap:
+    image: fineract-erp/integration-service:local
+    command: ["python", "-m", "integration_service.bootstrap"]
+    restart: "no"
+    depends_on:
+      integration-service:
+        condition: service_healthy
+    environment:
+      BOOTSTRAP_FINERACT_URL: http://fineract:8080/fineract-provider/api/v1
+      BOOTSTRAP_API_PASSWORD: ${FINERACT_API_PASSWORD:-Integration#2026}
+      BOOTSTRAP_INTEGRATION_URL: http://integration-service:8000
+      BOOTSTRAP_INTEGRATION_API_TOKEN: ${INTEGRATION_API_TOKEN:-integration-local-token}
+
 volumes:
   postgres-data:
