@@ -21,7 +21,8 @@ help: ## List targets
 # --- Stack ---------------------------------------------------------------------------------------------------------
 
 .PHONY: up
-up: ## Start and configure the whole stack (builds what is missing), then wait until it is ready
+up: ## Start and configure the whole stack (Fineract is built only if its image is missing), then wait until ready
+	docker compose build mock-erp integration-service
 	docker compose up -d --wait postgres fineract mock-erp integration-service
 	docker compose up bootstrap --exit-code-from bootstrap
 
@@ -47,13 +48,13 @@ fineract-image: fineract-patch ## Build the customized Fineract image with the h
 	$(GRADLE) :fineract-provider:jibDockerBuild -x test -Djib.to.image=$(FINERACT_IMAGE)
 
 .PHONY: test-java
-test-java: fineract-patch ## Java unit tests for the customization
-	$(GRADLE) :fineract-core:test $(GL_UNIT_TESTS) :fineract-accounting:test $(GL_UNIT_TESTS)
+test-java: fineract-patch ## Java unit tests for the customization (always re-run, never cached)
+	$(GRADLE) :fineract-core:test --rerun $(GL_UNIT_TESTS) :fineract-accounting:test --rerun $(GL_UNIT_TESTS)
 
 .PHONY: test-java-it
 test-java-it: fineract-patch ## Java integration tests against the running stack
 	cd $(FINERACT_DIR) && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=$${FINERACT_HOST_PORT:-58080} \
-		./gradlew :integration-tests:test $(GL_IT_TESTS) -PcargoDisabled --max-workers=2
+		./gradlew :integration-tests:test --rerun $(GL_IT_TESTS) -PcargoDisabled --max-workers=2
 
 # --- Python ------------------------------------------------------------------------------------------------------
 

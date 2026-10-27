@@ -1,0 +1,102 @@
+newman
+
+Fineract ERP integration
+
+→ Health
+  GET http://localhost:58090/health [200 OK, 176B, 32ms]
+  ✓  status (200,)
+
+→ Sync GL accounts from the ERP
+  POST http://localhost:58090/api/accounts/sync [200 OK, 1.73kB, 41ms]
+  ✓  status (200,)
+
+→ Create client
+  POST http://localhost:58090/api/clients [201 Created, 273B, 397ms]
+  ✓  status (201, 200)
+
+→ Create client again (replay)
+  POST http://localhost:58090/api/clients [200 OK, 268B, 6ms]
+  ✓  status (200,)
+
+→ Find client
+  GET http://localhost:58090/api/clients/SME-MVQ1JZS0 [200 OK, 376B, 107ms]
+  ✓  status (200,)
+  ✓  active with the right name
+
+→ Apply for a loan
+  POST http://localhost:58090/api/loans [201 Created, 401B, 373ms]
+  ✓  status (201, 200)
+
+→ Approve
+  POST http://localhost:58090/api/loans/LN-2026-000025/approve [201 Created, 264B, 459ms]
+  ✓  status (201, 200)
+
+→ Disburse
+  POST http://localhost:58090/api/loans/LN-2026-000025/disburse [201 Created, 486B, 415ms]
+  ✓  status (201, 200)
+
+→ Disburse with another reference (refused)
+  POST http://localhost:58090/api/loans/LN-2026-000025/disburse [409 Conflict, 317B, 9ms]
+  ✓  status (409,)
+
+→ Repayment 1
+  POST http://localhost:58090/api/loans/LN-2026-000025/repayments [201 Created, 492B, 401ms]
+  ✓  status (201, 200, 202)
+
+→ Repayment 2
+  POST http://localhost:58090/api/loans/LN-2026-000025/repayments [201 Created, 492B, 532ms]
+  ✓  status (201, 200, 202)
+
+→ Repayment 3
+  POST http://localhost:58090/api/loans/LN-2026-000025/repayments [201 Created, 492B, 481ms]
+  ✓  status (201, 200, 202)
+
+→ Loan (live from Fineract)
+  GET http://localhost:58090/api/loans/LN-2026-000025 [200 OK, 2.02kB, 162ms]
+  ✓  status (200,)
+
+→ Final payoff
+  POST http://localhost:58090/api/loans/LN-2026-000025/repayments [201 Created, 493B, 404ms]
+  ✓  status (201, 200, 202)
+
+→ Loan is closed
+  GET http://localhost:58090/api/loans/LN-2026-000025 [200 OK, 2.33kB, 104ms]
+  ✓  status (200,)
+  ✓  closed
+
+→ What happened to the final payoff
+  GET http://localhost:58090/api/transactions/REP-MVQ1JZS0-FINAL [200 OK, 923B, 4ms]
+  ✓  status (200,)
+
+→ Reconcile this loan's transactions
+  POST http://localhost:58090/api/reconciliation [200 OK, 1.88kB, 3s]
+  ✓  status (200,)
+  ✓  all matched
+
+→ Operations needing a human
+  GET http://localhost:58090/api/admin/operations?status=NEEDS_RECONCILIATION [200 OK, 162B, 7ms]
+  ✓  status (200,)
+
+→ Run recovery now
+  POST http://localhost:58090/api/admin/recovery [200 OK, 209B, 5ms]
+  ✓  status (200,)
+
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │               19 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │               19 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │               19 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │               22 │                0 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 7.2s                                      │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 10.67kB (approx)                         │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 367ms [min: 4ms, max: 3s, s.d.: 657ms] │
+└───────────────────────────────────────────────────────────────┘

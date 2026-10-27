@@ -119,7 +119,44 @@ SQLAlchemy 2.0 is used with typed mappings, and Alembic for the integration serv
 
 ## What happened to FIN-2026-000001?
 
-<!-- FIN-TRACE: filled in from the trace simulation of the final evidence run -->
+Recorded in the final evidence run (simulation *Tracing FIN-2026-000001* in [SIMULATIONS.md](SIMULATIONS.md)). The
+partner sent a repayment with `X-Correlation-ID: partner-FIN-2026-000001` while the ERP was briefly unavailable.
+
+**Step 1: one API call.** `GET /api/transactions/FIN-2026-000001` returns the status, Fineract's record, the ERP
+entry, and the correlation id to search the logs for:
+
+```json
+{"external_reference": "FIN-2026-000001", "type": "REPAYMENT", "loan_reference": "LN-2026-000012",
+ "status": "COMPLETED", "correlation_id": "partner-FIN-2026-000001", "attempts": 0, "error": null,
+ "recorded": {"amount": "458400", "principal_portion": "383400", "interest_portion": "75000",
+              "outstanding_after": "4616600", "erp_entry_number": "JE-000032"}}
+```
+
+**Step 2: the logs.** Filter every service's JSON logs on that correlation id (or on `external_reference`):
+
+```bash
+docker compose logs --no-log-prefix integration-service mock-erp | grep partner-FIN-2026-000001
+```
+
+| time (UTC) | service | event | status | fineract_transaction_id | erp_transaction_id |
+| --- | --- | --- | --- | --- | --- |
+| 02:01:28.770 | integration-service | operation fineract_pending | FINERACT_PENDING | | |
+| 02:01:29.391 | integration-service | submitted to Fineract | FINERACT_PENDING | | |
+| 02:01:29.413 | integration-service | operation fineract_done | FINERACT_DONE | 44 | |
+| 02:01:29.421 | integration-service | operation erp_pending | ERP_PENDING | | |
+| 02:01:29.438 | integration-service | deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable | ERP_PENDING | | |
+| 02:01:31.675 | mock-erp | journal entry posted | POSTED | | JE-000032 |
+| 02:01:31.681 | integration-service | operation completed | COMPLETED | | JE-000032 |
+
+**Reading it:**
+
+* Fineract recorded the repayment in 0.6 s (its transaction 44, split 383,400 principal and 75,000 interest).
+* The ERP was down, so the posting was deferred; the partner received 202 `ERP_PENDING`.
+* 2.2 s later, recovery posted entry `JE-000032`.
+
+The ERP's own log line carries the same correlation id because the integration forwards it, and recovery logs under
+the partner's original id because it is stored on the operation. Every line also carries `external_reference`,
+`client_uid` and `loan_reference`; they are omitted from the table for width.
 
 ## Found in review
 

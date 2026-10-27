@@ -27,7 +27,10 @@ services:
       retries: 30
 
   fineract:
+    # Built from source with the patch (fineract-customization/Dockerfile) only if the image is missing;
+    # `make fineract-image` builds the same image faster with a local JDK.
     image: ${FINERACT_IMAGE:-fineract-gl-sync:1.15.0}
+    build: ./fineract-customization
     depends_on:
       postgres:
         condition: service_healthy

@@ -71,7 +71,7 @@ The lookup order matters. The GL code is checked before the external id, so an a
 lookups is still found by its external id and treated as a replay. The first version checked them the other way
 round. The parallel integration test caught it: one of ten concurrent creates got 403 "duplicate GL code".
 
-Evidence: in 5 rounds of 10 concurrent identical creates, 36 inserts lost the race and were retried. All 50 requests
+Evidence: in 5 rounds of 10 concurrent identical creates, 28 inserts lost the race in the recorded run and were retried. All 50 requests
 returned 200 and each round produced exactly one account (`../evidence/java-race-retries.txt`).
 
 One gap: Fineract's batch API with an enclosing transaction (`/batches?enclosingTransaction=true`) skips the

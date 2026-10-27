@@ -1,5 +1,6 @@
-GL account create race: 5 rounds x 10 identical concurrent creates (GLAccountExternalIdIntegrationTest#concurrentIdenticalCreatesResolveToOneAccount)
+GL account create race: 5 rounds x 10 identical concurrent creates (GLAccountExternalIdIntegrationTest#concurrentIdenticalCreatesResolveToOneAccount),
+run against the Fineract image built by fineract-customization/Dockerfile on a freshly created database.
 Result: all 50 requests HTTP 200, one account id per round (see java-integration-tests.log).
 
-Inserts that lost the unique-constraint race and were retried by Fineract's command retry:
-  36 unique constraint "acc_gl_account_gl_code_key"
+Inserts that lost the unique-constraint race and were resolved by Fineract's command retry:
+  28 unique constraint "acc_gl_account_gl_code_key"

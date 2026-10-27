@@ -1,0 +1,242 @@
+docker compose build mock-erp integration-service
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [mock-erp internal] load .dockerignore
+#1 transferring context:
+#1 transferring context: 156B done
+#1 DONE 0.0s
+
+#2 [mock-erp internal] load build definition from Dockerfile
+#2 transferring dockerfile: 438B done
+#2 DONE 0.0s
+
+#3 [mock-erp internal] load metadata for docker.io/library/python:3.12.9-slim-bookworm
+#3 DONE 3.3s
+
+#4 [mock-erp 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
+#4 DONE 0.0s
+
+#5 [mock-erp internal] load build context
+#5 transferring context: 1.49kB done
+#5 DONE 0.0s
+
+#6 [mock-erp 2/5] WORKDIR /app
+#6 CACHED
+
+#7 [mock-erp 3/5] COPY pyproject.toml ./
+#7 CACHED
+
+#8 [mock-erp 4/5] COPY src ./src
+#8 CACHED
+
+#9 [mock-erp 5/5] RUN pip install .
+#9 CACHED
+
+#10 [mock-erp] exporting to image
+#10 exporting layers done
+#10 writing image sha256:eaa34a7e9b8e84c39d85c8a211bd04e598ec3041713f461a16a1f7f1ee7ec2a4 done
+#10 naming to docker.io/library/fineract-erp-mock-erp done
+#10 DONE 0.0s
+
+#11 [integration-service internal] load .dockerignore
+#11 transferring context: 156B done
+#11 DONE 0.0s
+
+#12 [integration-service internal] load build definition from Dockerfile
+#12 transferring dockerfile: 569B done
+#12 DONE 0.0s
+
+#3 [integration-service internal] load metadata for docker.io/library/python:3.12.9-slim-bookworm
+#3 DONE 3.7s
+
+#4 [integration-service 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
+#4 DONE 0.0s
+
+#13 [integration-service internal] load build context
+#13 transferring context: 80.76kB 0.0s done
+#13 DONE 0.0s
+
+#6 [integration-service 2/5] WORKDIR /app
+#6 CACHED
+
+#14 [integration-service 3/5] COPY pyproject.toml ./
+#14 CACHED
+
+#15 [integration-service 4/5] COPY src ./src
+#15 DONE 0.0s
+
+#16 [integration-service 5/5] RUN pip install .
+#16 1.517 Processing /app
+#16 1.519   Installing build dependencies: started
+#16 4.599   Installing build dependencies: finished with status 'done'
+#16 4.603   Getting requirements to build wheel: started
+#16 4.943   Getting requirements to build wheel: finished with status 'done'
+#16 4.944   Preparing metadata (pyproject.toml): started
+#16 5.265   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 5.899 Collecting fastapi==0.115.6 (from integration-service==1.0.0)
+#16 6.220   Downloading fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
+#16 6.371 Collecting uvicorn==0.34.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 6.467   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+#16 6.811 Collecting pydantic==2.10.4 (from integration-service==1.0.0)
+#16 6.963   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+#16 7.099 Collecting pydantic-settings==2.7.1 (from integration-service==1.0.0)
+#16 7.205   Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
+#16 7.936 Collecting SQLAlchemy==2.0.36 (from integration-service==1.0.0)
+#16 8.040   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (9.7 kB)
+#16 8.160 Collecting psycopg==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
+#16 8.265   Downloading psycopg-3.2.3-py3-none-any.whl.metadata (4.3 kB)
+#16 8.469 Collecting alembic==1.14.0 (from integration-service==1.0.0)
+#16 8.572   Downloading alembic-1.14.0-py3-none-any.whl.metadata (7.4 kB)
+#16 8.695 Collecting httpx==0.28.1 (from integration-service==1.0.0)
+#16 8.800   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#16 8.979 Collecting Mako (from alembic==1.14.0->integration-service==1.0.0)
+#16 9.084   Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+#16 9.222 Collecting typing-extensions>=4 (from alembic==1.14.0->integration-service==1.0.0)
+#16 9.320   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#16 9.523 Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->integration-service==1.0.0)
+#16 9.630   Downloading starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
+#16 9.796 Collecting anyio (from httpx==0.28.1->integration-service==1.0.0)
+#16 9.903   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#16 10.04 Collecting certifi (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.15   Downloading certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+#16 10.30 Collecting httpcore==1.* (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.41   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+#16 10.56 Collecting idna (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.66   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#16 11.03 Collecting psycopg-binary==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
+#16 11.16   Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (2.8 kB)
+#16 11.26 Collecting annotated-types>=0.6.0 (from pydantic==2.10.4->integration-service==1.0.0)
+#16 11.36   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#16 13.52 Collecting pydantic-core==2.27.2 (from pydantic==2.10.4->integration-service==1.0.0)
+#16 13.68   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (6.6 kB)
+#16 13.81 Collecting python-dotenv>=0.21.0 (from pydantic-settings==2.7.1->integration-service==1.0.0)
+#16 13.91   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+#16 14.67 Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.36->integration-service==1.0.0)
+#16 14.83   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (3.8 kB)
+#16 14.96 Collecting click>=7.0 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 15.06   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#16 15.17 Collecting h11>=0.8 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 15.35   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#16 15.54 Collecting httptools>=0.6.3 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 15.65   Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (3.5 kB)
+#16 15.85 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 15.96   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.4 kB)
+#16 16.14 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 16.30   Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (5.1 kB)
+#16 16.61 Collecting watchfiles>=0.13 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 16.71   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (4.9 kB)
+#16 17.13 Collecting websockets>=10.4 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 17.25   Downloading websockets-17.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (6.3 kB)
+#16 17.67 Collecting MarkupSafe>=2.0 (from Mako->alembic==1.14.0->integration-service==1.0.0)
+#16 17.77   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+#16 17.88 Downloading alembic-1.14.0-py3-none-any.whl (233 kB)
+#16 18.18 Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
+#16 18.41 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#16 18.52 Downloading psycopg-3.2.3-py3-none-any.whl (197 kB)
+#16 18.67 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#16 18.93 Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
+#16 19.03 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.2 MB)
+#16 19.27    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 13.9 MB/s eta 0:00:00
+#16 19.45 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#16 19.55 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#16 19.66 Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (4.4 MB)
+#16 19.90    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 21.1 MB/s eta 0:00:00
+#16 20.07 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.8 MB)
+#16 20.17    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 24.7 MB/s eta 0:00:00
+#16 20.27 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#16 20.39 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#16 20.51 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (611 kB)
+#16 20.54    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 611.7/611.7 kB 23.1 MB/s eta 0:00:00
+#16 20.65 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#16 20.77 Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (549 kB)
+#16 20.80    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 549.2/549.2 kB 15.9 MB/s eta 0:00:00
+#16 20.90 Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+#16 21.02 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (775 kB)
+#16 21.26    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 775.1/775.1 kB 4.6 MB/s eta 0:00:00
+#16 21.36 Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
+#16 21.55 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+#16 22.81 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#16 22.95 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#16 23.12 Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.4 MB)
+#16 28.21    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 839.6 kB/s eta 0:00:00
+#16 28.38 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (454 kB)
+#16 29.02 Downloading websockets-17.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (227 kB)
+#16 29.41 Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
+#16 29.64 Downloading mako-1.4.3-py3-none-any.whl (80 kB)
+#16 29.81 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+#16 29.98 Building wheels for collected packages: integration-service
+#16 30.00   Building wheel for integration-service (pyproject.toml): started
+#16 31.07   Building wheel for integration-service (pyproject.toml): finished with status 'done'
+#16 31.08   Created wheel for integration-service: filename=integration_service-1.0.0-py3-none-any.whl size=62807 sha256=a40eff62b86ea5358ff789be9bab28ea07ba07f5f50473c60dea34f597201af8
+#16 31.08   Stored in directory: /tmp/pip-ephem-wheel-cache-vz2dvhom/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#16 31.12 Successfully built integration-service
+#16 31.22 Installing collected packages: websockets, uvloop, typing-extensions, pyyaml, python-dotenv, psycopg-binary, MarkupSafe, idna, httptools, h11, greenlet, click, certifi, annotated-types, uvicorn, SQLAlchemy, pydantic-core, psycopg, Mako, httpcore, anyio, watchfiles, starlette, pydantic, httpx, alembic, pydantic-settings, fastapi, integration-service
+#16 34.59 Successfully installed Mako-1.4.3 MarkupSafe-3.0.4 SQLAlchemy-2.0.36 alembic-1.14.0 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 greenlet-3.5.6 h11-0.16.0 httpcore-1.0.9 httptools-0.9.0 httpx-0.28.1 idna-3.20 integration-service-1.0.0 psycopg-3.2.3 psycopg-binary-3.2.3 pydantic-2.10.4 pydantic-core-2.27.2 pydantic-settings-2.7.1 python-dotenv-1.2.4 pyyaml-6.0.3 starlette-0.41.3 typing-extensions-4.16.0 uvicorn-0.34.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.3
+#16 34.59 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#16 DONE 35.8s
+
+#17 [integration-service] exporting to image
+#17 exporting layers
+#17 exporting layers 0.6s done
+#17 writing image sha256:75c24d9af65e994afe1b844ec032dda82a43ba21d7e30e7ad9d873bb929c5d55 0.0s done
+#17 naming to docker.io/fineract-erp/integration-service:local done
+#17 DONE 0.6s
+docker compose up -d --wait postgres fineract mock-erp integration-service
+ Network fineract-erp_default  Creating
+ Network fineract-erp_default  Created
+ Volume "fineract-erp_postgres-data"  Creating
+ Volume "fineract-erp_postgres-data"  Created
+ Container fineract-erp-postgres-1  Creating
+ Container fineract-erp-postgres-1  Created
+ Container fineract-erp-mock-erp-1  Creating
+ Container fineract-erp-fineract-1  Creating
+ Container fineract-erp-fineract-1  Created
+ Container fineract-erp-mock-erp-1  Created
+ Container fineract-erp-integration-service-1  Creating
+ Container fineract-erp-integration-service-1  Created
+ Container fineract-erp-postgres-1  Starting
+ Container fineract-erp-postgres-1  Started
+ Container fineract-erp-postgres-1  Waiting
+ Container fineract-erp-postgres-1  Waiting
+ Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-fineract-1  Starting
+ Container fineract-erp-mock-erp-1  Starting
+ Container fineract-erp-mock-erp-1  Started
+ Container fineract-erp-fineract-1  Started
+ Container fineract-erp-mock-erp-1  Waiting
+ Container fineract-erp-postgres-1  Waiting
+ Container fineract-erp-fineract-1  Waiting
+ Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-mock-erp-1  Healthy
+ Container fineract-erp-fineract-1  Healthy
+ Container fineract-erp-integration-service-1  Starting
+ Container fineract-erp-integration-service-1  Started
+ Container fineract-erp-postgres-1  Waiting
+ Container fineract-erp-fineract-1  Waiting
+ Container fineract-erp-mock-erp-1  Waiting
+ Container fineract-erp-integration-service-1  Waiting
+ Container fineract-erp-mock-erp-1  Healthy
+ Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-fineract-1  Healthy
+ Container fineract-erp-integration-service-1  Healthy
+docker compose up bootstrap --exit-code-from bootstrap
+ Container fineract-erp-postgres-1  Running
+ Container fineract-erp-mock-erp-1  Running
+ Container fineract-erp-fineract-1  Running
+ Container fineract-erp-integration-service-1  Running
+ Container fineract-erp-bootstrap-1  Creating
+ Container fineract-erp-bootstrap-1  Created
+Attaching to fineract-erp-bootstrap-1
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.501016+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created office Kigali Main Office", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.891661+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "enabled currency RWF", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.944866+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created payment type Bank Transfer", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:03.188149+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created API user integration_api", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.452789+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "GL accounts synchronized from the ERP", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.649010+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created loan product SME Asset Finance", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.649106+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "Fineract is configured", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1 exited with code 0
+Aborting on container exit...
+ Container fineract-erp-bootstrap-1  Stopping
+ Container fineract-erp-bootstrap-1  Stopped
+make up  0.42s user 0.50s system 0% cpu 2:20.37 total

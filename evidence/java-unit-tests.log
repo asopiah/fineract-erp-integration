@@ -1,3 +1,5 @@
+patch already applied
+cd upstream/fineract && ./gradlew :fineract-core:test --rerun --tests 'org.apache.fineract.accounting.glaccount.*' :fineract-accounting:test --rerun --tests 'org.apache.fineract.accounting.glaccount.*'
 > Task :buildSrc:extractPluginRequests UP-TO-DATE
 > Task :buildSrc:generatePluginAdapters UP-TO-DATE
 > Task :buildSrc:compileJava UP-TO-DATE
@@ -19,65 +21,78 @@ project version: 1.15.0
 
 > Task :spotlessInternalRegisterDependencies UP-TO-DATE
 > Task :fineract-avro-schemas:preprocessAvroSchemas UP-TO-DATE
-> Task :fineract-validation:compileJava UP-TO-DATE
-> Task :fineract-command:compileJava UP-TO-DATE
 > Task :fineract-avro-schemas:spotlessJson UP-TO-DATE
 > Task :fineract-avro-schemas:spotlessJsonApply UP-TO-DATE
-> Task :fineract-command:processResources UP-TO-DATE
-> Task :fineract-validation:processResources UP-TO-DATE
-> Task :fineract-command:classes UP-TO-DATE
-> Task :fineract-validation:classes UP-TO-DATE
-> Task :fineract-validation:jar UP-TO-DATE
-> Task :fineract-command:jar UP-TO-DATE
 > Task :fineract-avro-schemas:buildJavaSdk UP-TO-DATE
+> Task :fineract-validation:compileJava UP-TO-DATE
+> Task :fineract-validation:processResources UP-TO-DATE
+> Task :fineract-validation:classes UP-TO-DATE
+> Task :fineract-command:compileJava UP-TO-DATE
+> Task :fineract-validation:jar UP-TO-DATE
+> Task :fineract-command:processResources UP-TO-DATE
+> Task :fineract-command:classes UP-TO-DATE
 > Task :fineract-avro-schemas:compileJava UP-TO-DATE
+> Task :fineract-command:jar UP-TO-DATE
 > Task :fineract-avro-schemas:processResources UP-TO-DATE
 > Task :fineract-avro-schemas:classes UP-TO-DATE
 > Task :fineract-avro-schemas:jar UP-TO-DATE
+
+> Task :fineract-core:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
 
 > Task :fineract-tax:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
 
 > Task :fineract-tax:processResources NO-SOURCE
-
-> Task :fineract-core:generateStaticWeavingPersistenceXml
-Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
+> Task :fineract-core:compileJava UP-TO-DATE
+> Task :fineract-core:processResources NO-SOURCE
+> Task :fineract-core:classes UP-TO-DATE
 
 > Task :fineract-charge:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
 
 > Task :fineract-charge:processResources UP-TO-DATE
-> Task :fineract-core:compileJava UP-TO-DATE
-> Task :fineract-core:processResources NO-SOURCE
-> Task :fineract-core:classes UP-TO-DATE
 > Task :fineract-core:jar UP-TO-DATE
+> Task :fineract-tax:compileJava UP-TO-DATE
+> Task :fineract-tax:classes UP-TO-DATE
+> Task :fineract-tax:jar UP-TO-DATE
+> Task :fineract-core:compileTestJava UP-TO-DATE
+> Task :fineract-core:processTestResources UP-TO-DATE
+> Task :fineract-core:testClasses UP-TO-DATE
+> Task :fineract-charge:compileJava UP-TO-DATE
+> Task :fineract-charge:classes UP-TO-DATE
+> Task :fineract-charge:jar UP-TO-DATE
 
 > Task :fineract-accounting:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
 
+> Task :fineract-accounting:compileJava UP-TO-DATE
 > Task :fineract-accounting:processResources UP-TO-DATE
+> Task :fineract-accounting:classes UP-TO-DATE
+> Task :fineract-accounting:compileTestJava UP-TO-DATE
 > Task :fineract-accounting:processTestResources NO-SOURCE
-> Task :fineract-tax:compileJava UP-TO-DATE
-> Task :fineract-tax:classes UP-TO-DATE
-> Task :fineract-tax:jar UP-TO-DATE
-> Task :fineract-charge:compileJava UP-TO-DATE
-> Task :fineract-charge:classes UP-TO-DATE
-> Task :fineract-charge:jar UP-TO-DATE
-> Task :fineract-core:compileTestJava UP-TO-DATE
-> Task :fineract-core:processTestResources UP-TO-DATE
-> Task :fineract-core:testClasses UP-TO-DATE
-> Task :fineract-core:test UP-TO-DATE
-> Task :fineract-accounting:compileJava
-> Task :fineract-accounting:classes
-> Task :fineract-accounting:compileTestJava
-> Task :fineract-accounting:testClasses
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :fineract-accounting:testClasses UP-TO-DATE
+
+> Task :fineract-core:test
+
+[0K[1morg.apache.fineract.accounting.glaccount.domain.GLAccountDefinitionTest[m
+
+[0K[1m  Test [22mfineractOwnedStateIsNotPartOfTheDefinition()[32m PASSED[m
+[0K[1m  Test [22manyCallerSuppliedDifferenceIsADifferentDefinition()[32m PASSED[m
+[0K[1m  Test [22msameCallerSuppliedAttributesAreTheSameDefinition()[32m PASSED[m
+
+[0K[1;32mSUCCESS: [39mExecuted 3 tests in 2.3s[m
+
 
 > Task :fineract-accounting:test
 
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :fineract-accounting:test
 [0K[1morg.apache.fineract.accounting.glaccount.service.GLAccountExternalIdCreateTest[m
 
-[0K[1m  Test [22mglCodeOwnedByAnotherAccountIsADuplicateDecidedBeforeTheInsert()[32m PASSED[33m (1.3s)[m
+[0K[1m  Test [22mglCodeOwnedByAnotherAccountIsADuplicateDecidedBeforeTheInsert()[32m PASSED[33m (1.9s)[m
 [0K[1m  Test [22mknownExternalIdUnderAnotherGlCodeIsAConflict()[32m PASSED[m
 [0K[1m  Test [22mnewExternalIdCreatesTheAccountAndReturnsItsExternalId()[32m PASSED[m
 [0K[1m  Test [22mdifferentDefinitionUnderAKnownExternalIdIsAConflict()[32m PASSED[m
@@ -96,7 +111,7 @@ OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader clas
 [0K[1m  Test [22mrecognizesPostgresqlUniqueViolationAnywhereInTheCauseChain()[32m PASSED[m
 [0K[1m  Test [22mignoresOtherIntegrityViolations()[32m PASSED[m
 
-[0K[1;32mSUCCESS: [39mExecuted 12 tests in 2.3s[m
+[0K[1;32mSUCCESS: [39mExecuted 12 tests in 4.6s[m
 
 
 [Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
@@ -107,6 +122,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 10s
-40 actionable tasks: 7 executed, 33 up-to-date
-EXIT=0
+BUILD SUCCESSFUL in 15s
+40 actionable tasks: 6 executed, 34 up-to-date

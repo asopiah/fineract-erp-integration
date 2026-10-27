@@ -1,0 +1,1409 @@
+cd integration-service && /Users/sopia/workspace/assessments/fineract-erp-integration/.venv/bin/python -m simulations --output /Users/sopia/workspace/assessments/fineract-erp-integration/SIMULATIONS.md
+## Client identity — PASS
+
+*Covers: Part C (client_uid as Fineract externalId), Part F (client idempotency)*
+
+**1. Initial state**
+
+```json
+{
+  "client_uid": "SME-F5ECE3-001",
+  "in_fineract": false
+}
+```
+
+**2. Request**
+
+```json
+{
+  "POST /api/clients": {
+    "external_reference": "CLI-F5ECE3-002",
+    "client_uid": "SME-F5ECE3-001",
+    "first_name": "Amina",
+    "last_name": "Uwase",
+    "activation_date": "2026-01-10"
+  },
+  "then": "same request again; same client_uid under a new reference"
+}
+```
+
+**3. Response**
+
+```json
+{
+  "create": [
+    201,
+    {
+      "last_name": "Uwase",
+      "client_uid": "SME-F5ECE3-001",
+      "first_name": "Amina",
+      "external_reference": "CLI-F5ECE3-002"
+    }
+  ],
+  "replay": [
+    200,
+    {
+      "last_name": "Uwase",
+      "client_uid": "SME-F5ECE3-001",
+      "first_name": "Amina",
+      "external_reference": "CLI-F5ECE3-002"
+    }
+  ],
+  "new reference, same client_uid": [
+    409,
+    "CLIENT_UID_TAKEN"
+  ],
+  "GET /api/clients/SME-F5ECE3-001": {
+    "external_reference": "CLI-F5ECE3-002",
+    "client_uid": "SME-F5ECE3-001",
+    "first_name": "Amina",
+    "last_name": "Uwase",
+    "fineract": {
+      "exists": true,
+      "active": true,
+      "status": "Active",
+      "display_name": "Amina Uwase",
+      "name_matches": true
+    }
+  }
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "externalId": "SME-F5ECE3-001",
+  "displayName": "Amina Uwase",
+  "active": true
+}
+```
+
+**5. ERP state**
+
+—
+
+**6. Integration state**
+
+```json
+{
+  "mapping rows for client_uid": 1
+}
+```
+
+**7. Expected result**
+
+201 then 200 with the same body; 409 for the reused client_uid; exists, active, correct name
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+client_uid is stored as the Fineract client's externalId and is unique in the integration database. The lookup reads Fineract by external id, so Fineract's numeric id never reaches the partner.
+
+Checks: 5/5 passed
+
+## GL account sync — PASS
+
+*Covers: Part A (Python side): create-only sync, retry while Fineract is down*
+
+**1. Initial state**
+
+A new ERP account, unknown to Fineract
+
+**2. Request**
+
+```json
+{
+  "ERP POST /api/accounts x4": {
+    "code": "7963",
+    "name": "Equipment F5ECE3",
+    "type": "ASSET",
+    "currency": "RWF",
+    "external_reference": "GL-7963-F5ECE3"
+  },
+  "POST /api/accounts/sync x4": {
+    "external_references": [
+      "GL-7963-F5ECE3"
+    ]
+  }
+}
+```
+
+**3. Response**
+
+```json
+{
+  "ERP account creates": [
+    201,
+    200,
+    200,
+    200
+  ],
+  "sync 1 (Fineract down)": [
+    {
+      "external_reference": "GL-7963-F5ECE3",
+      "code": "7963",
+      "name": "Equipment F5ECE3",
+      "erp_type": "ASSET",
+      "status": "FAILED",
+      "attempts": 1,
+      "last_error": "fineract: POST /glaccounts not delivered: ConnectError('injected fault: Fineract unavailable')"
+    }
+  ],
+  "syncs 2-4": [
+    "SYNCED",
+    "SYNCED",
+    "SYNCED"
+  ]
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "GL accounts with this externalId": 1,
+  "glCode": [
+    "7963"
+  ]
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "accounts with this external_reference": 1
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "mapping rows": [
+    [
+      "SYNCED",
+      1
+    ]
+  ]
+}
+```
+
+**7. Expected result**
+
+FAILED while Fineract is down, SYNCED after the retry; one ERP account, one GL account, one mapping
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+The sync creates the GL account with the ERP's external_reference as Fineract externalId. Fineract (patched) answers a replay with the existing account, so a retry after an outage can never create a second one; recovery retries FAILED accounts with backoff.
+
+Checks: 5/5 passed
+
+## Loan lifecycle — PASS
+
+*Covers: Part D: application → approval → disbursement → repayments → Closed*
+
+**1. Initial state**
+
+```json
+{
+  "client_uid": "SME-F5ECE3-004",
+  "loan_reference": "LN-2026-000001"
+}
+```
+
+**2. Request**
+
+POST clients, loans, approve, disburse, 3 x repayments of 458400, payoff of Fineract's total outstanding
+
+**3. Response**
+
+```json
+[
+  {
+    "stage": "application",
+    "http": 201
+  },
+  {
+    "stage": "approval",
+    "http": 201
+  },
+  {
+    "stage": "disbursement",
+    "http": 201
+  },
+  {
+    "stage": "repayment 1",
+    "http": 201
+  },
+  {
+    "stage": "repayment 2",
+    "http": 201
+  },
+  {
+    "stage": "repayment 3",
+    "http": 201
+  },
+  {
+    "stage": "final payoff (4125599.0)",
+    "http": 201
+  }
+]
+```
+
+**4. Fineract state**
+
+```json
+[
+  {
+    "stage": "application",
+    "http": 201,
+    "status": "Submitted and pending approval",
+    "principal_outstanding": 0,
+    "interest_outstanding": 0,
+    "total_outstanding": 0,
+    "disbursements": 0,
+    "repayments": 0
+  },
+  {
+    "stage": "approval",
+    "http": 201,
+    "status": "Approved",
+    "principal_outstanding": 0,
+    "interest_outstanding": 0,
+    "total_outstanding": 0,
+    "disbursements": 0,
+    "repayments": 0
+  },
+  {
+    "stage": "disbursement",
+    "http": 201,
+    "status": "Active",
+    "principal_outstanding": 5000000.0,
+    "interest_outstanding": 500799.0,
+    "total_outstanding": 5500799.0,
+    "disbursements": 1,
+    "repayments": 0
+  },
+  {
+    "stage": "repayment 1",
+    "http": 201,
+    "status": "Active",
+    "principal_outstanding": 4616600.0,
+    "interest_outstanding": 425799.0,
+    "total_outstanding": 5042399.0,
+    "disbursements": 1,
+    "repayments": 1
+  },
+  {
+    "stage": "repayment 2",
+    "http": 201,
+    "status": "Active",
+    "principal_outstanding": 4227449.0,
+    "interest_outstanding": 356550.0,
+    "total_outstanding": 4583999.0,
+    "disbursements": 1,
+    "repayments": 2
+  },
+  {
+    "stage": "repayment 3",
+    "http": 201,
+    "status": "Active",
+    "principal_outstanding": 3832461.0,
+    "interest_outstanding": 293138.0,
+    "total_outstanding": 4125599.0,
+    "disbursements": 1,
+    "repayments": 3
+  },
+  {
+    "stage": "final payoff (4125599.0)",
+    "http": 201,
+    "status": "Closed (obligations met)",
+    "principal_outstanding": 0.0,
+    "interest_outstanding": 0.0,
+    "total_outstanding": 0.0,
+    "disbursements": 1,
+    "repayments": 4
+  }
+]
+```
+
+**5. ERP state**
+
+```json
+[
+  {
+    "reference": "DISB-F5ECE3-008",
+    "entry": "JE-000001",
+    "total": "5000000.000000"
+  },
+  {
+    "reference": "REP-F5ECE3-009",
+    "entry": "JE-000002",
+    "total": "458400.000000"
+  },
+  {
+    "reference": "REP-F5ECE3-010",
+    "entry": "JE-000003",
+    "total": "458400.000000"
+  },
+  {
+    "reference": "REP-F5ECE3-011",
+    "entry": "JE-000004",
+    "total": "458400.000000"
+  },
+  {
+    "reference": "REP-F5ECE3-012",
+    "entry": "JE-000005",
+    "total": "4125599.000000"
+  }
+]
+```
+
+**6. Integration state**
+
+```json
+{
+  "loan_transactions rows": 5
+}
+```
+
+**7. Expected result**
+
+Every stage succeeds; the loan ends 'Closed (obligations met)' with nothing outstanding
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+Statuses and balances above are read from Fineract's own API after each call. The payoff amount is Fineract's total outstanding; each ERP entry is derived from the principal/interest split Fineract recorded.
+
+Checks: 4/4 passed
+
+## I1 Sequential duplicates — PASS
+
+*Covers: Part I1: the same disbursement sent 4 times*
+
+**1. Initial state**
+
+```json
+{
+  "status": "Approved",
+  "principal_outstanding": 0,
+  "interest_outstanding": 0,
+  "total_outstanding": 0,
+  "disbursements": 0,
+  "repayments": 0
+}
+```
+
+**2. Request**
+
+POST /api/loans/LN-2026-000002/disburse x4 with external_reference DISB-F5ECE3-017
+
+**3. Response**
+
+```json
+[
+  201,
+  200,
+  200,
+  200
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "status": "Active",
+  "principal_outstanding": 5000000.0,
+  "interest_outstanding": 500799.0,
+  "total_outstanding": 5500799.0,
+  "disbursements": 1,
+  "repayments": 0
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "entries": 1
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "transactions": 1,
+  "operation": "COMPLETED"
+}
+```
+
+**7. Expected result**
+
+Requests received: 4, Fineract disbursements: 1, ERP journal entries: 1, Integration transactions: 1
+
+**8. Actual result**
+
+Requests received: 4, Fineract disbursements: 1, ERP journal entries: 1, Integration transactions: 1
+
+**9. Explanation**
+
+The first request claims (DISBURSEMENT, reference) in the operations table and completes; the others find the completed operation and return its stored result without calling Fineract or the ERP.
+
+Checks: 3/3 passed
+
+## I2a Concurrent disbursements, same reference — PASS
+
+*Covers: Part I2(a): 10 simultaneous requests*
+
+**1. Initial state**
+
+```json
+{
+  "loan": "LN-2026-000003",
+  "status": "Approved",
+  "disbursements": 0
+}
+```
+
+**2. Request**
+
+10 simultaneous POST /api/loans/LN-2026-000003/disburse
+
+**3. Response**
+
+```json
+[
+  201,
+  202,
+  202,
+  202,
+  202,
+  202,
+  202,
+  202,
+  202,
+  202
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "status": "Active",
+  "principal_outstanding": 5000000.0,
+  "interest_outstanding": 500799.0,
+  "total_outstanding": 5500799.0,
+  "disbursements": 1,
+  "repayments": 0
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "entries": 1
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "transactions": 1
+}
+```
+
+**7. Expected result**
+
+Exactly one disbursement everywhere; one 201; the rest 200 or 202
+
+**8. Actual result**
+
+statuses [201, 202, 202, 202, 202, 202, 202, 202, 202, 202]; Fineract disbursements: 1, ERP journal entries: 1, Integration transactions: 1
+
+**9. Explanation**
+
+Layers: (1) unique (type, external_reference) — same reference waits on one operation (202/200); (2) partial unique index, one active DISBURSEMENT per loan — different references lose with 409; (3) Fineract externalId lookup before every submit and a unique index on m_loan_transaction.external_id; (4) last line of defence: Fineract's loan state refuses a second disbursement of a single-tranche loan. (1) misses different references, (2) lives in our database only, (3) only dedupes one reference; (4) is the system of record for the money.
+
+Checks: 2/2 passed
+
+## I2b Concurrent disbursements, different references — PASS
+
+*Covers: Part I2(b): 10 simultaneous requests*
+
+**1. Initial state**
+
+```json
+{
+  "loan": "LN-2026-000004",
+  "status": "Approved",
+  "disbursements": 0
+}
+```
+
+**2. Request**
+
+10 simultaneous POST /api/loans/LN-2026-000004/disburse
+
+**3. Response**
+
+```json
+[
+  201,
+  409,
+  409,
+  409,
+  409,
+  409,
+  409,
+  409,
+  409,
+  409
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "status": "Active",
+  "principal_outstanding": 5000000.0,
+  "interest_outstanding": 500799.0,
+  "total_outstanding": 5500799.0,
+  "disbursements": 1,
+  "repayments": 0
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "entries": 1
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "transactions": 1
+}
+```
+
+**7. Expected result**
+
+Exactly one disbursement everywhere; one 201; nine 409 LOAN_ALREADY_DISBURSED
+
+**8. Actual result**
+
+statuses [201, 409, 409, 409, 409, 409, 409, 409, 409, 409]; Fineract disbursements: 1, ERP journal entries: 1, Integration transactions: 1
+
+**9. Explanation**
+
+Layers: (1) unique (type, external_reference) — same reference waits on one operation (202/200); (2) partial unique index, one active DISBURSEMENT per loan — different references lose with 409; (3) Fineract externalId lookup before every submit and a unique index on m_loan_transaction.external_id; (4) last line of defence: Fineract's loan state refuses a second disbursement of a single-tranche loan. (1) misses different references, (2) lives in our database only, (3) only dedupes one reference; (4) is the system of record for the money.
+
+Checks: 2/2 passed
+
+## I3 Concurrent repayments — PASS
+
+*Covers: Part I3: 10 different references at once, plus duplicates of one*
+
+**1. Initial state**
+
+```json
+{
+  "status": "Active",
+  "principal_outstanding": 5000000.0,
+  "interest_outstanding": 500799.0,
+  "total_outstanding": 5500799.0,
+  "disbursements": 1,
+  "repayments": 0
+}
+```
+
+**2. Request**
+
+13 simultaneous POST /api/loans/LN-2026-000005/repayments (10 references, the first sent 4 times)
+
+**3. Response**
+
+```json
+[
+  201,
+  201,
+  201,
+  201,
+  201,
+  201,
+  201,
+  201,
+  201,
+  201,
+  202,
+  202,
+  202
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "after": {
+    "status": "Active",
+    "principal_outstanding": 4207661.0,
+    "interest_outstanding": 293138.0,
+    "total_outstanding": 4500799.0,
+    "disbursements": 1,
+    "repayments": 10
+  },
+  "repayments recorded for these references": 10,
+  "distinct references": 10,
+  "principal portions": "792339.0",
+  "interest portions": "207661.0"
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "entries": 10
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "loan_transactions rows (incl. disbursement)": 11
+}
+```
+
+**7. Expected result**
+
+10 repayments applied once each; outstanding principal = initial - principal portions recorded by Fineract
+
+**8. Actual result**
+
+10 repayments; principal outstanding 4207661.0 (initial 5000000.0 - 792339.0 = 4207661.0)
+
+**9. Explanation**
+
+Different references are different operations, so all ten proceed in parallel; Fineract serializes them on the loan. The three copies of the first reference hit its operation row and never reach Fineract. The check uses Fineract's own breakdown, not the amounts the test sent.
+
+Checks: 5/5 passed
+
+## J1 ERP down after Fineract success — PASS
+
+*Covers: Part J1*
+
+**1. Initial state**
+
+ERP unavailable (injected); loan active
+
+**2. Request**
+
+POST /api/loans/LN-2026-000006/repayments REP-F5ECE3-057
+
+**3. Response**
+
+```json
+{
+  "while ERP down": [
+    202,
+    {
+      "external_reference": "REP-F5ECE3-057",
+      "operation": "REPAYMENT",
+      "status": "ERP_PENDING",
+      "detail": "recorded in Fineract; the ERP journal entry is being posted"
+    }
+  ],
+  "replay afterwards": [
+    200,
+    {
+      "type": "REPAYMENT",
+      "amount": "458400",
+      "fee_portion": "0",
+      "loan_reference": "LN-2026-000006",
+      "penalty_portion": "0",
+      "erp_entry_number": "JE-000021",
+      "interest_portion": "75000",
+      "transaction_date": "2026-02-15",
+      "outstanding_after": "4616600",
+      "principal_portion": "383400",
+      "external_reference": "REP-F5ECE3-057",
+      "overpayment_portion": "0"
+    }
+  ]
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "during": 1,
+  "after": 1
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "during": null,
+  "after": "JE-000021"
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "during": "ERP_PENDING",
+  "after": "COMPLETED"
+}
+```
+
+**7. Expected result**
+
+202 ERP_PENDING; repayment in Fineract once; the ERP catches up exactly once when it returns
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+The operation stays ERP_PENDING with a backoff schedule; recovery re-derives the same journal from the stored Fineract transaction and posts it. Double posting is impossible: Fineract is never called again (its step is done) and the ERP is idempotent on the external reference.
+
+Checks: 5/5 passed
+
+## J2 Fineract down — PASS
+
+*Covers: Part J2*
+
+**1. Initial state**
+
+Fineract unreachable (injected connection refused); loan approved
+
+**2. Request**
+
+POST /api/loans/LN-2026-000007/disburse DISB-F5ECE3-062, then the same request again
+
+**3. Response**
+
+```json
+{
+  "while down": [
+    503,
+    {
+      "error": {
+        "code": "FINERACT_UNAVAILABLE",
+        "message": "Fineract did not process the request: GET /loans/external-id/LN-2026-000007/transactions/external-id/DISB-F5ECE3-062 not delivered: ConnectError('injected fault: Fineract unavailable')",
+        "correlation_id": "0f812af4-0f88-4c54-9d03-59471a4a4f54"
+      }
+    }
+  ],
+  "retry": 201
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "during": 0,
+  "after": 1
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "during": null,
+  "after": "JE-000022"
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "during": [
+    "FAILED",
+    "retryable=True"
+  ],
+  "after": "COMPLETED"
+}
+```
+
+**7. Expected result**
+
+503 FINERACT_UNAVAILABLE; only the operation row persisted (FAILED, retryable); the retry succeeds once
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+A connection that never opened is classified 'not applied': nothing can have happened in Fineract, so the operation is FAILED with retryable=true and the same reference may be sent again. It frees the loan's disbursement slot, since FAILED operations are excluded from the once-per-loan index.
+
+Checks: 4/4 passed
+
+## J3 Fineract timeout after sending — PASS
+
+*Covers: Part J3*
+
+**1. Initial state**
+
+Fineract processes the command but the answer is lost (injected read timeout)
+
+**2. Request**
+
+POST /api/loans/LN-2026-000008/disburse DISB-F5ECE3-067 (X-Correlation-ID sim-j3-F5ECE3)
+
+**3. Response**
+
+```json
+[
+  201,
+  {
+    "type": "DISBURSEMENT",
+    "amount": "5000000",
+    "fee_portion": "0",
+    "loan_reference": "LN-2026-000008",
+    "penalty_portion": "0",
+    "erp_entry_number": "JE-000023",
+    "interest_portion": "0",
+    "transaction_date": "2026-01-15",
+    "outstanding_after": "5000000",
+    "principal_portion": "0",
+    "external_reference": "DISB-F5ECE3-067",
+    "overpayment_portion": "0"
+  }
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "disbursements": 1
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "entry": "JE-000023"
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "operation": "COMPLETED",
+  "executor log trail": [
+    "FINERACT_PENDING: operation fineract_pending",
+    "FINERACT_PENDING: Fineract attempt 1 failed: POST /loans/external-id/LN-2026-000008 outcome unknown: ReadTimeout('injected fault: response lost after Fineract processed it')",
+    "FINERACT_PENDING: already in Fineract, not submitting again",
+    "FINERACT_DONE: operation fineract_done",
+    "ERP_PENDING: operation erp_pending",
+    "COMPLETED: operation completed"
+  ]
+}
+```
+
+**7. Expected result**
+
+Not resent blindly: the lookup by externalId finds the disbursement; one disbursement, one entry
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+The read timeout after sending is an unknown outcome. The next attempt starts with GET /loans/external-id/{loan}/transactions/external-id/{reference}, finds the transaction and continues; had the lookup failed too, the operation would stay FINERACT_PENDING for recovery — never FAILED.
+
+Checks: 3/3 passed
+
+## J4 ERP timeout after the entry was written — PASS
+
+*Covers: Part J4*
+
+**1. Initial state**
+
+The ERP commits journal entries, then holds the answer past the integration's 5 s timeout
+
+**2. Request**
+
+POST /api/loans/LN-2026-000009/repayments REP-F5ECE3-073
+
+**3. Response**
+
+```json
+[
+  202,
+  {
+    "external_reference": "REP-F5ECE3-073",
+    "operation": "REPAYMENT",
+    "status": "ERP_PENDING",
+    "detail": "recorded in Fineract; the ERP journal entry is being posted"
+  }
+]
+```
+
+**4. Fineract state**
+
+```json
+{
+  "repayments": 1
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "during": "JE-000025",
+  "entries with this reference after the retry": 1
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "during": "ERP_PENDING",
+  "after": "COMPLETED"
+}
+```
+
+**7. Expected result**
+
+202 ERP_PENDING; the retry is answered with the existing entry; exactly one journal entry
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+The ERP enforces uniqueness on external_reference and compares payloads. The retry sends the identical entry (derived from the stored Fineract transaction), so the ERP answers 200 with the entry it already has.
+
+Checks: 4/4 passed
+
+## J5 Crash between Fineract success and the ERP call — PASS
+
+*Covers: Part J5*
+
+**1. Initial state**
+
+The integration service exits right after Fineract confirms (injected); compose restarts it
+
+**2. Request**
+
+POST /api/loans/LN-2026-000010/disburse DISB-F5ECE3-078
+
+**3. Response**
+
+```json
+{
+  "caller saw": "RemoteProtocolError"
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "during": 1,
+  "after": 1
+}
+```
+
+**5. ERP state**
+
+```json
+{
+  "during": null,
+  "after": "JE-000026"
+}
+```
+
+**6. Integration state**
+
+```json
+{
+  "during": "FINERACT_DONE",
+  "after": "COMPLETED",
+  "container restarts": 1
+}
+```
+
+**7. Expected result**
+
+FINERACT_DONE survives the crash; after restart and lease expiry, recovery posts the ERP entry once
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+Each status is committed before the next external call, so the restart finds FINERACT_DONE with the dead process's lease. When the lease expires, the recovery sweep runs the same executor: Fineract is already done, so only the ERP entry is posted.
+
+Checks: 4/4 passed
+
+## K Reconciliation — PASS
+
+*Covers: Part K: all four outcomes, seeded deliberately; read-only*
+
+**1. Initial state**
+
+Two transactions through the integration, plus three seeded directly in one system
+
+**2. Request**
+
+```json
+{
+  "POST /api/reconciliation": {
+    "external_references": [
+      "DISB-F5ECE3-083",
+      "REP-F5ECE3-084",
+      "TELLER-F5ECE3-085",
+      "MANUAL-F5ECE3-086",
+      "TELLER-F5ECE3-087"
+    ]
+  }
+}
+```
+
+**3. Response**
+
+```json
+{
+  "criteria": {
+    "from_date": null,
+    "to_date": null,
+    "external_references": [
+      "DISB-F5ECE3-083",
+      "MANUAL-F5ECE3-086",
+      "REP-F5ECE3-084",
+      "TELLER-F5ECE3-085",
+      "TELLER-F5ECE3-087"
+    ]
+  },
+  "summary": {
+    "MATCHED": 2,
+    "MISSING_IN_FINERACT": 1,
+    "MISSING_IN_ERP": 1,
+    "AMOUNT_MISMATCH": 1
+  },
+  "items": [
+    {
+      "external_reference": "DISB-F5ECE3-083",
+      "loan_reference": "LN-2026-000011",
+      "outcome": "MATCHED",
+      "note": null,
+      "fineract": {
+        "type": "DISBURSEMENT",
+        "transaction_date": "2026-01-15",
+        "amount": "5000000",
+        "reversed": false
+      },
+      "erp": {
+        "entry_number": "JE-000027",
+        "type": "DISBURSEMENT",
+        "entry_date": "2026-01-15",
+        "amount": "5000000"
+      }
+    },
+    {
+      "external_reference": "MANUAL-F5ECE3-086",
+      "loan_reference": null,
+      "outcome": "MISSING_IN_FINERACT",
+      "note": null,
+      "fineract": null,
+      "erp": {
+        "entry_number": "JE-000029",
+        "type": "REPAYMENT",
+        "entry_date": "2026-03-15",
+        "amount": "75000"
+      }
+    },
+    {
+      "external_reference": "REP-F5ECE3-084",
+      "loan_reference": "LN-2026-000011",
+      "outcome": "MATCHED",
+      "note": null,
+      "fineract": {
+        "type": "REPAYMENT",
+        "transaction_date": "2026-02-15",
+        "amount": "458400",
+        "reversed": false
+      },
+      "erp": {
+        "entry_number": "JE-000028",
+        "type": "REPAYMENT",
+        "entry_date": "2026-02-15",
+        "amount": "458400"
+      }
+    },
+    {
+      "external_reference": "TELLER-F5ECE3-085",
+      "loan_reference": "LN-2026-000011",
+      "outcome": "MISSING_IN_ERP",
+      "note": null,
+      "fineract": {
+        "type": "REPAYMENT",
+        "transaction_date": "2026-03-15",
+        "amount": "100000",
+        "reversed": false
+      },
+      "erp": null
+    },
+    {
+      "external_reference": "TELLER-F5ECE3-087",
+      "loan_reference": "LN-2026-000011",
+      "outcome": "AMOUNT_MISMATCH",
+      "note": null,
+      "fineract": {
+        "type": "REPAYMENT",
+        "transaction_date": "2026-03-20",
+        "amount": "100000",
+        "reversed": false
+      },
+      "erp": {
+        "entry_number": "JE-000030",
+        "type": "REPAYMENT",
+        "entry_date": "2026-03-20",
+        "amount": "90000"
+      }
+    }
+  ]
+}
+```
+
+**4. Fineract state**
+
+repayments posted directly for the TELLER references
+
+**5. ERP state**
+
+```json
+{
+  "entries before": [
+    true,
+    true,
+    false,
+    true,
+    true
+  ],
+  "entries after": [
+    true,
+    true,
+    false,
+    true,
+    true
+  ]
+}
+```
+
+**6. Integration state**
+
+—
+
+**7. Expected result**
+
+MATCHED x2, MISSING_IN_ERP, MISSING_IN_FINERACT, AMOUNT_MISMATCH; nothing written
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+Each Fineract disbursement or repayment is matched to the ERP entry with the same external_reference. The report never writes; repairs are a separate, explicit action (POST /api/admin/recovery for pending postings).
+
+Checks: 5/5 passed
+
+## Tracing FIN-2026-000001 — PASS
+
+*Covers: Section 9: what happened to one reference, from logs and one API call*
+
+**1. Initial state**
+
+ERP unavailable for one call, so the trail shows a deferral and recovery
+
+**2. Request**
+
+POST /api/loans/LN-2026-000012/repayments FIN-2026-000001, then GET /api/transactions/FIN-2026-000001
+
+**3. Response**
+
+```json
+{
+  "first answer": [
+    202,
+    {
+      "external_reference": "FIN-2026-000001",
+      "operation": "REPAYMENT",
+      "status": "ERP_PENDING",
+      "detail": "recorded in Fineract; the ERP journal entry is being posted"
+    }
+  ],
+  "lookup": {
+    "external_reference": "FIN-2026-000001",
+    "type": "REPAYMENT",
+    "loan_reference": "LN-2026-000012",
+    "client_uid": "SME-F5ECE3-088",
+    "status": "COMPLETED",
+    "correlation_id": "partner-FIN-2026-000001",
+    "attempts": 0,
+    "next_attempt_at": null,
+    "error": null,
+    "requested": {
+      "amount": "458400",
+      "transaction_date": "2026-02-15",
+      "external_reference": "FIN-2026-000001"
+    },
+    "recorded": {
+      "external_reference": "FIN-2026-000001",
+      "loan_reference": "LN-2026-000012",
+      "type": "REPAYMENT",
+      "transaction_date": "2026-02-15",
+      "amount": "458400",
+      "principal_portion": "383400",
+      "interest_portion": "75000",
+      "fee_portion": "0",
+      "penalty_portion": "0",
+      "overpayment_portion": "0",
+      "outstanding_after": "4616600",
+      "erp_entry_number": "JE-000032"
+    },
+    "created_at": "2026-10-27T02:01:28.766167Z",
+    "updated_at": "2026-10-27T02:01:31.683017Z"
+  }
+}
+```
+
+**4. Fineract state**
+
+—
+
+**5. ERP state**
+
+—
+
+**6. Integration state**
+
+```json
+{
+  "log trail": [
+    {
+      "timestamp": "2026-10-27T02:01:28.770624+00:00",
+      "service": "integration-service",
+      "event": "operation fineract_pending",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "FINERACT_PENDING",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": null
+    },
+    {
+      "timestamp": "2026-10-27T02:01:29.391604+00:00",
+      "service": "integration-service",
+      "event": "submitted to Fineract",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "FINERACT_PENDING",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": null
+    },
+    {
+      "timestamp": "2026-10-27T02:01:29.413159+00:00",
+      "service": "integration-service",
+      "event": "operation fineract_done",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "FINERACT_DONE",
+      "fineract_transaction_id": 44,
+      "erp_transaction_id": null
+    },
+    {
+      "timestamp": "2026-10-27T02:01:29.421255+00:00",
+      "service": "integration-service",
+      "event": "operation erp_pending",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "ERP_PENDING",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": null
+    },
+    {
+      "timestamp": "2026-10-27T02:01:29.438544+00:00",
+      "service": "integration-service",
+      "event": "deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable (injected fault)",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "ERP_PENDING",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": null
+    },
+    {
+      "timestamp": "2026-10-27T02:01:31.675451+00:00",
+      "service": "mock-erp",
+      "event": "journal entry posted",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "POSTED",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": "JE-000032"
+    },
+    {
+      "timestamp": "2026-10-27T02:01:31.681567+00:00",
+      "service": "integration-service",
+      "event": "operation completed",
+      "correlation_id": "partner-FIN-2026-000001",
+      "status": "COMPLETED",
+      "fineract_transaction_id": null,
+      "erp_transaction_id": "JE-000032"
+    }
+  ]
+}
+```
+
+**7. Expected result**
+
+One API call shows the outcome; the logs show each step under one correlation id
+
+**8. Actual result**
+
+All checks passed.
+
+**9. Explanation**
+
+Recovery re-binds the correlation id stored on the operation, so the deferred ERP posting is logged under the partner's original correlation id.
+
+Checks: 2/2 passed
+

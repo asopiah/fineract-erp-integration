@@ -1,3 +1,6 @@
+patch already applied
+cd upstream/fineract && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=${FINERACT_HOST_PORT:-58080} \
+		./gradlew :integration-tests:test --rerun --tests 'org.apache.fineract.integrationtests.accounting.GLAccountExternalIdIntegrationTest' -PcargoDisabled --max-workers=2
 > Task :buildSrc:extractPluginRequests UP-TO-DATE
 > Task :buildSrc:generatePluginAdapters UP-TO-DATE
 > Task :buildSrc:compileJava UP-TO-DATE
@@ -73,11 +76,11 @@ Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 m
 > Task :fineract-branch:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
 
-> Task :fineract-branch:compileJava UP-TO-DATE
 > Task :fineract-cob:compileJava UP-TO-DATE
 > Task :fineract-cob:processResources NO-SOURCE
-> Task :fineract-branch:processResources UP-TO-DATE
 > Task :fineract-cob:classes UP-TO-DATE
+> Task :fineract-branch:compileJava UP-TO-DATE
+> Task :fineract-branch:processResources UP-TO-DATE
 > Task :fineract-branch:classes UP-TO-DATE
 > Task :fineract-cob:jar UP-TO-DATE
 > Task :fineract-branch:jar UP-TO-DATE
@@ -164,71 +167,65 @@ Generated EclipseLink static weaving persistence.xml for :fineract-security with
 > Task :fineract-security:processResources NO-SOURCE
 > Task :fineract-security:classes UP-TO-DATE
 > Task :fineract-security:jar UP-TO-DATE
+> Task :fineract-client:spotlessMisc UP-TO-DATE
+> Task :fineract-client:spotlessMiscApply UP-TO-DATE
+> Task :fineract-client:processResources UP-TO-DATE
 
 > Task :fineract-provider:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
 
 > Task :fineract-provider:compileJava UP-TO-DATE
-> Task :fineract-client:spotlessMisc UP-TO-DATE
-> Task :fineract-client:spotlessMiscApply UP-TO-DATE
-> Task :fineract-client:processResources UP-TO-DATE
+> Task :fineract-client-feign:spotlessMisc UP-TO-DATE
+> Task :fineract-client-feign:spotlessMiscApply UP-TO-DATE
+> Task :fineract-client-feign:processResources UP-TO-DATE
+> Task :integration-tests:compileJava NO-SOURCE
+> Task :integration-tests:processResources NO-SOURCE
+> Task :integration-tests:classes UP-TO-DATE
+> Task :integration-tests:processTestResources UP-TO-DATE
 > Task :fineract-provider:generateGitProperties
 > Task :fineract-provider:generateRebelMain UP-TO-DATE
 > Task :fineract-provider:processResources UP-TO-DATE
 > Task :fineract-provider:classes
 > Task :fineract-provider:prepareInputYaml UP-TO-DATE
 > Task :fineract-provider:resolve UP-TO-DATE
+> Task :fineract-client-feign:buildJavaSdk UP-TO-DATE
 > Task :fineract-client:buildJavaSdk UP-TO-DATE
+> Task :fineract-client-feign:cleanupGeneratedJavaFiles UP-TO-DATE
 > Task :fineract-client:cleanupGeneratedJavaFiles UP-TO-DATE
+> Task :fineract-client-feign:licenseFormatMain UP-TO-DATE
 > Task :fineract-client:licenseFormatMain UP-TO-DATE
 > Task :fineract-client:buildTypescriptAngularSdk UP-TO-DATE
 > Task :fineract-client:buildAsciidoc UP-TO-DATE
+> Task :fineract-client-feign:compileJava UP-TO-DATE
+> Task :fineract-client-feign:classes UP-TO-DATE
+> Task :fineract-client-feign:jar UP-TO-DATE
 > Task :fineract-client:compileJava UP-TO-DATE
 > Task :fineract-client:classes UP-TO-DATE
 > Task :fineract-client:jar UP-TO-DATE
 > Task :fineract-provider:jar UP-TO-DATE
-> Task :integration-tests:compileJava NO-SOURCE
-> Task :integration-tests:processResources NO-SOURCE
-> Task :integration-tests:classes UP-TO-DATE
-> Task :integration-tests:processTestResources UP-TO-DATE
-> Task :fineract-client-feign:spotlessMisc UP-TO-DATE
-> Task :fineract-client-feign:buildJavaSdk UP-TO-DATE
-> Task :fineract-client-feign:cleanupGeneratedJavaFiles UP-TO-DATE
-> Task :fineract-client-feign:licenseFormatMain UP-TO-DATE
-> Task :fineract-client-feign:spotlessMiscApply UP-TO-DATE
-> Task :fineract-client-feign:compileJava UP-TO-DATE
-> Task :fineract-client-feign:processResources UP-TO-DATE
-> Task :fineract-client-feign:classes UP-TO-DATE
-> Task :fineract-client-feign:jar UP-TO-DATE
-
-> Task :integration-tests:compileTestJava
-/Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/integration-tests/src/test/java/org/apache/fineract/integrationtests/accounting/GLAccountExternalIdIntegrationTest.java:61: warning: [removal] initializeRESTAssured() in Utils has been deprecated and marked for removal
-        Utils.initializeRESTAssured();
-             ^
-1 warning
-
-> Task :integration-tests:testClasses
+> Task :integration-tests:compileTestJava UP-TO-DATE
+> Task :integration-tests:testClasses UP-TO-DATE
 
 > Task :integration-tests:test
 
 [0K[1morg.apache.fineract.integrationtests.accounting.GLAccountExternalIdIntegrationTest[m
 
-[0K[1m  Test [22munknownExternalIdIsNotFound()[32m PASSED[31m (3s)[m
-[0K[1m  Test [22msameExternalIdWithADifferentDefinitionIsAConflict()[32m PASSED[33m (1.2s)[m
+[0K[1m  Test [22munknownExternalIdIsNotFound()[32m PASSED[33m (1.2s)[m
+[0K[1m  Test [22msameExternalIdWithADifferentDefinitionIsAConflict()[32m PASSED[31m (3.1s)[m
 [0K[1m  Test [22midenticalCreateIsAReplayOfTheSameAccount()[32m PASSED[m
 [0K[1m  Test [22mcreateIsProtectedByFineractPermissions()[32m PASSED[m
 
 [0K[1m  concurrentIdenticalCreatesResolveToOneAccount()[m
 
-[0K[1m    Test [22mrepetition 1 of 5[32m PASSED[33m (1.3s)[m
-[0K[1m    Test [22mrepetition 2 of 5[32m PASSED[33m (1.2s)[m
+[0K[1m    Test [22mrepetition 1 of 5[32m PASSED[33m (1.5s)[m
+[0K[1m    Test [22mrepetition 2 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 3 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 4 of 5[32m PASSED[33m (1.1s)[m
-[0K[1m    Test [22mrepetition 5 of 5[32m PASSED[33m (1.1s)[m
+[0K[1m    Test [22mrepetition 5 of 5[32m PASSED[33m (1.2s)[m
 
 [0K[1m  Test [22mexternalIdCannotBeChangedAfterCreate()[32m PASSED[m
 
-[0K[1;32mSUCCESS: [39mExecuted 10 tests in 13.4s[m
+[0K[1;32mSUCCESS: [39mExecuted 10 tests in 14.7s[m
 
 
 [Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
@@ -239,6 +236,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 33s
-115 actionable tasks: 18 executed, 97 up-to-date
-EXIT=0
+BUILD SUCCESSFUL in 34s
+115 actionable tasks: 17 executed, 98 up-to-date
