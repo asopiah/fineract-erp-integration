@@ -5,7 +5,8 @@ same ``external_reference``. ERP entries of those types with no Fineract counter
 
 Reversals: a transaction reversed in Fineract nets to zero. If the ERP still holds its entry (no reversing entry is
 posted automatically), the pair is an AMOUNT_MISMATCH; if the ERP never received it, the pair matches at zero.
-Repairs are explicit and separate: ``POST /api/admin/recovery`` re-drives pending ERP postings.
+Repairs are explicit and separate: ``POST /api/admin/operations/{type}/{reference}/resume`` re-drives the ERP posting of
+a movement Fineract recorded; ``POST /api/admin/recovery`` resumes interrupted work.
 """
 
 from collections import Counter
@@ -97,8 +98,8 @@ class Reconciler:
 
     def _by_dates(self, from_date: date, to_date: date) -> tuple[dict[str, FineractSide], dict[str, ErpJournalEntry]]:
         fineract_side = {
-            _key(side): side
-            for side in self._fineract_transactions()
+            key: side
+            for key, side in self._fineract_transactions()
             if from_date <= side.transaction.transaction_date <= to_date
         }
         erp_side = {
@@ -109,7 +110,7 @@ class Reconciler:
         return fineract_side, erp_side
 
     def _by_references(self, references: frozenset[str]) -> tuple[dict[str, FineractSide], dict[str, ErpJournalEntry]]:
-        fineract_side = {_key(side): side for side in self._fineract_transactions() if _key(side) in references}
+        fineract_side = {key: side for key, side in self._fineract_transactions() if key in references}
         erp_side: dict[str, ErpJournalEntry] = {}
         for reference in references:
             entry = self._erp.find_journal_entry(reference)
@@ -117,23 +118,28 @@ class Reconciler:
                 erp_side[reference] = entry
         return fineract_side, erp_side
 
-    def _fineract_transactions(self) -> Iterator[FineractSide]:
-        """Money transactions on every loan the integration originated, including ones posted directly in Fineract.
+    def _fineract_transactions(self) -> Iterator[tuple[str, FineractSide]]:
+        """Money transactions on every loan the integration originated, keyed by external reference, including ones
+        posted directly in Fineract. Fineract finds a transaction by external id only within a loan, so each loan is
+        read once.
 
-        Fineract finds a transaction by external id only within a loan, so each loan is read once.
+        A transaction without an external reference (posted by hand in Fineract) gets a descriptive key of its own,
+        so several of them are reported separately and never collapse into one.
         """
         with self._session_factory() as session:
             in_fineract = select(Loan.loan_reference).where(Loan.fineract_loan_id.isnot(None)).order_by(Loan.id)
             loan_references = list(session.scalars(in_fineract))
         for loan_reference in loan_references:
             loan = self._fineract.find_loan(loan_reference)
+            unreferenced = 0
             for transaction in loan.transactions if loan is not None else ():
-                if transaction.type in MIRRORED_TYPES:
-                    yield FineractSide(loan_reference, transaction)
-
-
-def _key(side: FineractSide) -> str:
-    return side.transaction.external_reference or f"(no external reference, {side.loan_reference})"
+                if transaction.type not in MIRRORED_TYPES:
+                    continue
+                key = transaction.external_reference
+                if key is None:
+                    unreferenced += 1
+                    key = f"(no reference) {loan_reference} {transaction.fineract_type} #{unreferenced}"
+                yield key, FineractSide(loan_reference, transaction)
 
 
 def _item(

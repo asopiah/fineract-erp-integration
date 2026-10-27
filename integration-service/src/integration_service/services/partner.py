@@ -33,7 +33,7 @@ from integration_service.commands import (
 from integration_service.domain.operations import OperationStatus, OperationType
 from integration_service.domain.references import loan_reference
 from integration_service.errors import ApiError, ErrorCode
-from integration_service.models import LOAN_REFERENCE_SEQUENCE, Client, Loan, Operation
+from integration_service.models import LOAN_REFERENCE_SEQUENCE, MONEY_REFERENCE_INDEX, Client, Loan, Operation
 from integration_service.services import operation_store
 from integration_service.services.executor import OperationExecutor
 from integration_service.services.operation_store import BusinessKeyTakenError, ReferenceReusedError, Reserve
@@ -44,7 +44,6 @@ _PENDING_DETAIL = {
     OperationStatus.FINERACT_PENDING: "Fineract's outcome is not confirmed yet; it is resolved by looking it up",
     OperationStatus.FINERACT_DONE: "recorded in Fineract",
     OperationStatus.ERP_PENDING: "recorded in Fineract; the ERP journal entry is being posted",
-    OperationStatus.NEEDS_RECONCILIATION: "recorded in Fineract but needs manual reconciliation",
 }
 
 
@@ -145,7 +144,7 @@ class PartnerService:
         reserve: Reserve | None = None,
         key_taken: Callable[[], ApiError] | None = None,
     ) -> Outcome:
-        with self._session_factory() as session, _translating_taken_keys(key_taken):
+        with self._session_factory() as session, _translating_taken_keys(operation_type, key_taken):
             try:
                 claim = operation_store.claim(
                     session,
@@ -160,19 +159,18 @@ class PartnerService:
             except ReferenceReusedError as error:
                 raise ApiError(409, ErrorCode.IDEMPOTENCY_CONFLICT, str(error)) from error
 
-        executed = claim.is_new or self._lease_failed_for_retry(claim.operation_id)
-        if executed:
-            with _translating_taken_keys(key_taken):
-                self._executor.execute(claim.operation_id)
-        return self._outcome(claim.operation_id, executed)
+        lease = claim.lease if claim.is_new else self._lease_failed_for_retry(claim.operation_id)
+        if lease is not None:
+            with _translating_taken_keys(operation_type, key_taken):
+                self._executor.execute(claim.operation_id, lease)
+        return self._outcome(claim.operation_id, executed=lease is not None)
 
-    def _lease_failed_for_retry(self, operation_id: int) -> bool:
+    def _lease_failed_for_retry(self, operation_id: int) -> str | None:
         """A retryable failure never reached Fineract: the same request may run again (once, under a lease)."""
         with self._session_factory() as session:
-            operation = session.get_one(Operation, operation_id)
-            if operation.status is not OperationStatus.FAILED or not operation.retryable:
-                return False
-            return operation_store.try_lease(session, operation_id, self._settings.lease_seconds)
+            return operation_store.try_lease(
+                session, operation_id, self._settings.lease_seconds, only_retryable_failure=True
+            )
 
     def _outcome(self, operation_id: int, executed: bool) -> Outcome:
         with self._session_factory() as session:
@@ -184,6 +182,9 @@ class PartnerService:
                 case OperationStatus.FAILED:
                     assert operation.error is not None
                     raise ApiError.from_stored(operation.error)
+                case OperationStatus.NEEDS_RECONCILIATION:
+                    reason = (operation.error or {}).get("reason", "see the operations view")
+                    return Outcome(202, pending_body(operation, f"needs manual reconciliation: {reason}"))
                 case status:
                     return Outcome(202, pending_body(operation, _PENDING_DETAIL[status]))
 
@@ -205,11 +206,14 @@ class PartnerService:
 
 
 @contextmanager
-def _translating_taken_keys(key_taken: Callable[[], ApiError] | None) -> Iterator[None]:
+def _translating_taken_keys(operation_type: OperationType, key_taken: Callable[[], ApiError] | None) -> Iterator[None]:
     """A business key taken by another operation becomes the use case's own 409 (e.g. LOAN_ALREADY_DISBURSED)."""
     try:
         yield
     except BusinessKeyTakenError as error:
+        if error.constraint == MONEY_REFERENCE_INDEX:
+            message = f"external_reference is already used by another disbursement or repayment ({operation_type})"
+            raise ApiError(409, ErrorCode.IDEMPOTENCY_CONFLICT, message) from error
         if key_taken is None:
             raise
         raise key_taken() from error

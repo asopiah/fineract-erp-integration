@@ -10,9 +10,11 @@ from typing import Any
 from pydantic import BaseModel
 
 
-def fingerprint(request: BaseModel) -> str:
-    """SHA-256 of the request's canonical JSON. ``5000000`` and ``5000000.00`` fingerprint the same."""
-    canonical = json.dumps(_canonical(request.model_dump()), sort_keys=True, separators=(",", ":"))
+def fingerprint(request: BaseModel, **context: Any) -> str:
+    """SHA-256 of the request's canonical JSON, plus any context that is part of the request but not of its body
+    (such as the loan in the URL). ``5000000`` and ``5000000.00`` fingerprint the same."""
+    payload = {"body": request.model_dump(), "context": context}
+    canonical = json.dumps(_canonical(payload), sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode()).hexdigest()
 
 

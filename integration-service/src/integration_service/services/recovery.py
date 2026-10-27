@@ -10,8 +10,12 @@ import logging
 import threading
 from dataclasses import dataclass
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
+from integration_service.domain.operations import OperationStatus, OperationType
+from integration_service.errors import ApiError, ErrorCode
+from integration_service.models import LoanTransaction, Operation
 from integration_service.services import operation_store
 from integration_service.services.executor import OperationExecutor
 from integration_service.services.gl_sync import GlAccountSynchronizer
@@ -47,10 +51,11 @@ class Recovery:
             due = operation_store.due_for_recovery(session)
         for operation_id in due:
             with self._session_factory() as session:
-                if not operation_store.try_lease(session, operation_id, self._settings.lease_seconds):
-                    continue  # someone else is working on it
+                lease = operation_store.try_lease(session, operation_id, self._settings.lease_seconds)
+            if lease is None:
+                continue  # someone else is working on it
             try:
-                self._executor.execute(operation_id)
+                self._executor.execute(operation_id, lease)
                 resumed += 1
             except Exception:
                 logger.exception("recovery of operation %d failed; it stays in place for the next sweep", operation_id)
@@ -62,6 +67,36 @@ class Recovery:
         if resumed or gl_retried:
             logger.info("recovery resumed %d operation(s), retried %d GL account(s)", resumed, gl_retried)
         return RecoveryReport(operations_resumed=resumed, gl_accounts_retried=gl_retried)
+
+    def resume_erp_posting(self, operation_type: OperationType, external_reference: str) -> OperationStatus:
+        """Explicit operator repair for a money movement in NEEDS_RECONCILIATION whose Fineract side is recorded.
+
+        Idempotent: it posts the journal derived from Fineract's stored record, which the ERP accepts once.
+        Operations whose Fineract side is not settled (unknown outcome given up, contradicting record) are refused:
+        they need a decision in Fineract first.
+        """
+        with self._session_factory() as session:
+            operation = operation_store.find(session, operation_type, external_reference)
+            if operation is None:
+                raise ApiError(404, ErrorCode.NOT_FOUND, f"no {operation_type} {external_reference}")
+            if operation.status is not OperationStatus.NEEDS_RECONCILIATION:
+                raise ApiError(
+                    409, ErrorCode.NOT_RESUMABLE, f"{external_reference} is {operation.status}, not awaiting repair"
+                )
+            recorded = session.scalar(
+                select(LoanTransaction.id).where(LoanTransaction.external_reference == external_reference)
+            )
+            if not operation.type.posts_journal or recorded is None:
+                raise ApiError(
+                    409, ErrorCode.NOT_RESUMABLE, "Fineract's side is not settled; resolve it in Fineract first"
+                )
+            lease = operation_store.try_lease(session, operation.id, self._settings.lease_seconds)
+            if lease is None:
+                raise ApiError(409, ErrorCode.NOT_RESUMABLE, f"{external_reference} is being worked on")
+            operation_id = operation.id
+        self._executor.resume_erp_posting(operation_id, lease)
+        with self._session_factory() as session:
+            return session.get_one(Operation, operation_id).status
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._loop, name="recovery", daemon=True)

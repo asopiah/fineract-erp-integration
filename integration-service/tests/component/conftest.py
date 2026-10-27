@@ -46,12 +46,12 @@ class System:
         with self.session_factory() as session:
             return session.query(Operation).filter_by(external_reference=external_reference).one()
 
-    def open_loan(self) -> str:
+    def open_loan(self, n: int = 1) -> str:
         """A client and an approved loan, ready for disbursement. Returns the loan reference."""
         self.partner.create_client(
             CreateClient(
-                external_reference="CLI-1",
-                client_uid="SME-000001",
+                external_reference=f"CLI-{n}",
+                client_uid=f"SME-00000{n}",
                 first_name="Amina",
                 last_name="Uwase",
                 activation_date=date(2026, 1, 10),
@@ -59,8 +59,8 @@ class System:
         )
         application = self.partner.apply_for_loan(
             ApplyForLoan(
-                external_reference="APP-1",
-                client_uid="SME-000001",
+                external_reference=f"APP-{n}",
+                client_uid=f"SME-00000{n}",
                 principal=Decimal(5_000_000),
                 annual_interest_rate=Decimal(18),
                 term_months=12,
@@ -69,7 +69,7 @@ class System:
             )
         )
         reference = str(application.body["loan_reference"])
-        self.partner.approve_loan(reference, ApproveLoan(external_reference="APR-1", approved_on=date(2026, 1, 15)))
+        self.partner.approve_loan(reference, ApproveLoan(external_reference=f"APR-{n}", approved_on=date(2026, 1, 15)))
         return reference
 
     def disburse(self, loan_reference: str, external_reference: str = "DISB-1", amount: int = 5_000_000) -> Outcome:

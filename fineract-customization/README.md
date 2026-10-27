@@ -74,6 +74,10 @@ round. The parallel integration test caught it: one of ten concurrent creates go
 Evidence: in 5 rounds of 10 concurrent identical creates, 36 inserts lost the race and were retried. All 50 requests
 returned 200 and each round produced exactly one account (`../evidence/java-race-retries.txt`).
 
+One gap: Fineract's batch API with an enclosing transaction (`/batches?enclosingTransaction=true`) skips the
+command retry. A losing create inside such a batch therefore gets Fineract's generic 409 concurrency conflict instead
+of resolving to the winner. The integration service does not use batches.
+
 A note on upstream code: Fineract maps a duplicate GL code by searching the error message for `acc_gl_code`. On
 PostgreSQL that constraint is called `acc_gl_account_gl_code_key`, so the match never succeeds there. The patch
 does not depend on constraint names.

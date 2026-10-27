@@ -38,7 +38,7 @@ A broker (Kafka/RabbitMQ) or a worker (Celery) would add a second source of trut
 delivery guarantees to reconcile against the database. Instead, the `operations` table *is* the durable queue:
 
 * every status is committed before each external call;
-* a lease names the current owner;
+* a lease (owner token + expiry) names the current owner, and the row's version makes a former owner's writes fail;
 * `next_attempt_at` holds the backoff schedule.
 
 The recovery sweep is a thread in the service that runs at startup, every 5 s, and on demand. It executes due
@@ -60,7 +60,8 @@ Application checks give good error messages; constraints make them true under co
 * Fineract enforces unique `external_id` on clients, loans and loan transactions. I verified this on the PostgreSQL
   schema with `pg_indexes`, rather than trusting the JPA annotations.
 
-No row lock is held across an HTTP call. Leases (an atomic conditional `UPDATE`) give single ownership without one.
+No row lock is held across an HTTP call. Leases (an atomic conditional `UPDATE` with an owner token) plus optimistic
+locking on the operation row give single ownership without one.
 
 ## Idempotency
 
@@ -85,8 +86,11 @@ No row lock is held across an HTTP call. Leases (an atomic conditional `UPDATE`)
 * **ERP after Fineract.** The ERP posting happens only after Fineract confirms, and it is derived from Fineract's
   stored record. A retry sends the identical entry, which the ERP answers with the entry it already holds. ERP
   outages therefore delay the journal (202 `ERP_PENDING`) but cannot duplicate it.
-* **Budgets.** In-request: 3 Fineract attempts (0.5 s, then 1 s). Background: 8 attempts with exponential backoff from
-  2 s, capped at 300 s. Then NEEDS_RECONCILIATION, visible in the dead-letter view.
+* **Budgets.** In-request: 3 Fineract attempts (0.5 s, then 1 s). Background: 20 attempts with exponential backoff
+  from 2 s, capped at 300 s, so about an hour. Then NEEDS_RECONCILIATION, visible in the dead-letter view, where
+  `POST /api/admin/operations/{type}/{ref}/resume` re-drives an ERP posting explicitly and idempotently.
+* **A failed lookup proves nothing.** It means "not applied" only if nothing was submitted yet. Failing to confirm
+  after a submit is an unknown outcome.
 * **Contradictions go to a human.** If Fineract's record disagrees with the request (another amount, another type, a
   reversal), the operation becomes NEEDS_RECONCILIATION. The service never "fixes" money on its own.
 
@@ -116,6 +120,27 @@ SQLAlchemy 2.0 is used with typed mappings, and Alembic for the integration serv
 ## What happened to FIN-2026-000001?
 
 <!-- FIN-TRACE: filled in from the trace simulation of the final evidence run -->
+
+## Found in review
+
+An independent correctness review of the finished code found the following. Each is now fixed and pinned by a test
+(`integration-service/tests/component/test_review_findings.py`).
+
+* **Critical:** a failed confirmation lookup after a successful submit was classified "not applied". An applied
+  repayment could then be reported as "not processed" (503), so the ERP never got the entry. It is now an unknown
+  outcome and is deferred to recovery.
+* **NEEDS_RECONCILIATION was a dead end** (the repair transition existed but nothing used it), and an ERP outage of
+  about 5 minutes exhausted the retry budget. Fixed with the explicit resume repair and a 20-attempt budget.
+* **The fingerprint ignored the loan in the URL:** the same repayment reference on another loan replayed the first
+  loan's result. The loan is now part of the fingerprint.
+* **Leases did not guarantee a single executor.** The expiry used the transaction's start time, writes were
+  unconditional, and a former owner could release the new owner's lease. Fixed with owner tokens,
+  `clock_timestamp()`, renewal before each call and optimistic locking.
+* **Minor:**
+  * unexpected exceptions looped without counting attempts;
+  * a disbursement and a repayment could share a reference (Fineract and the ERP cannot);
+  * reconciliation collapsed transactions that had no reference;
+  * two concurrent replays of a retryable failure could both answer 201.
 
 ## What I chose not to build
 

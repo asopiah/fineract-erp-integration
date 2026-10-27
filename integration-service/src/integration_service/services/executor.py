@@ -4,9 +4,12 @@ The request that creates an operation runs it first; recovery resumes whatever w
 code, and every step can be cut short (timeout, outage, crash) and resumed later from the persisted status:
 
 * Fineract is always asked first whether it already has the operation, by its external reference. A retry never
-  submits a command that may already have been applied.
+  submits a command that may already have been applied, and an operation whose outcome is unknown is never FAILED.
 * The ERP journal is derived from what Fineract stored, and the ERP is idempotent on the external reference, so
   posting it again is safe.
+
+One executor at a time: the caller passes the lease token it holds, every write checks the row's version, and the
+lease is renewed before each external call. An executor whose lease was taken over stops at its next write.
 """
 
 import logging
@@ -14,12 +17,11 @@ import os
 import sys
 import time
 from collections.abc import Callable, Mapping
-from datetime import timedelta
 from typing import Any, NoReturn
 
-from sqlalchemy import func, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm.exc import StaleDataError
 
 from integration_service.domain.accounting import UnmappableTransactionError
 from integration_service.domain.fineract import FineractLoanTransaction
@@ -30,11 +32,16 @@ from integration_service.gateways.errors import GatewayError, NotAppliedError, O
 from integration_service.gateways.faults import FaultInjector
 from integration_service.models import Operation
 from integration_service.observability import log_context
+from integration_service.services import operation_store
 from integration_service.services.handlers import MoneyMovement, OperationHandler
-from integration_service.services.operation_store import BusinessKeyTakenError
+from integration_service.services.operation_store import BusinessKeyTakenError, lease_expiry
 from integration_service.settings import Settings
 
 logger = logging.getLogger(__name__)
+
+
+class LeaseLostError(Exception):
+    """Another executor took the operation over (this one's lease expired); this one must stop."""
 
 
 def _exit_process() -> NoReturn:
@@ -59,13 +66,27 @@ class OperationExecutor:
         self._faults = faults
         self._crash = crash
 
-    def execute(self, operation_id: int) -> None:
-        """Advances the operation as far as it can go now. The caller holds its lease; it is released on return.
+    def execute(self, operation_id: int, lease: str) -> None:
+        """Advances the operation as far as it can go now, under the caller's lease, then releases the lease.
 
         A simulated crash (a ``BaseException``) deliberately skips the release, like a process that died.
         """
+        self._run(operation_id, lease, self._advance)
+
+    def resume_erp_posting(self, operation_id: int, lease: str) -> None:
+        """Operator repair: re-drives the ERP posting of a money movement Fineract recorded (NEEDS_RECONCILIATION)."""
+
+        def resume(session: Session, operation: Operation) -> None:
+            self._move(session, operation, OperationStatus.ERP_PENDING)
+            self._advance(session, operation)
+
+        self._run(operation_id, lease, resume)
+
+    def _run(self, operation_id: int, lease: str, work: Callable[[Session, Operation], None]) -> None:
         with self._session_factory() as session:
             operation = session.get_one(Operation, operation_id)
+            if operation.lease_owner != lease:
+                return  # taken over before we started
             with log_context(
                 correlation_id=operation.correlation_id,
                 external_reference=operation.external_reference,
@@ -73,11 +94,17 @@ class OperationExecutor:
                 loan_reference=operation.loan_reference,
             ):
                 try:
-                    self._advance(session, operation)
+                    work(session, operation)
+                except LeaseLostError:
+                    session.rollback()
+                    logger.warning("lease lost: another executor now owns this operation; stopping")
+                    return
                 except Exception:
-                    self._release(session, operation_id)
+                    session.rollback()
+                    operation_store.release(session, operation_id, lease)
                     raise
-                self._release(session, operation_id)
+                session.rollback()
+                operation_store.release(session, operation_id, lease)
 
     def _advance(self, session: Session, operation: Operation) -> None:
         handler = self._handlers[operation.type]
@@ -110,8 +137,9 @@ class OperationExecutor:
         self, session: Session, operation: Operation, handler: OperationHandler[Any], may_have_applied: bool
     ) -> bool:
         """Leaves FINERACT_PENDING only on evidence: Fineract's record, or certainty that nothing reached it."""
-        last_failure: GatewayError | None = None
+        last_failure = "no attempt made"
         for attempt in range(1, self._settings.fineract_attempts + 1):
+            self._renew_lease(session, operation)
             record: Any = None
             try:
                 record = self._find_or_submit(session, operation, handler)
@@ -120,26 +148,29 @@ class OperationExecutor:
                 try:
                     record = handler.find(session, operation)
                 except GatewayError as failure:
-                    last_failure, may_have_applied = failure, True
+                    last_failure, may_have_applied = failure.message, True
                 else:
                     if record is None:
                         handler.release(session, operation)
                         self._fail(session, operation, rejection, retryable=False)
                         return False
             except OutcomeUnknownError as failure:
-                last_failure, may_have_applied = failure, True
+                last_failure, may_have_applied = failure.message, True
             except NotAppliedError as failure:
-                last_failure = failure
+                last_failure = failure.message
+            except (GatewayError, ValueError, KeyError) as failure:
+                # Not a classified outcome (an unparseable answer, missing reference data): never conclude anything.
+                logger.exception("unexpected failure talking to Fineract")
+                last_failure, may_have_applied = f"{type(failure).__name__}: {failure}", True
             if record is not None:
                 return self._accept(session, operation, handler, record)
             logger.warning("Fineract attempt %d failed: %s", attempt, last_failure, extra={"status": operation.status})
-            self._pause(session, operation, attempt)
+            self._pause(attempt)
 
-        assert last_failure is not None
         if may_have_applied:
             self._defer(session, operation, last_failure)
         else:
-            self._fail(session, operation, last_failure, retryable=True)
+            self._fail(session, operation, NotAppliedError("fineract", last_failure), retryable=True)
         return False
 
     def _find_or_submit(self, session: Session, operation: Operation, handler: OperationHandler[Any]) -> Any:
@@ -148,9 +179,13 @@ class OperationExecutor:
             logger.info("already in Fineract, not submitting again", extra={"status": operation.status})
             return record
         handler.submit(session, operation)
-        record = handler.find(session, operation)
+        # From here on Fineract has the command: failing to confirm it means "unknown", never "not applied".
+        try:
+            record = handler.find(session, operation)
+        except GatewayError as failure:
+            raise OutcomeUnknownError("fineract", f"submitted, but could not confirm: {failure.message}") from failure
         if record is None:
-            raise OutcomeUnknownError("fineract", "command accepted but its result is not visible yet")
+            raise OutcomeUnknownError("fineract", "submitted, but the result is not visible yet")
         logger.info("submitted to Fineract", extra={"status": operation.status})
         return record
 
@@ -174,13 +209,14 @@ class OperationExecutor:
         except UnmappableTransactionError as error:
             self._needs_reconciliation(session, operation, str(error))
             return False
+        self._renew_lease(session, operation)
         try:
             entry = self._erp.post_journal_entry(draft)
         except RejectedError as error:
             self._needs_reconciliation(session, operation, f"ERP rejected the journal entry: {error.message}")
             return False
         except (NotAppliedError, OutcomeUnknownError) as error:
-            self._defer(session, operation, error)
+            self._defer(session, operation, error.message)
             return False
         handler.record_journal(session, operation, entry)
         with log_context(erp_transaction_id=entry.entry_number):
@@ -191,18 +227,20 @@ class OperationExecutor:
 
     def _move(self, session: Session, operation: Operation, target: OperationStatus, **changes: Any) -> None:
         ensure_transition(operation.status, target)
+        leaving_failed = operation.status is OperationStatus.FAILED
         operation.status = target
         operation.attempts = 0
         operation.next_attempt_at = None
-        operation.lease_expires_at = func.now() + timedelta(seconds=self._settings.lease_seconds)
+        operation.lease_expires_at = lease_expiry(self._settings.lease_seconds)
         for name, value in changes.items():
             setattr(operation, name, value)
         try:
-            session.commit()
+            self._commit(session)
         except IntegrityError as error:
-            # Re-entering a once-per-loan slot that another operation took while this one was FAILED.
             session.rollback()
-            raise BusinessKeyTakenError(str(error.orig)) from error
+            if leaving_failed:  # re-entering a once-per-loan slot another operation took meanwhile
+                raise BusinessKeyTakenError(error) from error
+            raise
         logger.info("operation %s", target.value.lower(), extra={"status": target})
 
     def _complete(self, session: Session, operation: Operation, handler: OperationHandler[Any]) -> None:
@@ -210,9 +248,8 @@ class OperationExecutor:
 
     def _fail(self, session: Session, operation: Operation, failure: GatewayError, *, retryable: bool) -> None:
         if retryable:
-            error = ApiError(
-                503, ErrorCode.FINERACT_UNAVAILABLE, f"Fineract did not process the request: {failure.message}"
-            )
+            message = f"Fineract did not process the request: {failure.message}"
+            error = ApiError(503, ErrorCode.FINERACT_UNAVAILABLE, message)
         else:
             error = ApiError(422, ErrorCode.FINERACT_REJECTED, failure.message, fineract_code=failure.code)
         self._move(session, operation, OperationStatus.FAILED, error=error.as_stored(), retryable=retryable)
@@ -221,39 +258,42 @@ class OperationExecutor:
         self._move(session, operation, OperationStatus.NEEDS_RECONCILIATION, error={"reason": reason})
         logger.error("needs reconciliation: %s", reason, extra={"status": OperationStatus.NEEDS_RECONCILIATION})
 
-    def _defer(self, session: Session, operation: Operation, failure: GatewayError) -> None:
+    def _defer(self, session: Session, operation: Operation, reason: str) -> None:
         """Keeps the status and leaves the next attempt to recovery, with capped exponential backoff."""
         operation.attempts += 1
         if operation.attempts >= self._settings.recovery_max_attempts:
-            self._needs_reconciliation(
-                session, operation, f"gave up after {operation.attempts} attempts: {failure.message}"
-            )
+            self._needs_reconciliation(session, operation, f"gave up after {operation.attempts} attempts: {reason}")
             return
         delay = min(
             self._settings.recovery_backoff_cap_seconds,
             self._settings.recovery_backoff_seconds * 2 ** (operation.attempts - 1),
         )
-        operation.next_attempt_at = func.now() + timedelta(seconds=delay)
-        session.commit()
+        operation.next_attempt_at = lease_expiry(delay)
+        self._commit(session)
         logger.warning(
             "deferred to recovery (attempt %d, next in %.1fs): %s",
             operation.attempts,
             delay,
-            failure.message,
+            reason,
             extra={"status": operation.status},
         )
 
-    def _pause(self, session: Session, operation: Operation, attempt: int) -> None:
-        if attempt == self._settings.fineract_attempts:
-            return
-        time.sleep(self._settings.fineract_backoff_seconds * 2 ** (attempt - 1))
-        operation.lease_expires_at = func.now() + timedelta(seconds=self._settings.lease_seconds)
-        session.commit()
+    def _renew_lease(self, session: Session, operation: Operation) -> None:
+        """Before every external call: extends the lease, and finds out early if it was lost."""
+        operation.lease_expires_at = lease_expiry(self._settings.lease_seconds)
+        self._commit(session)
 
-    def _release(self, session: Session, operation_id: int) -> None:
-        session.rollback()
-        session.execute(update(Operation).where(Operation.id == operation_id).values(lease_expires_at=None))
-        session.commit()
+    def _pause(self, attempt: int) -> None:
+        if attempt < self._settings.fineract_attempts:
+            time.sleep(self._settings.fineract_backoff_seconds * 2 ** (attempt - 1))
+
+    @staticmethod
+    def _commit(session: Session) -> None:
+        try:
+            session.commit()
+        except StaleDataError as error:
+            session.rollback()
+            raise LeaseLostError from error
 
     def _crash_if_requested(self) -> None:
         if self._faults is not None and self._faults.take_crash():

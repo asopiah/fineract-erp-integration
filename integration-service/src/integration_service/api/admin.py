@@ -5,7 +5,8 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Query
 
 from integration_service.api.dependencies import ServicesDep, require_api_token
-from integration_service.domain.operations import OperationStatus
+from integration_service.commands import ExternalReference
+from integration_service.domain.operations import OperationStatus, OperationType
 from integration_service.gateways.faults import FaultConfig
 
 admin = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(require_api_token)])
@@ -25,6 +26,15 @@ def list_operations(
 ) -> list[dict[str, Any]]:
     """Operations in one status; by default those waiting for a human (a dead-letter view)."""
     return services.queries.operations(status)
+
+
+@admin.post("/operations/{operation_type}/{external_reference}/resume")
+def resume_erp_posting(
+    operation_type: OperationType, external_reference: ExternalReference, services: ServicesDep
+) -> dict[str, str]:
+    """Re-drives the ERP posting of a money movement awaiting reconciliation (its Fineract side must be recorded)."""
+    status = services.recovery.resume_erp_posting(operation_type, external_reference)
+    return {"external_reference": external_reference, "status": status.value}
 
 
 @faults.get("", response_model=FaultConfig)

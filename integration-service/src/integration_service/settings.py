@@ -29,7 +29,8 @@ class Settings(BaseSettings):
     fineract_backoff_seconds: float = 0.5
     # Work left for recovery (an unknown Fineract outcome, an ERP posting): retried with capped exponential backoff,
     # then routed to NEEDS_RECONCILIATION for a human.
-    recovery_max_attempts: int = 8
+    # 20 attempts at 2 s doubling to a 300 s cap: an outage of up to about an hour heals by itself.
+    recovery_max_attempts: int = 20
     recovery_backoff_seconds: float = 2.0
     recovery_backoff_cap_seconds: float = 300.0
 

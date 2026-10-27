@@ -1,16 +1,21 @@
 """Operations in the database: claiming an external reference, leasing work, finding operations.
 
 The database decides every race here. Two requests can never both own a reference: ``(type, external_reference)`` is
-unique, and the business keys an operation reserves (a client uid, a loan's single approval or disbursement) are
-unique too. A lease makes one executor at a time responsible for advancing an operation.
+unique (money references are unique across types), and the business keys an operation reserves (a client uid, a
+loan's single approval or disbursement) are unique too.
+
+A lease makes one executor at a time responsible for an operation. It is taken with an atomic conditional update and
+identified by an owner token; the row's ``version`` (optimistic locking) makes any write by a former owner fail.
+Times come from ``clock_timestamp()``, the database's wall clock, not the start of a transaction.
 """
 
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from pydantic import BaseModel
-from sqlalchemy import func, or_, select, update
+from sqlalchemy import ColumnElement, DateTime, func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -26,6 +31,8 @@ Reserve = Callable[[Session, Operation], None]
 class Claim:
     operation_id: int
     is_new: bool
+    # The lease token of a new operation (its claimer executes it); None for an existing one.
+    lease: str | None = None
 
 
 class ReferenceReusedError(Exception):
@@ -38,7 +45,17 @@ class ReferenceReusedError(Exception):
 
 
 class BusinessKeyTakenError(Exception):
-    """A unique business key the operation needs (client uid, a loan's approval or disbursement) is already taken."""
+    """A unique business key the operation needs is already taken; ``constraint`` names which one."""
+
+    def __init__(self, error: IntegrityError) -> None:
+        super().__init__(str(error.orig))
+        diagnostics = getattr(error.orig, "diag", None)
+        self.constraint: str | None = getattr(diagnostics, "constraint_name", None)
+
+
+def lease_expiry(seconds: float) -> ColumnElement[datetime]:
+    """``seconds`` from now, by the database's wall clock (``now()`` would be the transaction's start)."""
+    return func.clock_timestamp(type_=DateTime(timezone=True)) + timedelta(seconds=seconds)
 
 
 def claim(
@@ -54,14 +71,15 @@ def claim(
 ) -> Claim:
     """Registers a new operation, or identifies the existing one for this reference.
 
-    A new operation is created leased to the caller, together with whatever rows ``reserve`` adds in the same
-    transaction. Reusing a reference with a different payload raises ``ReferenceReusedError``.
+    The fingerprint covers what the partner asked for: the body and the loan it targets. A new operation is created
+    leased to the caller, with whatever rows ``reserve`` adds, in one transaction.
     """
-    request_fingerprint = fingerprint(request)
+    request_fingerprint = fingerprint(request, loan_reference=loan_reference)
     existing = find(session, operation_type, external_reference)
     if existing is not None:
         return _existing(existing, request_fingerprint)
 
+    lease = str(uuid.uuid4())
     operation = Operation(
         type=operation_type,
         external_reference=external_reference,
@@ -70,7 +88,8 @@ def claim(
         client_uid=client_uid,
         loan_reference=loan_reference,
         correlation_id=current_correlation_id(),
-        lease_expires_at=func.now() + timedelta(seconds=lease_seconds),
+        lease_owner=lease,
+        lease_expires_at=lease_expiry(lease_seconds),
     )
     session.add(operation)
     try:
@@ -82,8 +101,8 @@ def claim(
         winner = find(session, operation_type, external_reference)
         if winner is not None:
             return _existing(winner, request_fingerprint)
-        raise BusinessKeyTakenError(str(error.orig)) from error
-    return Claim(operation.id, is_new=True)
+        raise BusinessKeyTakenError(error) from error
+    return Claim(operation.id, is_new=True, lease=lease)
 
 
 def find(session: Session, operation_type: OperationType, external_reference: str) -> Operation | None:
@@ -103,18 +122,40 @@ def active_for_loan(session: Session, operation_type: OperationType, loan_refere
     )
 
 
-def try_lease(session: Session, operation_id: int, lease_seconds: float) -> bool:
-    """Takes the operation if nobody holds it (or the holder's lease expired). Atomic: one caller wins."""
+def try_lease(
+    session: Session, operation_id: int, lease_seconds: float, *, only_retryable_failure: bool = False
+) -> str | None:
+    """Takes the operation if nobody holds it (or the holder's lease expired). Returns the lease token, or None.
+
+    With ``only_retryable_failure`` the operation must also still be a retryable FAILED one: checked in the same
+    statement, so a replay that waited for another executor cannot take an operation that has meanwhile finished.
+    """
+    lease = str(uuid.uuid4())
+    conditions = [
+        Operation.id == operation_id,
+        or_(Operation.lease_expires_at.is_(None), Operation.lease_expires_at < func.clock_timestamp()),
+    ]
+    if only_retryable_failure:
+        conditions += [Operation.status == OperationStatus.FAILED, Operation.retryable.is_(True)]
     taken = session.execute(
         update(Operation)
-        .where(
-            Operation.id == operation_id,
-            or_(Operation.lease_expires_at.is_(None), Operation.lease_expires_at < func.now()),
-        )
-        .values(lease_expires_at=func.now() + timedelta(seconds=lease_seconds))
+        .where(*conditions)
+        .values(lease_owner=lease, lease_expires_at=lease_expiry(lease_seconds), version=Operation.version + 1)
+        .execution_options(synchronize_session=False)
     )
     session.commit()
-    return bool(taken.rowcount)
+    return lease if taken.rowcount else None
+
+
+def release(session: Session, operation_id: int, lease: str) -> None:
+    """Gives the operation up, if this token still holds it."""
+    session.execute(
+        update(Operation)
+        .where(Operation.id == operation_id, Operation.lease_owner == lease)
+        .values(lease_owner=None, lease_expires_at=None, version=Operation.version + 1)
+        .execution_options(synchronize_session=False)
+    )
+    session.commit()
 
 
 def due_for_recovery(session: Session, limit: int = 100) -> list[int]:
@@ -124,8 +165,8 @@ def due_for_recovery(session: Session, limit: int = 100) -> list[int]:
             select(Operation.id)
             .where(
                 Operation.status.in_(IN_FLIGHT),
-                or_(Operation.next_attempt_at.is_(None), Operation.next_attempt_at <= func.now()),
-                or_(Operation.lease_expires_at.is_(None), Operation.lease_expires_at < func.now()),
+                or_(Operation.next_attempt_at.is_(None), Operation.next_attempt_at <= func.clock_timestamp()),
+                or_(Operation.lease_expires_at.is_(None), Operation.lease_expires_at < func.clock_timestamp()),
             )
             .order_by(Operation.id)
             .limit(limit)

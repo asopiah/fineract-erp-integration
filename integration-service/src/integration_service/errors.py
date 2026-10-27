@@ -16,6 +16,7 @@ class ErrorCode(StrEnum):
     # Preconditions held locally
     CLIENT_NOT_READY = "CLIENT_NOT_READY"
     LOAN_NOT_READY = "LOAN_NOT_READY"
+    NOT_RESUMABLE = "NOT_RESUMABLE"
     # Downstream outcomes
     FINERACT_REJECTED = "FINERACT_REJECTED"
     FINERACT_UNAVAILABLE = "FINERACT_UNAVAILABLE"

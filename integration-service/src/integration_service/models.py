@@ -35,6 +35,7 @@ from integration_service.domain.operations import OperationStatus, OperationType
 MONEY = Numeric(19, 6)
 
 LOAN_REFERENCE_SEQUENCE = Sequence("loan_reference_seq", metadata=Base.metadata)
+MONEY_REFERENCE_INDEX = "uq_operations_money_reference"
 
 
 def _enum(enum: type[StrEnum]) -> Enum:
@@ -60,6 +61,14 @@ class Operation(Base):
             unique=True,
             postgresql_where=text("type IN ('LOAN_APPROVAL', 'DISBURSEMENT') AND status <> 'FAILED'"),
         ),
+        # Fineract (m_loan_transaction.external_id) and the ERP (journal external_reference) each have one namespace
+        # for money references, so a disbursement and a repayment cannot share one either.
+        Index(
+            MONEY_REFERENCE_INDEX,
+            "external_reference",
+            unique=True,
+            postgresql_where=text("type IN ('DISBURSEMENT', 'REPAYMENT')"),
+        ),
         Index("ix_operations_status_next_attempt_at", "status", "next_attempt_at"),
     )
 
@@ -81,7 +90,13 @@ class Operation(Base):
 
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The executor responsible for the operation, and until when. Taken and released only by its token.
+    lease_owner: Mapped[str | None] = mapped_column(String(36))
     lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    # Optimistic locking: every ORM update checks and bumps ``version``, so a writer holding stale state fails
+    # instead of overwriting a newer status.
+    __mapper_args__ = {"version_id_col": version}  # noqa: RUF012
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

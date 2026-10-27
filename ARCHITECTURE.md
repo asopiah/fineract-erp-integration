@@ -72,7 +72,8 @@ An operation stores:
 * the stored result or error, which a replay returns;
 * the correlation id;
 * `attempts` and `next_attempt_at`, the backoff schedule;
-* `lease_expires_at`, which names the current owner.
+* `lease_owner` and `lease_expires_at`, which name the current owner and until when;
+* `version`, for optimistic locking: every write checks it, so a former owner can never overwrite a newer state.
 
 The schema is an Alembic migration. A test fails if the models and the migrations drift apart.
 
@@ -92,7 +93,7 @@ stateDiagram-v2
     FINERACT_DONE --> COMPLETED: client, loan application, approval
     ERP_PENDING --> COMPLETED: journal posted
     ERP_PENDING --> NEEDS_RECONCILIATION: ERP rejects, or retries exhausted
-    NEEDS_RECONCILIATION --> ERP_PENDING: operator repair
+    NEEDS_RECONCILIATION --> ERP_PENDING: explicit repair (resume)
     COMPLETED --> [*]
 ```
 
@@ -104,7 +105,7 @@ stateDiagram-v2
 | `ERP_PENDING` | Waiting for the ERP posting (backoff) | Post the identical journal again (the ERP is idempotent) |
 | `COMPLETED` | Done | Replay the stored result |
 | `FAILED` | Definitive rejection (`retryable=false`), or nothing reached Fineract (`retryable=true`) | Replay the error. A retryable failure re-executes when the same request is sent again. |
-| `NEEDS_RECONCILIATION` | A human must decide | Visible in `GET /api/admin/operations` |
+| `NEEDS_RECONCILIATION` | A human must decide | Visible in `GET /api/admin/operations`. If Fineract's side is recorded, `POST /api/admin/operations/{type}/{ref}/resume` re-drives the ERP posting. |
 
 Every transition is committed **before** the next external call, and the allowed transitions are enforced in code
 (`domain/operations.py`). A crash at any point therefore leaves a status that says exactly what is known.
@@ -132,7 +133,16 @@ Retry policy:
 
 * **Within the request:** Fineract is tried 3 times, with 0.5 s then 1 s backoff.
 * **In the background:** recovery retries with capped exponential backoff: 2 s, 4 s, 8 s and so on, up to 300 s, for at
-  most 8 attempts. After that the operation becomes NEEDS_RECONCILIATION.
+  most 20 attempts, so an outage of up to about an hour heals by itself. After that the operation becomes
+  NEEDS_RECONCILIATION.
+
+A failed lookup proves nothing, but its meaning depends on when it happens:
+
+* **Before** anything was submitted, it is "not applied".
+* **After** a submit (the confirmation step), it is an **unknown outcome**: the command reached Fineract.
+
+An unexpected failure, such as an unparseable answer, is deferred with backoff like an unknown outcome, never
+concluded.
 
 ## Concurrency and the "exactly once" layers
 
@@ -143,8 +153,16 @@ Retry policy:
 | 3. Lookup by external id before submit; Fineract's unique `external_id` on clients, loans and loan transactions | Resubmitting what may already have been applied | Dedupes one reference only |
 | 4. **Fineract's loan state** (the last line of defence) | A second disbursement of a single-tranche loan, whatever the integration believes | It is the system of record: it decides |
 
-Leases (`operations.lease_expires_at`, taken with an atomic conditional `UPDATE`) make one executor at a time
-responsible for an operation. Leases replace long-held row locks: no database lock is held across an HTTP call.
+Leases make one executor at a time responsible for an operation, without holding a database lock across an HTTP
+call:
+
+* A lease is taken with an atomic conditional `UPDATE` that sets an owner token and an expiry by the database's wall
+  clock (`clock_timestamp()`).
+* It is renewed before every external call.
+* It is released only by its owner's token.
+* Every write to the operation checks its `version` (SQLAlchemy optimistic locking). An executor whose lease expired
+  and was taken over fails at its next write and stops; it cannot overwrite or release the new owner's work.
+  Fineract's lookup-first rule makes even its last in-flight command harmless.
 
 ## GL sync design
 

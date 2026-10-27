@@ -23,7 +23,7 @@ from integration_service.domain.fineract import (
     LoanTransactionType,
 )
 from integration_service.domain.gl_accounts import fineract_gl_type
-from integration_service.gateways.errors import GatewayError
+from integration_service.gateways.errors import NotAppliedError
 from integration_service.gateways.http import JsonApi, json_or_empty, propagate_correlation_id
 from integration_service.settings import Settings
 
@@ -218,7 +218,8 @@ class FineractGateway:
             if name not in self._reference_ids:
                 found = lookup()
                 if found is None:
-                    raise GatewayError("fineract", f"{name} is not configured in Fineract; run the bootstrap")
+                    # Raised before anything is sent, so nothing was applied.
+                    raise NotAppliedError("fineract", f"{name} is not configured in Fineract; run the bootstrap")
                 self._reference_ids[name] = int(found["id"])
             return self._reference_ids[name]
 

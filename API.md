@@ -27,7 +27,7 @@ Every error has one shape:
 | --- | --- |
 | 401 | `UNAUTHORIZED` |
 | 404 | `NOT_FOUND` |
-| 409 | `IDEMPOTENCY_CONFLICT`, `CLIENT_UID_TAKEN`, `LOAN_ALREADY_APPROVED`, `LOAN_ALREADY_DISBURSED`, `CLIENT_NOT_READY`, `LOAN_NOT_READY` |
+| 409 | `IDEMPOTENCY_CONFLICT`, `CLIENT_UID_TAKEN`, `LOAN_ALREADY_APPROVED`, `LOAN_ALREADY_DISBURSED`, `CLIENT_NOT_READY`, `LOAN_NOT_READY`, `NOT_RESUMABLE` |
 | 422 | `VALIDATION_ERROR` (with `details` per field); `FINERACT_REJECTED` (Fineract refused it; `details.fineract_code` has Fineract's reason code) |
 | 503 | `FINERACT_UNAVAILABLE` (nothing reached Fineract: safe to retry the same request), `ERP_UNAVAILABLE` |
 | 500 | `INTERNAL_ERROR` (the logs carry the details under the returned correlation id) |
@@ -45,7 +45,8 @@ Every state-changing request carries an `external_reference`. Uniqueness is per 
 | Same reference after `503 FINERACT_UNAVAILABLE` | Executed again (nothing had reached Fineract) |
 | Same reference after `422 FINERACT_REJECTED` | The same rejection. A corrected request needs a new reference. |
 
-"Same payload" compares a canonical fingerprint of the validated body, so `5000000` and `5000000.00` are the same.
+"Same payload" compares a canonical fingerprint of the validated body **and the loan in the URL**, so `5000000` and
+`5000000.00` are the same, but reusing a repayment reference on another loan is a 409.
 
 | Operation | Unique per |
 | --- | --- |
@@ -55,6 +56,7 @@ Every state-changing request carries an `external_reference`. Uniqueness is per 
 | Approval | `external_reference`, and one approval per loan |
 | Disbursement | `external_reference`, and **one disbursement per loan** whatever the reference |
 | Repayment | `external_reference`. Any number of repayments per loan. |
+| Disbursements and repayments together | One namespace (as in Fineract and the ERP): a repayment cannot reuse a disbursement's reference (409) |
 
 A `202` body says what is pending:
 
@@ -177,8 +179,12 @@ The possible outcomes are:
 
 ### Admin
 
-* `POST /api/admin/recovery`: run the recovery sweep now. It is also the explicit, idempotent repair action.
+* `POST /api/admin/recovery`: run the recovery sweep now, instead of at its next scheduled run.
 * `GET /api/admin/operations?status=NEEDS_RECONCILIATION`: operations waiting for a human (the dead-letter view).
+* `POST /api/admin/operations/{type}/{external_reference}/resume`: the explicit, idempotent repair. It re-drives the
+  ERP posting of a disbursement or repayment in NEEDS_RECONCILIATION whose Fineract side is recorded, for example
+  after the ERP was down beyond the retry budget or rejected the entry. It refuses (`409 NOT_RESUMABLE`) when
+  Fineract's side is not settled: that needs a decision in Fineract first.
 * `GET|PUT /api/admin/faults`: fault injection, present only when `INTEGRATION_FAULT_INJECTION_ENABLED=true` (test
   stacks). The body is `{"fineract": "none|unavailable|timeout_after_send", "remaining": n, "crash_after_fineract":
   false}`.

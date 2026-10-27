@@ -35,6 +35,7 @@ class Fault(Enum):
     UNKNOWN_BEFORE = auto()  # answer lost, and in fact nothing happened
     UNKNOWN_AFTER = auto()  # answer lost after the effect was committed
     MISSING = auto()  # (lookups only) briefly does not see a committed record
+    GARBAGE = auto()  # (lookups only) an answer that cannot be parsed
 
 
 class Scripted:
@@ -43,12 +44,23 @@ class Scripted:
     def __init__(self, system: str) -> None:
         self._system = system
         self._faults: dict[str, deque[Fault]] = defaultdict(deque)
+        self._hooks: dict[str, deque[Callable[[], None]]] = defaultdict(deque)
         self._lock = threading.RLock()
         self.calls: list[str] = []
 
     def fail(self, method: str, *faults: Fault) -> None:
         with self._lock:
             self._faults[method].extend(faults)
+
+    def during_next(self, method: str, action: Callable[[], None]) -> None:
+        """Runs ``action`` while the next call of ``method`` is in progress (e.g. another executor taking over)."""
+        with self._lock:
+            self._hooks[method].append(action)
+
+    def _run_hook(self, method: str) -> None:
+        hook = self._hooks[method].popleft() if self._hooks[method] else None
+        if hook is not None:
+            hook()
 
     def _command(self, method: str, apply: Callable[[], None]) -> None:
         with self._lock:
@@ -67,10 +79,13 @@ class Scripted:
     def _lookup[T](self, method: str, find: Callable[[], T | None]) -> T | None:
         with self._lock:
             fault = self._faults[method].popleft() if self._faults[method] else None
+            self._run_hook(method)
             if fault is Fault.NOT_APPLIED:
                 raise NotAppliedError(self._system, f"{method}: injected outage")
             if fault is Fault.MISSING:
                 return None
+            if fault is Fault.GARBAGE:
+                raise ValueError(f"{method}: injected unparseable answer")
             return find()
 
 
