@@ -1,0 +1,9 @@
+# Compose override used only by `make test-java-regression`. Never part of the normal stack.
+#
+# Fineract's own integration tests share a base class (BaseLoanIntegrationTest) that calls internal endpoints such as
+# /v1/internal/loan/status/{id}. Fineract only creates those endpoints under the Spring profile "test", so without
+# this override upstream's tests fail in their setup with 404 before they test anything.
+services:
+  fineract:
+    environment:
+      SPRING_PROFILES_ACTIVE: test

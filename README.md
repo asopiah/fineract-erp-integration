@@ -74,6 +74,7 @@ curl -s -X POST localhost:58090/api/clients \
 | --- | --- | --- |
 | Java | `make test-java` | Unit tests for the GL customization (Gradle/JUnit, no server needed) |
 | Java | `make test-java-it` | Integration test against the running Fineract: replay, 409, 10 concurrent creates ×5, permissions |
+| Java | `make test-java-regression` | Regression: Fineract's own GL integration tests plus ours, to prove the patch broke nothing that worked before (restarts Fineract in its `test` profile for the run) |
 | Python | `make test-python` | Ruff, `mypy --strict`, then the unit and component tests of both services (component tests use real PostgreSQL) |
 | Both | `make test` | `test-python` and `test-java` |
 | Stack | `make test-stack` | Every simulation as an automated test against the running stack |

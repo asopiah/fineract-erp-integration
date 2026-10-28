@@ -12,6 +12,7 @@ The final run started from empty volumes (`make down && make up`) with the Finer
 | `build-dockerfile.log` | The same patched build inside Docker, for machines without a JDK | `docker build fineract-customization` |
 | `java-unit-tests.log` | JUnit unit tests of the GL customization pass | `make test-java` |
 | `java-integration-tests.log` | JUnit integration test against the running patched Fineract: replay, 409, 5 × 10 concurrent creates, permission denied, immutable external id, lookup | `make test-java-it` |
+| `java-regression-tests.log` | Regression: Fineract's own `GLAccountIntegrationTest` (4 tests: create, update, delete, and the delete guards for children, product mappings and journal entries) passes on the patched build, next to our 10 | `make test-java-regression` |
 | `java-race-retries.txt` | How many concurrent GL inserts lost the unique-constraint race and were resolved by Fineract's command retry | Fineract logs during `make test-java-it` |
 | `python-tests.log` | Ruff, `mypy --strict`, and unit and component tests of both Python services | `make test-python` |
 | `stack-tests.log` | Every simulation as an automated test against the running stack | `make test-stack` |

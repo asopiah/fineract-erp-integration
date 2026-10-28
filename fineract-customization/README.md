@@ -113,8 +113,9 @@ That target clones tag `1.15.0` into `upstream/fineract`, applies the patch and 
 ## Tests
 
 ```bash
-make test-java          # unit tests (Gradle, no server needed)
-make test-java-it       # integration tests against the running stack (needs `docker compose up`)
+make test-java             # unit tests (Gradle, no server needed)
+make test-java-it          # integration tests against the running stack (needs `docker compose up`)
+make test-java-regression  # upstream's GL integration tests + ours (restarts Fineract in its "test" profile)
 ```
 
 | Kind | Class | Covers |
@@ -123,6 +124,22 @@ make test-java-it       # integration tests against the running stack (needs `do
 | Unit | `GLAccountExternalIdCreateTest` (fineract-accounting) | replay, conflict, code clash, lookup window, race hand-off, non-unique errors |
 | Unit | `UniqueConstraintViolationsTest` | SQL-state detection for PostgreSQL and MySQL |
 | Integration | `GLAccountExternalIdIntegrationTest` (integration-tests) | replay, 409, 10 concurrent creates ×5, permission denied (403), immutable external id, 404 lookup |
+| Regression | `GLAccountIntegrationTest` (upstream, unchanged) | create, update, delete, and refusing to delete an account with children, a product mapping or journal entries |
 
-Recorded runs: `../evidence/java-unit-tests.log`, `../evidence/java-integration-tests.log`, and the image build in
+### Regression: proving nothing else broke
+
+The tests above prove the new behaviour. They can't prove that the old behaviour survived, and the patch changes
+code every GL account create and update goes through, plus the `acc_gl_account` table every journal entry points
+at. So `make test-java-regression` runs Fineract's own GL integration tests on the patched build, unchanged, next to
+ours. Those tests never send an external id, so they exercise the paths existing Fineract users depend on.
+
+Upstream's tests share a base class (`BaseLoanIntegrationTest`) that calls internal endpoints which Fineract only
+creates under its Spring profile `test`. Without that profile, all four fail in setup with 404 before testing
+anything. The target therefore restarts Fineract with `docker/fineract-test-profile.yml` for the run. Afterwards it
+always restarts Fineract in its normal profile, even when tests fail, and still exits with the tests' result.
+
+Scope: the GL area the patch touches, not Fineract's whole integration suite (thousands of tests, hours).
+
+Recorded runs: `../evidence/java-unit-tests.log`, `../evidence/java-integration-tests.log`,
+`../evidence/java-regression-tests.log` (14 tests: upstream's 4 + our 10, 0 failures), and the image build in
 `../evidence/build-patched.log`.

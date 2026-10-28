@@ -9,6 +9,9 @@ GRADLE         := cd $(FINERACT_DIR) && ./gradlew
 
 GL_UNIT_TESTS := --tests 'org.apache.fineract.accounting.glaccount.*'
 GL_IT_TESTS   := --tests 'org.apache.fineract.integrationtests.accounting.GLAccountExternalIdIntegrationTest'
+# Upstream's own GL integration tests: they never send an external id, so they pin the behaviour from before the patch
+GL_UPSTREAM_IT_TESTS := --tests 'org.apache.fineract.integrationtests.accounting.GLAccountIntegrationTest'
+TEST_PROFILE  := -f docker-compose.yml -f docker/fineract-test-profile.yml
 
 VENV   := $(CURDIR)/.venv
 BIN    := $(VENV)/bin
@@ -55,6 +58,16 @@ test-java: fineract-patch ## Java unit tests for the customization (always re-ru
 test-java-it: fineract-patch ## Java integration tests against the running stack
 	cd $(FINERACT_DIR) && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=$${FINERACT_HOST_PORT:-58080} \
 		./gradlew :integration-tests:test --rerun $(GL_IT_TESTS) -PcargoDisabled --max-workers=2
+
+# Proves the patch broke nothing that worked before: upstream's GL tests run next to ours. Upstream's tests need
+# Fineract's "test" Spring profile (see docker/fineract-test-profile.yml), so Fineract is restarted with it for the run
+# and always restarted without it afterwards, even when tests fail; the target still exits with the tests' status.
+.PHONY: test-java-regression
+test-java-regression: fineract-patch ## Upstream's GL integration tests + ours against Fineract in its "test" profile
+	docker compose $(TEST_PROFILE) up -d --wait fineract
+	cd $(FINERACT_DIR) && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=$${FINERACT_HOST_PORT:-58080} \
+		./gradlew :integration-tests:test --rerun $(GL_UPSTREAM_IT_TESTS) $(GL_IT_TESTS) -PcargoDisabled --max-workers=2; \
+		status=$$?; cd $(CURDIR) && docker compose up -d --wait fineract; exit $$status
 
 # --- Python ------------------------------------------------------------------------------------------------------
 
