@@ -20,7 +20,7 @@ RUN sed -i 's/-Xmx12g/-Xmx3g/' gradle.properties \
     && ./gradlew --no-daemon :fineract-provider:bootJar -x test \
     && cp "fineract-provider/build/libs/fineract-provider-${FINERACT_TAG}.jar" /fineract-provider.jar
 
-# Same runtime base as Fineract's Jib image.
+# Same runtime base as Fineract's own Jib image (fineract-provider/build.gradle), which uses this tag too.
 FROM azul/zulu-openjdk-alpine:21
 COPY --from=build /fineract-provider.jar /app/fineract-provider.jar
 USER nobody:nogroup

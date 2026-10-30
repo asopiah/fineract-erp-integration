@@ -2,6 +2,7 @@
 SHELL := /bin/bash
 
 FINERACT_TAG   := 1.15.0
+FINERACT_COMMIT := d5636847ac556c30b437254c353f05526d172b97
 FINERACT_DIR   := upstream/fineract
 FINERACT_IMAGE := fineract-gl-sync:$(FINERACT_TAG)
 PATCH          := $(CURDIR)/fineract-customization/gl-account-external-id.patch
@@ -37,6 +38,7 @@ down: ## Stop the stack and delete its data
 
 $(FINERACT_DIR):
 	git clone --depth 1 --branch $(FINERACT_TAG) https://github.com/apache/fineract.git $(FINERACT_DIR)
+	test "$$(git -C $(FINERACT_DIR) rev-parse HEAD)" = "$(FINERACT_COMMIT)"
 
 .PHONY: fineract-patch
 fineract-patch: $(FINERACT_DIR) ## Apply the GL external id patch to the upstream checkout (idempotent)
@@ -45,6 +47,13 @@ fineract-patch: $(FINERACT_DIR) ## Apply the GL external id patch to the upstrea
 	else \
 		git -C $(FINERACT_DIR) apply $(PATCH) && echo "patch applied"; \
 	fi
+
+.PHONY: fineract-save-patch
+fineract-save-patch: ## Write your edits in upstream/fineract (new files included) back to the shipped patch
+	git -C $(FINERACT_DIR) add -A
+	git -C $(FINERACT_DIR) diff --cached > $(PATCH)
+	git -C $(FINERACT_DIR) reset -q
+	@git diff --stat -- $(PATCH)
 
 .PHONY: fineract-image
 fineract-image: fineract-patch ## Build the customized Fineract image with the host JDK (fast path)
