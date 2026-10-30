@@ -15,19 +15,27 @@ The options were a new endpoint, an extension of the existing GL command handler
 * **Where the rules run.** `GLAccountWritePlatformServiceJpaRepositoryImpl.createGLAccount`, inside the command's
   transaction. The transaction boundary is `CommandSourceService.processCommandAndSaveResult` (`@Transactional`).
   The lookup, the insert and the unique constraint are therefore one unit.
-* **Race handling.** Fineract's command retry wraps that transaction from the outside, so a retried attempt gets a
-  fresh transaction. A create that loses the unique-constraint race throws a `ConcurrencyFailureException`, which
-  that retry is configured for. The retry then resolves against the committed winner.
+* **Race handling.** A create that loses the unique-constraint race throws a `ConcurrencyFailureException`, which
+  Fineract's command retry already handles: it runs the request again in a fresh transaction, where it resolves to
+  the winner. Retrying inside the failed transaction is impossible (it is rollback-only), and a `REQUIRES_NEW`
+  sub-transaction would have split the account from its audit row.
+* **409, not 403.** Fineract answers domain-rule exceptions with 403, the same status as "no permission". A dedicated
+  mapper returns 409, so a client can tell "this id already means something else" from "you may not".
+* **Not used: Fineract's `Idempotency-Key`.** It does not compare payloads, and it replays cached errors.
 
-  Retrying inside the failed transaction is impossible: it is rollback-only, and on PostgreSQL it is aborted. A
-  `REQUIRES_NEW` sub-transaction would have split the account from its audit row.
-* **409, not 403.** Fineract maps domain-rule exceptions to 403, the same status as "no permission". A dedicated
-  exception mapper returns 409, so a client can tell "this id already means something else" from "you may not".
-* **The lookup order was found by a test.** Checking the GL code before the external id is what makes an account
-  committed between the two lookups resolve as a replay. The parallel integration test caught the first version,
-  which got 1 × 403 in 10 concurrent creates.
-* **Not used: Fineract's `Idempotency-Key`.** It does not compare payloads (a different body replays the cached
-  result), and it replays cached errors, which would pin a transient failure.
+The details, including the edge cases, are in [fineract-customization/README.md](fineract-customization/README.md).
+
+## GL sync: an explicit call, create-only
+
+The brief leaves the trigger open. The sync runs when something calls `POST /api/accounts/sync`: the bootstrap does,
+before it creates the loan product, and an operator can at any time.
+
+* **Why not an ERP webhook:** the mock ERP would need outbound delivery, retries and signatures, and a missed
+  webhook still needs a sweep to catch up. The explicit call *is* that sweep.
+* **Why not polling on a timer:** the chart changes rarely, and a new account matters only once a product maps it,
+  which is a deliberate configuration step anyway.
+* **Create-only**, as the brief says. Each account is a `gl_account_syncs` row with its own status, so one failing
+  account doesn't block the others, and recovery retries transient failures.
 
 ## Synchronous calls, no queue
 
@@ -37,9 +45,9 @@ contract.
 A broker (Kafka/RabbitMQ) or a worker (Celery) would add a second source of truth for in-flight work, with its own
 delivery guarantees to reconcile against the database. Instead, the `operations` table *is* the durable queue:
 
-* every status is committed before each external call;
-* a lease (owner token + expiry) names the current owner, and the row's version makes a former owner's writes fail;
-* `next_attempt_at` holds the backoff schedule.
+* every status is committed before each external call
+* a lease (owner token + expiry) names the current owner, and the row's version makes a former owner's writes fail
+* `next_attempt_at` holds the backoff schedule
 
 The recovery sweep is a thread in the service that runs at startup, every 5 s, and on demand. It executes due
 operations with the same code the request used. This meets "recovery without a worker" and survives a crash (J5).
@@ -52,7 +60,7 @@ Application checks give good error messages; constraints make them true under co
 
 * `operations UNIQUE (type, external_reference)`: one operation per reference and type.
 * A partial unique index allows one active `LOAN_APPROVAL` and one active `DISBURSEMENT` per loan. FAILED rows are
-  excluded: they never reached Fineract, so they must not block a corrected request.
+  excluded: Fineract either refused them or never received them, so they must not block a corrected request.
 * `clients.client_uid`, `loans.loan_reference` and `loan_transactions.external_reference` are unique, and the claim
   inserts them **in the same transaction** as the operation row.
 * The Mock ERP enforces its own uniqueness (`external_reference`, `code`) and refuses unbalanced entries. It also has
@@ -60,8 +68,20 @@ Application checks give good error messages; constraints make them true under co
 * Fineract enforces unique `external_id` on clients, loans and loan transactions. I verified this on the PostgreSQL
   schema with `pg_indexes`, rather than trusting the JPA annotations.
 
-No row lock is held across an HTTP call. Leases (an atomic conditional `UPDATE` with an owner token) plus optimistic
-locking on the operation row give single ownership without one.
+Partner operations never hold a row lock across an HTTP call. Leases (an atomic conditional `UPDATE` with an owner
+token) plus optimistic locking on the operation row give single ownership without one. The one exception is GL
+sync, an operator action: it locks the account's sync row while it calls Fineract, so two syncs of the same account
+take turns.
+
+**Why leases, not `SELECT … FOR UPDATE SKIP LOCKED`:** a lock lives as long as a transaction, so holding one across a
+Fineract call would keep a transaction open for up to the whole call (seconds, or a 15 s timeout). A lease is a
+committed fact: it survives the transaction, it shows in the table who owns the work and until when, and it expires
+on its own if the owner dies (J5).
+
+**The numbers.** Lease 60 s by default (20 s in the compose stack, so the crash simulation recovers quickly); it is
+renewed before each Fineract call. Recovery sweeps every 5 s. A request tries Fineract 3 times before handing over
+to recovery, which then backs off exponentially from 2 s up to 300 s for at most 20 attempts. All of these are
+settings (`INTEGRATION_*`).
 
 ## Idempotency
 
@@ -79,7 +99,8 @@ locking on the operation row give single ownership without one.
   lookup by external id. A timeout (unknown outcome) can never end as FAILED: only certainty that nothing was
   delivered, or Fineract's rejection, can.
 * **Classification decides safety.**
-  * *Not applied* (connect error, 429, 503, a Fineract lock conflict): resend after backoff.
+  * *Not applied* (connect error, 408, 429, 503, a Fineract lock conflict, refused credentials): resend after
+    backoff.
   * *Rejected* (4xx): final. But first look again, because Fineract's uniqueness may be refusing our own earlier
     attempt.
   * *Unknown* (read timeout, 500, 502, 504): look up, never resend blindly.
@@ -104,15 +125,20 @@ locking on the operation row give single ownership without one.
 | GL accounts | Created from the ERP with `manualEntriesAllowed=false`: the ERP owns the ledger, and Fineract posts only from loan transactions |
 | Least privilege | Role *Integration API* has 13 permissions: read/create GL account, read office, loan product and payment type, read/create/activate client, read/create/approve/disburse/repay loan. The bootstrap re-applies exactly this set on each run. `ACTIVATE_CLIENT` was found missing by a 403 in testing (clients are created active). |
 | Reference data | The service resolves office, product and payment type by business key (external id or name), never by a configured numeric id |
-| Database | PostgreSQL: Fineract's default, and its 1.15 image ships the driver |
+| Database | PostgreSQL: Fineract's default, and its 1.15 image ships the driver. One server with a database and an owner role per service keeps the stack light; nothing crosses databases, so splitting them later is a configuration change. |
 
 ## Python framework
 
 **FastAPI** for both services:
 
-* typed request and response models (pydantic) give validation and the OpenAPI documentation from one definition;
-* dependency injection keeps the routes thin;
-* synchronous endpoints run in a thread pool, which suits blocking SQLAlchemy and httpx without async plumbing.
+| Why | |
+| --- | --- |
+| Validation and API docs from one definition | Pydantic request and response models generate the OpenAPI document |
+| Thin routes | Dependency injection supplies the session, auth and services |
+| Simple concurrency | Plain `def` endpoints run in a thread pool, which suits blocking SQLAlchemy and httpx |
+
+Flask would need extensions for validation and OpenAPI; Django REST Framework brings an ORM and admin this service
+doesn't need.
 
 SQLAlchemy 2.0 is used with typed mappings, and Alembic for the integration service's schema. The Mock ERP uses
 `create_all`: it is a stand-in with no upgrade path. Both services pass `mypy --strict` and Ruff.
@@ -160,8 +186,12 @@ the partner's original id because it is stored on the operation. Every line also
 
 ## Found in review
 
-An independent correctness review of the finished code found the following. Each is now fixed and pinned by a test
-(`integration-service/tests/component/test_review_findings.py`).
+The finished code went through two review rounds, each by fresh AI reviewers with no access to my reasoning, and
+every finding was reproduced before it was fixed. Each fix is pinned by a test
+(`integration-service/tests/component/test_review_findings.py`, and `GLAccountExternalIdValidationTest` for the Java
+patch).
+
+**Round one:**
 
 * **Critical:** a failed confirmation lookup after a successful submit was classified "not applied". An applied
   repayment could then be reported as "not processed" (503), so the ERP never got the entry. It is now an unknown
@@ -174,10 +204,30 @@ An independent correctness review of the finished code found the following. Each
   unconditional, and a former owner could release the new owner's lease. Fixed with owner tokens,
   `clock_timestamp()`, renewal before each call and optimistic locking.
 * **Minor:**
-  * unexpected exceptions looped without counting attempts;
-  * a disbursement and a repayment could share a reference (Fineract and the ERP cannot);
-  * reconciliation collapsed transactions that had no reference;
-  * two concurrent replays of a retryable failure could both answer 201.
+  * unexpected exceptions looped without counting attempts
+  * a disbursement and a repayment could share a reference (Fineract and the ERP cannot)
+  * reconciliation collapsed transactions that had no reference
+  * two concurrent replays of a retryable failure could both answer 201
+
+**Round two**, on the finished submission:
+
+* **An unexpected error type still bypassed the retry budget.** The first fix only covered some exception types; an
+  ERP answer that wasn't JSON, for example, still left the operation untouched, so recovery retried it every 5
+  seconds forever. Any unexpected failure while an operation is in flight is now deferred with backoff and counts
+  toward the 20-attempt budget.
+* **A long `X-Correlation-ID` header broke every write** (the column holds 100 characters). Both services now accept
+  only 1–100 safe characters and mint a new id otherwise.
+* **Refused credentials looked like business rejections.** After a password rotation, every request would have
+  failed permanently and released its reserved keys. A 401, 407 or Fineract's "not authorized" 403 is now "not
+  applied": safe to resend once the configuration is fixed.
+* **The operator repair trusted the stored record.** It now re-reads Fineract first and refuses if the transaction
+  was reversed or changed since.
+* **Smaller:**
+  * amounts like `5E+6` reached Fineract in exponent form; they are now always sent as plain digits
+  * the lease is renewed before each Fineract call, not once per attempt
+  * an empty reconciliation request returned 500; it is now a 422
+  * the Java patch silently treated a blank `externalId` as "none"; it is now rejected
+  * one Java integration test would have passed even without the rule it tested
 
 ## What I chose not to build
 
@@ -206,8 +256,21 @@ An independent correctness review of the finished code found the following. Each
   covered by a test, but it is the last line of defence, not the first.
 * **Fault injection is mounted in the compose stack** (`FAULT_INJECTION_ENABLED=true`) so the simulations can run.
   It is off by default in the services' own settings and must stay off in production.
-* **Plain HTTP inside the compose network, static bearer tokens, development credentials in `docker-compose.yml`.**
-  Acceptable for a local assessment stack only.
+* **Security is local-stack grade.**
+  * Plain HTTP inside the compose network.
+  * Development credentials have defaults in the code and in `docker-compose.yml`. A production build should refuse
+    to start without them.
+  * One bearer token covers the partner API and the admin routes (recovery, resume, the operations view); production
+    needs a separate operator credential.
+  * Fineract's own error message is passed back to the partner in `FINERACT_REJECTED`. That is useful here, but it
+    can expose internals.
+* **Reconciliation compares type and amount**, not the entry date or the principal/interest split, and it doesn't
+  tell "still being posted" (`ERP_PENDING`) apart from "lost". `GET /api/transactions/{ref}` answers the former.
+* **Client creation and loan applications have no repair action.** If one ends in NEEDS_RECONCILIATION (Fineract
+  never answered clearly within the retry budget), an operator has to check Fineract by its external id and fix the
+  row. Only money movements have the `resume` repair.
+* **Changes made directly in Fineract are trusted.** If a loan was approved in Fineract's UI, an approval request
+  for it is answered from Fineract's record without comparing the approval date.
 * **Interest is whatever Fineract computes.** The lifecycle uses back-dated monthly repayments and a payoff of
   Fineract's total outstanding, which includes interest scheduled for future periods.
 * **The Java integration test runs against an already running Fineract** (`-PcargoDisabled`), not Fineract's own

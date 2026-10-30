@@ -120,6 +120,7 @@ services:
   # One-shot: configures the empty Fineract (office, currency, role, user, GL sync, loan product). Idempotent.
   bootstrap:
     image: fineract-erp/integration-service:local
+    build: ./integration-service
     command: ["python", "-m", "integration_service.bootstrap"]
     restart: "no"
     depends_on:

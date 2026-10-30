@@ -14,10 +14,11 @@ flowchart LR
     end
     integration -- commands and lookups<br/>by external id --> fineract
     integration -- chart of accounts,<br/>journal entries --> erp
-    bootstrap -. office, RWF, role, user,<br/>GL sync, loan product .-> fineract
-    integration --- db
-    erp --- db
-    fineract --- db
+    bootstrap -. office, RWF, role, user,<br/>loan product .-> fineract
+    bootstrap -. POST /api/accounts/sync .-> integration
+    integration -- integration --- db
+    erp -- mock_erp --- db
+    fineract -- fineract_tenants,<br/>fineract_default --- db
 ```
 
 | Component | Owns | Does not own |
@@ -39,20 +40,89 @@ creates the loan product, because the product references the synced accounts by 
 ids up with `GET /glaccounts/external-id/{id}`.
 
 **Partner operations (Parts C–F).** Client creation, loan application, approval, disbursement and repayment take one
-path:
+path. A disbursement, end to end:
 
+```mermaid
+sequenceDiagram
+    autonumber
+    participant P as Partner
+    participant I as Integration service
+    participant D as integration DB
+    participant F as Fineract
+    participant E as Mock ERP
+    P->>I: POST /api/loans/LN-…/disburse (external_reference DISB-1)
+    I->>D: claim (DISBURSEMENT, DISB-1) + fingerprint
+    Note over I,D: seen before? replay 200, in progress 202,<br/>different payload 409
+    I->>F: GET transaction by external id DISB-1
+    F-->>I: 404 (not there yet)
+    I->>F: POST disburse, externalId DISB-1
+    I->>F: GET transaction by external id (confirm)
+    F-->>I: amount and portions as Fineract recorded them
+    I->>D: FINERACT_DONE, store Fineract's record
+    I->>E: POST journal entry DISB-1 (DR 1200 / CR 1100)
+    E-->>I: JE-000001
+    I->>D: COMPLETED
+    I-->>P: 201 transaction + erp_entry_number
 ```
-request ─▶ validate ─▶ claim (type, external_reference) ─▶ executor ─▶ response
-                          │                                   │
-                          └ replay / in progress / conflict   ├ Fineract: look up, submit if absent, confirm
-                                                              └ ERP (money only): post the journal derived from Fineract
-```
+
+Each status is committed before the next external call. If anything fails part-way, the row says exactly how far it
+got, and recovery continues from there with the same steps.
 
 **Recovery (Part J).** A sweep runs at startup, every 5 s, and on `POST /api/admin/recovery`. It resumes operations
 whose owner died (lease expired) or whose backoff has elapsed. It runs the **same executor** as the request did.
 
 **Reconciliation (Part K).** A read-only comparison of the Fineract transactions on every loan the integration
 originated with the ERP's journal entries, keyed by `external_reference`.
+
+## Accounting mapping (Part H)
+
+The journal entry is derived from Fineract's transaction, never from our own arithmetic. Fineract decides how a
+repayment splits into principal, interest, fees and penalties (its repayment schedule and allocation rule). The
+integration reads that split back from the transaction it recorded (`principalPortion`, `interestPortion`,
+`feeChargesPortion`, `penaltyChargesPortion`, `overpaymentPortion`) and copies it into the entry.
+
+The mapping is one pure function, `journal_entry_for` in `integration-service/src/integration_service/domain/accounting.py`,
+unit-tested in `tests/unit/test_accounting.py`.
+
+| Fineract transaction | Debit | Credit |
+| --- | --- | --- |
+| Disbursement | 1200 Loan Receivable (amount) | 1100 Bank (amount) |
+| Repayment | 1100 Bank (amount) | 1200 Loan Receivable (principal portion) |
+| | | 4000 Interest Income (interest portion) |
+| | | 4100 Fee Income (fee portion) |
+| | | 4200 Penalty Income (penalty portion) |
+| | | 2100 Overpayment Liability (overpayment portion) |
+
+A credit line appears only when its portion is above zero. If the portions don't add up to the amount, the
+function refuses to build an entry, and the operation goes to NEEDS_RECONCILIATION instead of posting an unbalanced or
+guessed journal.
+
+**Overpayments.** When a partner pays more than is owed, Fineract books the excess as `overpaymentPortion` and keeps
+it as a liability to the client. The entry credits 2100 Overpayment Liability with it, the same account the loan
+product maps for overpayments, so both ledgers show the money is owed back.
+
+**Reversals.** A reversed Fineract transaction is never posted (the function refuses it). If the ERP already holds
+the entry, reconciliation reports it as `AMOUNT_MISMATCH` with a note, because Fineract now nets to zero and the ERP
+does not. The fix, not built here, is a reversing entry `{reference}:REVERSAL` with the lines swapped, derived from
+Fineract's reversal in the same way.
+
+**The chart.** The ERP seeds these accounts, and the bootstrap maps the loan product to them through their external
+ids (`GL-1100` …):
+
+| Code | Name | Type | Fineract product mapping |
+| --- | --- | --- | --- |
+| 1100 | Bank | Asset | Fund source |
+| 1200 | Loan Receivable | Asset | Loan portfolio |
+| 1300 | Transfers in Suspense | Asset | Transfers in suspense |
+| 2100 | Overpayment Liability | Liability | Overpayment liability |
+| 4000 | Interest Income | Income | Interest on loans |
+| 4100 | Fee Income | Income | Income from fees |
+| 4200 | Penalty Income | Income | Income from penalties |
+| 4300 | Recovery Income | Income | Income from recovery |
+| 5100 | Loan Write-off Expense | Expense | Losses written off |
+
+ERP account types map to Fineract's GL types in one tested function, `fineract_gl_type` in
+`domain/gl_accounts.py`: Asset → 1, Liability → 2, Equity → 3, Income → 4, Expense → 5.
 
 ## Data model (integration database)
 
@@ -65,15 +135,17 @@ originated with the ERP's journal entries, keyed by `external_reference`.
 | `gl_account_syncs` | ERP account ↔ Fineract GL account, with sync status | `UNIQUE external_reference`, `UNIQUE code` |
 | `loan_reference_seq` | Issues `LN-<year>-<n>` | sequence |
 
-An operation stores:
+An operation row stores:
 
-* the request itself (JSON), so recovery can resume without the original HTTP request;
-* the request's SHA-256 fingerprint, with amounts normalized so `5000000` equals `5000000.00`;
-* the stored result or error, which a replay returns;
-* the correlation id;
-* `attempts` and `next_attempt_at`, the backoff schedule;
-* `lease_owner` and `lease_expires_at`, which name the current owner and until when;
-* `version`, for optimistic locking: every write checks it, so a former owner can never overwrite a newer state.
+| Column(s) | Why |
+| --- | --- |
+| `request` (JSON) | Recovery can resume without the original HTTP request |
+| `request_fingerprint` | SHA-256 of the canonical request, so `5000000` equals `5000000.00` |
+| `result` / `error` | What a replay returns |
+| `correlation_id` | Recovery logs under the partner's original id |
+| `attempts`, `next_attempt_at` | The backoff schedule |
+| `lease_owner`, `lease_expires_at` | Who is working on it, and until when |
+| `version` | Optimistic locking: a former owner can never overwrite a newer state |
 
 The schema is an Alembic migration. A test fails if the models and the migrations drift apart.
 
@@ -125,9 +197,10 @@ Failures are classified by `gateways/http.py`:
 
 | Outcome | Examples | Executor response |
 | --- | --- | --- |
-| Not applied | connection refused, connect timeout, 429, 503, a Fineract 409 lock conflict, any failed read | Back off and retry (3 attempts). Then FAILED, retryable, unless an earlier attempt's outcome was unknown. |
-| Rejected | 4xx | Look once more (our own earlier attempt may be what Fineract refused as a duplicate). Then FAILED, not retryable, and release reserved keys. |
-| Outcome unknown | read timeout, dropped connection, 500, 502, 504 | Back off and retry, starting with the lookup. If unresolved, stay FINERACT_PENDING and defer to recovery. |
+| Not applied | connection refused, connect timeout, 408, 429, 503, a Fineract 409 lock conflict, any failed read | Back off and retry (3 attempts). Then FAILED, retryable, unless an earlier attempt's outcome was unknown. |
+| Not applied, and a configuration problem | 401, 407, Fineract's 403 `error.msg.not.authorized` (a missing permission) | As above, logged as an error. Reserved keys are kept, so the same request succeeds once the credentials are fixed. |
+| Rejected | any other 4xx, including Fineract's 403 for a broken business rule | Look once more (our own earlier attempt may be what Fineract refused as a duplicate). Then FAILED, not retryable, and release reserved keys. |
+| Outcome unknown | read timeout, dropped connection, 500, 502, 504, and anything unexpected (an answer that can't be parsed) | Back off and retry, starting with the lookup. If unresolved, defer to recovery, which counts the attempt. Never FAILED. |
 
 Retry policy:
 
@@ -136,13 +209,9 @@ Retry policy:
   most 20 attempts, so an outage of up to about an hour heals by itself. After that the operation becomes
   NEEDS_RECONCILIATION.
 
-A failed lookup proves nothing, but its meaning depends on when it happens:
-
-* **Before** anything was submitted, it is "not applied".
-* **After** a submit (the confirmation step), it is an **unknown outcome**: the command reached Fineract.
-
-An unexpected failure, such as an unparseable answer, is deferred with backoff like an unknown outcome, never
-concluded.
+A failed lookup before submitting means "not applied". After submitting, it means "outcome unknown", because the
+command may have reached Fineract. Anything unexpected, such as an answer that can't be parsed, is treated as an
+unknown outcome too: deferred with backoff, never concluded.
 
 ## Concurrency and the "exactly once" layers
 
@@ -153,27 +222,22 @@ concluded.
 | 3. Lookup by external id before submit; Fineract's unique `external_id` on clients, loans and loan transactions | Resubmitting what may already have been applied | Dedupes one reference only |
 | 4. **Fineract's loan state** (the last line of defence) | A second disbursement of a single-tranche loan, whatever the integration believes | It is the system of record: it decides |
 
-Leases make one executor at a time responsible for an operation, without holding a database lock across an HTTP
-call:
+**Leases: one worker per operation at a time.** The request that created an operation and the recovery sweep could
+both try to work on it. A lease decides who may, without holding a database lock during HTTP calls:
 
-* A lease is taken with an atomic conditional `UPDATE` that sets an owner token and an expiry by the database's wall
-  clock (`clock_timestamp()`).
-* It is renewed before every external call.
-* It is released only by its owner's token.
-* Every write to the operation checks its `version` (SQLAlchemy optimistic locking). An executor whose lease expired
-  and was taken over fails at its next write and stops; it cannot overwrite or release the new owner's work.
-  Fineract's lookup-first rule makes even its last in-flight command harmless.
+| Step | How |
+| --- | --- |
+| Take | One conditional `UPDATE` sets an owner token and an expiry, using the database clock (`clock_timestamp()`) |
+| Keep | Renewed before each external call |
+| Give back | Released only with the owner's token |
+| Lose | Every write checks the row's `version` (optimistic locking). A worker whose lease expired and was taken over fails at its next write and stops. Because every attempt starts with a Fineract lookup, even a command it already sent can't be applied twice. |
 
 ## GL sync design
 
 ### Fineract side (Java)
 
-The patch extends the existing `GLACCOUNT/CREATE` command. That keeps Fineract's permission check, maker-checker,
-audit trail and command retry. The external id is unique (Liquibase changeset `0242`). An identical replay returns
-the existing account; a different definition gets 409 from a dedicated exception mapper.
-
-A create that loses a unique-constraint race throws a `ConcurrencyFailureException` subclass, so Fineract's command
-retry re-runs it in a fresh transaction, where it resolves against the committed winner. Details:
+GL accounts get a unique external id, enforced inside Fineract's own create command: an identical replay returns the
+existing account and a different definition gets 409, even under concurrent creates. See
 [fineract-customization/README.md](fineract-customization/README.md).
 
 ### Integration side (Python)
@@ -186,13 +250,8 @@ retry re-runs it in a fresh transaction, where it resolves against the committed
 
 ## Observability
 
-Every service logs JSON lines with the same fields:
-
-* `timestamp`;
-* `correlation_id`;
-* `external_reference`, `client_uid`, `loan_reference`;
-* `fineract_transaction_id`, `erp_transaction_id`;
-* `status`.
+Every service logs one JSON object per line, with the fields `timestamp`, `correlation_id`, `external_reference`,
+`client_uid`, `loan_reference`, `fineract_transaction_id`, `erp_transaction_id` and `status`.
 
 The correlation id comes from the partner's `X-Correlation-ID` header or is minted. It is echoed on every response
 (including errors) and forwarded to the ERP and Fineract. It is also stored on the operation, so recovery logs its

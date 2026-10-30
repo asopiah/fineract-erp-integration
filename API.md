@@ -149,13 +149,8 @@ Status, balances and transactions, read live from Fineract:
 
 ### `GET /api/transactions/{external_reference}` — what happened to one money movement
 
-One call returns:
-
-* the lifecycle status, attempts and next attempt;
-* any error;
-* the request as received;
-* Fineract's record (`recorded`) and the ERP entry number;
-* the correlation id to search the logs for.
+One call returns the lifecycle status (with attempts and the next attempt), any error, the request as received,
+Fineract's record (`recorded`) with the ERP entry number, and the correlation id to search the logs for.
 
 ### `POST /api/reconciliation`
 
@@ -169,13 +164,16 @@ Give either `{"from_date": "2026-01-01", "to_date": "2026-12-31"}` or `{"externa
             "erp": {"entry_number": "JE-000002", "type": "REPAYMENT", "entry_date": "2026-02-15", "amount": "458400"}}]}
 ```
 
-The possible outcomes are:
+| Outcome | Meaning |
+| --- | --- |
+| `MATCHED` | Same reference, type and amount on both sides |
+| `MISSING_IN_ERP` | In Fineract, no ERP entry (for example while the ERP was down) |
+| `MISSING_IN_FINERACT` | An ERP entry with no Fineract transaction behind it |
+| `AMOUNT_MISMATCH` | Both exist, amounts differ (a reversal in Fineract shows here, with a note) |
+| `TYPE_MISMATCH` | Both exist, one is a disbursement and the other a repayment. Kept apart so it is never reported as an amount difference. |
 
-* `MATCHED`;
-* `MISSING_IN_ERP`;
-* `MISSING_IN_FINERACT`;
-* `AMOUNT_MISMATCH`;
-* `TYPE_MISMATCH`, a fifth outcome so that a type difference is never reported as an amount difference.
+The request needs a non-empty list of references, or a date range with `from_date` on or before `to_date`;
+anything else is `422 VALIDATION_ERROR`.
 
 ### Admin
 

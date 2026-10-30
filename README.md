@@ -1,111 +1,210 @@
 # Fineract ↔ ERP integration
 
-Apache Fineract (core banking) connected to an ERP (accounting master) and to financing partners, and kept
-financially correct under duplicates, timeouts, partial success and concurrency.
+A financing partner sends loan requests. **Apache Fineract** (the core banking system) records the loans and the
+money. An **ERP** (the accounting system) owns the chart of accounts and gets a balanced journal entry for every money
+movement. The **integration service** in between keeps all three in step, and keeps the books right when requests are
+duplicated, time out, arrive concurrently or fail half-way.
 
-* **Fineract customization (Java/Spring Boot):** GL accounts get an ERP-owned `externalId`. Fineract enforces the
-  rules itself: a replay is idempotent, a conflict gets HTTP 409, and concurrent creates are resolved through
-  Fineract's command retry. See [`fineract-customization/`](fineract-customization/README.md).
-* **Mock ERP (Python/FastAPI):** chart of accounts and balanced journal entries, idempotent on `external_reference`.
-* **Integration service (Python/FastAPI):** the partner API. Every state-changing request goes through one
-  persisted state machine that looks Fineract up before every submit. ERP journals are derived from Fineract's own
-  transaction breakdown, and recovery finishes whatever a failure interrupted.
+## How it fits together
 
-## Tiers completed
+```
+                           Financing partner
+                                  │  REST · bearer token · X-Correlation-ID
+                                  ▼
+              ┌───────────────────┴──────────────────┐
+              │ Integration service   :58090 Python  │
+              │ idempotency · state machine          │
+              │ recovery · reconciliation            │
+              └────────┬────────────────────┬────────┘
+                     ① │                  ② │
+                       ▼                    ▼
+             ┌────────────────────┐ ┌────────────────────┐
+             │ Apache Fineract    │ │ Mock ERP           │
+             │ 1.15.0 + GL patch  │ │ chart of accounts  │
+             │ loans and money    │ │ journal entries    │
+             │ :58080 Java        │ │ :58001 Python      │
+             └────────────────────┘ └────────────────────┘
+
+ ① Look the operation up by its external id, submit it only if it isn't there, read back what Fineract recorded.
+ ② Post a journal entry built from Fineract's record. (GL sync reads the ERP's chart of accounts the same way.)
+
+ Everything runs in docker compose. Each service has its own database on one PostgreSQL server (:55432), and a
+ one-shot bootstrap configures the empty Fineract.
+```
+
+Each step is saved before the next one starts, so after any failure the service knows exactly what's left to do,
+and a background sweep finishes it.
+[ARCHITECTURE.md](ARCHITECTURE.md) has the full picture.
+
+## What's here
+
+| Part | What it does |
+| --- | --- |
+| [`fineract-customization/`](fineract-customization/README.md) | A patch to Fineract (Java): GL accounts get an ERP external id. A repeated create returns the same account, a conflicting one gets 409, even under concurrent creates. |
+| `mock-erp/` | The ERP (Python/FastAPI): chart of accounts and balanced journal entries, idempotent on `external_reference`. |
+| `integration-service/` | The partner API (Python/FastAPI): clients, loans, approvals, disbursements, repayments, GL sync, recovery, reconciliation. Also the simulations. |
+
+**Tiers completed**
 
 | Tier | Status |
 | --- | --- |
-| 1. Core (A–G) | **Done.** Every part is implemented and demonstrated against the live stack. |
+| 1. Core (A–G) | **Done.** Every part runs against the live stack. |
 | 2. Reliability (H–K) | **Done.** I1–I3, J1–J5 and K run as automated tests and produce the evidence in [SIMULATIONS.md](SIMULATIONS.md). |
-| 3. Stretch (L) | Not taken as a tier. Some pieces exist because the core design needed them: a dead-letter view (`GET /api/admin/operations`), fee, penalty and overpayment lines in the accounting mapping (unit-tested, not demonstrated live), reversal-aware reconciliation (unit-tested), and a scheduled recovery sweep. |
+| 3. Stretch (L) | Not taken as a tier. A few pieces exist because the core needed them: the dead-letter view (`GET /api/admin/operations`), fee, penalty and overpayment lines in the accounting mapping (unit-tested), reversal-aware reconciliation (unit-tested) and the scheduled recovery sweep. |
 
-## Quick start
+## Run it
 
-Prerequisites: Docker with Compose v2 and about 6 GB of memory for Docker. A JDK 21 is optional and only speeds up
-the Fineract build.
+### 1. Prerequisites
+
+| To… | You need |
+| --- | --- |
+| Run the stack and try the API | Docker with Compose v2, about 6 GB of memory for Docker, `make`, `curl` (and `jq` for the walkthrough below) |
+| Run the Python tests and the simulations | Python 3.12 (`make` creates a virtualenv in `.venv/`) |
+| Run the Java tests, or build Fineract faster | JDK 21 and `git` |
+
+Ports used on your machine: 55432, 58001, 58080, 58090. See [Troubleshooting](#troubleshooting) if one is taken.
+
+### 2. Start everything
 
 ```bash
-make fineract-image   # optional, ~8 min with a local JDK 21; otherwise compose builds it (longer) on first start
-make up               # PostgreSQL, Fineract, Mock ERP, integration service, then the Fineract bootstrap
+cd fineract-erp-integration
+make up
 ```
 
-`make up` is `docker compose up` plus waiting. The one-shot `bootstrap` container configures the empty Fineract:
+`make up` builds the images, starts PostgreSQL, Fineract, the Mock ERP and the integration service, waits until all
+are healthy, then runs the one-shot bootstrap that configures the empty Fineract:
 
-* office *Kigali Main Office* and currency RWF;
-* a least-privilege role and API user;
-* GL accounts synchronized from the ERP;
-* loan product *SME Asset Finance* (18% a year, 12 monthly repayments, single disbursement, cash accounting).
+* office *Kigali Main Office* and currency RWF
+* a least-privilege role and API user
+* the GL accounts, synchronized from the ERP
+* loan product *SME Asset Finance* (18 % a year, 12 monthly repayments, cash accounting)
 
-Running it again is harmless.
+**The first run takes 15–20 minutes**, because Docker builds the patched Fineract from source. Later runs take about
+2–3 minutes. With JDK 21 installed, `make fineract-image` first builds the same image in about 8 minutes.
+
+It is ready when the output ends with:
+
+```
+{"...", "service": "bootstrap", "event": "Fineract is configured", ...}
+fineract-erp-bootstrap-1 exited with code 0
+```
+
+No `make`? Run the same steps by hand:
+
+```bash
+docker compose up -d --build --wait postgres fineract mock-erp integration-service
+docker compose up bootstrap
+```
+
+### 3. Walk through a loan
+
+```bash
+API=localhost:58090/api
+AUTH=(-H 'Authorization: Bearer integration-local-token' -H 'Content-Type: application/json')
+
+# A client, then a loan application for 5,000,000 RWF
+curl -s "${AUTH[@]}" $API/clients -d '{"external_reference": "CLI-0001", "client_uid": "SME-000001",
+  "first_name": "Amina", "last_name": "Uwase", "activation_date": "2026-01-10"}' | jq -c
+LOAN=$(curl -s "${AUTH[@]}" $API/loans -d '{"external_reference": "APP-0001", "client_uid": "SME-000001",
+  "principal": "5000000", "annual_interest_rate": "18", "term_months": 12,
+  "submitted_on": "2026-01-15", "expected_disbursement_on": "2026-01-15"}' | jq -r .loan_reference)
+
+# Approve, disburse, repay
+curl -s "${AUTH[@]}" $API/loans/$LOAN/approve -d '{"external_reference": "APR-0001", "approved_on": "2026-01-15"}' | jq -c
+curl -s "${AUTH[@]}" $API/loans/$LOAN/disburse \
+  -d '{"external_reference": "DISB-0001", "amount": "5000000", "transaction_date": "2026-01-15"}' | jq -c
+curl -s "${AUTH[@]}" $API/loans/$LOAN/repayments \
+  -d '{"external_reference": "REP-0001", "amount": "458400", "transaction_date": "2026-02-15"}' | jq -c
+
+# The loan as Fineract holds it, and the books compared
+curl -s "${AUTH[@]}" $API/loans/$LOAN | jq -c '{status, outstanding}'
+curl -s "${AUTH[@]}" $API/reconciliation -d '{"external_references": ["DISB-0001", "REP-0001"]}' | jq -c .summary
+```
+
+The repayment comes back with Fineract's split (principal and interest) and the ERP entry that mirrors it, and
+reconciliation reports `{"MATCHED": 2}`. Send any of these requests again: it answers `200` with the same body
+instead of doing it twice. [API.md](API.md) documents every endpoint. Interactive docs are at
+<http://localhost:58090/docs> and <http://localhost:58001/docs>.
 
 | Service | URL | Credentials |
 | --- | --- | --- |
-| Integration service (partner API) | http://localhost:58090, docs at `/docs` | `Authorization: Bearer integration-local-token` |
-| Mock ERP | http://localhost:58001, docs at `/docs` | `Authorization: Bearer erp-local-token` |
-| Fineract | http://localhost:58080/fineract-provider/api/v1 | admin `mifos` / `password`; the service runs as `integration_api` |
-| PostgreSQL | localhost:55432 | `postgres` / `postgres` (one database per service) |
+| Integration service (partner API) | http://localhost:58090 | `Authorization: Bearer integration-local-token` |
+| Mock ERP | http://localhost:58001 | `Authorization: Bearer erp-local-token` |
+| Fineract | http://localhost:58080/fineract-provider/api/v1 | `mifos` / `password`, header `Fineract-Platform-TenantId: default` |
+| PostgreSQL | localhost:55432 | `postgres` / `postgres` |
 
-The credentials are local development defaults. Ports are configurable in `docker-compose.yml`.
+These are local development credentials.
 
-A first partner request:
+### 4. Run the tests and the simulations
+
+| Command | What runs | Needs |
+| --- | --- | --- |
+| `make test-python` | Ruff, `mypy --strict`, then the unit and component tests of both services, against real PostgreSQL | Python 3.12 |
+| `make test-java` | JUnit unit tests of the Fineract patch | JDK 21 |
+| `make test-java-it` | JUnit integration tests against the running Fineract: replay, 409, 10 concurrent creates × 5, permissions | JDK 21, stack up |
+| `make test-java-regression` | Fineract's own GL tests plus ours, to show the patch broke nothing (restarts Fineract in its `test` profile) | JDK 21, stack up |
+| `make test-stack` | Every simulation as an automated test against the running stack | Python 3.12, stack up |
+| `make simulate` | Runs every simulation and **rewrites** [SIMULATIONS.md](SIMULATIONS.md) with the evidence | Python 3.12, stack up |
+
+One simulation at a time: `make simulate-<name>` (`make simulations` lists them).
+
+| Brief | Name | | Brief | Name |
+| --- | --- | --- | --- | --- |
+| Client identity | `client` | | J1 ERP down | `erp-down` |
+| GL sync | `gl-sync` | | J2 Fineract down | `fineract-down` |
+| Loan lifecycle | `lifecycle` | | J3 Fineract timeout | `fineract-timeout` |
+| I1 Sequential duplicates | `duplicates` | | J4 ERP timeout | `erp-timeout` |
+| I2a Concurrent, same reference | `concurrent-same` | | J5 Crash | `crash` |
+| I2b Concurrent, different references | `concurrent-different` | | K Reconciliation | `reconciliation` |
+| I3 Concurrent repayments | `concurrent-repayments` | | Trace one reference | `trace` |
+
+The Postman collection runs the lifecycle too: `npx newman run postman/collection.json`.
+
+### 5. Stop
 
 ```bash
-curl -s -X POST localhost:58090/api/clients \
-  -H 'Authorization: Bearer integration-local-token' -H 'Content-Type: application/json' \
-  -d '{"external_reference": "CLI-0001", "client_uid": "SME-000001", "first_name": "Amina",
-       "last_name": "Uwase", "activation_date": "2026-01-10"}'
+make down    # stops everything and deletes the data, so the next `make up` starts clean
 ```
 
-[API.md](API.md) walks through the whole loan lifecycle.
+## Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| A port is already taken | Override it, e.g. `INTEGRATION_HOST_PORT=59090 make up`. The variables are `POSTGRES_HOST_PORT`, `FINERACT_HOST_PORT`, `ERP_HOST_PORT`, `INTEGRATION_HOST_PORT`. The tests and simulations assume the defaults. |
+| Fineract exits or restarts during the first start | Docker needs about 6 GB of memory (Docker Desktop → Settings → Resources). |
+| A code change doesn't show up | `docker compose up -d --build --wait <service>`. For the Java patch: `make fineract-image`, then `docker compose up -d --wait fineract`. Compose doesn't rebuild an image it already has. |
+| You want a clean slate | `make down && make up` |
+| Something failed and you want to know why | `docker compose logs <service>`. Each log line is JSON with a `correlation_id`; every API response carries the same id in `X-Correlation-ID`. |
+
+## Read next
+
+| Document | What's in it |
+| --- | --- |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Components, a disbursement step by step, the accounting mapping, the state machine, the concurrency safeguards |
+| [API.md](API.md) | Every endpoint, the error format, the idempotency contract |
+| [DECISIONS.md](DECISIONS.md) | Why each choice was made and what it costs, what wasn't built, known weaknesses, assumptions, how to trace a reference, AI disclosure |
+| [SIMULATIONS.md](SIMULATIONS.md) | Each simulation with its evidence, in the brief's template |
+| [fineract-customization/README.md](fineract-customization/README.md) | The Fineract patch in detail |
+| [evidence/](evidence/README.md) | Raw logs of the builds and test runs |
+
+## Repository layout
+
+```
+fineract-customization/   the Fineract patch, its Dockerfile and notes
+mock-erp/                 the ERP service (src/, tests/, Dockerfile)
+integration-service/      the partner API (src/, tests/, simulations/, Dockerfile)
+docker/                   database setup, and the test-profile override for the regression run
+evidence/                 build logs and test runs
+postman/                  a collection that runs the lifecycle
+upstream/fineract/        Fineract's source, cloned by `make` for Java builds; not committed
+```
 
 ## Pinned versions
 
 | Piece | Version |
 | --- | --- |
-| Apache Fineract | tag `1.15.0`, commit `d5636847ac556c30b437254c353f05526d172b97` |
-| JDK | 21 (Fineract's toolchain: `JavaLanguageVersion.of(21)`; built here with OpenJDK 21.0.9) |
-| Build tool | Gradle 8.14.5 (the wrapper in the tag). The image is built with Jib (`make fineract-image`) or with `fineract-customization/Dockerfile`. |
-| PostgreSQL | 18.3, one server: `fineract_tenants`, `fineract_default`, `mock_erp`, `integration` |
+| Apache Fineract | tag `1.15.0`, commit `d5636847ac556c30b437254c353f05526d172b97` (verified on every clone) |
+| JDK | 21: Temurin 21.0.5 in the Docker build, OpenJDK 21.0.9 for local builds. Runtime image `azul/zulu-openjdk-alpine:21`, as in Fineract's own build. |
+| Build tool | Gradle 8.14.5, the wrapper in the tag |
+| PostgreSQL | 18.3 |
 | Python | 3.12; FastAPI 0.115.6, SQLAlchemy 2.0.36, Alembic 1.14.0, httpx 0.28.1, pydantic 2.10.4 |
-
-## Tests
-
-| Language | Command | What runs |
-| --- | --- | --- |
-| Java | `make test-java` | Unit tests for the GL customization (Gradle/JUnit, no server needed) |
-| Java | `make test-java-it` | Integration test against the running Fineract: replay, 409, 10 concurrent creates ×5, permissions |
-| Java | `make test-java-regression` | Regression: Fineract's own GL integration tests plus ours, to prove the patch broke nothing that worked before (restarts Fineract in its `test` profile for the run) |
-| Python | `make test-python` | Ruff, `mypy --strict`, then the unit and component tests of both services (component tests use real PostgreSQL) |
-| Both | `make test` | `test-python` and `test-java` |
-| Stack | `make test-stack` | Every simulation as an automated test against the running stack |
-
-## Simulations
-
-```bash
-make simulate               # all of them; writes SIMULATIONS.md
-make simulations            # list the names
-make simulate-duplicates    # one of them, e.g. I1
-```
-
-Each simulation reads every system directly (Fineract's API, the ERP's API, the integration database) and prints
-the brief's nine-field evidence template.
-
-## Repository layout
-
-```
-fineract-customization/   patch against Fineract 1.15.0, Dockerfile, notes
-mock-erp/                 ERP service (src/, tests/, Dockerfile)
-integration-service/      partner API (src/, tests/, simulations/, Dockerfile)
-docker/postgres/          database and role creation
-evidence/                 build logs, test runs, race and lifecycle evidence
-postman/                  supporting collection (the simulations are the primary evidence)
-upstream/fineract/        the upstream checkout used for building; not committed
-```
-
-## Documentation
-
-* [ARCHITECTURE.md](ARCHITECTURE.md): components, data flow, data model, state machine, GL sync design.
-* [API.md](API.md): endpoints, examples, errors, the idempotency contract.
-* [SIMULATIONS.md](SIMULATIONS.md): every simulation, with its evidence.
-* [DECISIONS.md](DECISIONS.md): trade-offs and rationale, known weaknesses, how to trace one reference, and the
-  disclosure of AI assistance and references.
