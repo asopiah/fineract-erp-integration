@@ -540,7 +540,8 @@ def reconciliation(stack: Stack) -> Evidence:
     evidence.actual = _verdict(evidence)
     evidence.explanation = (
         "Each Fineract disbursement or repayment is matched to the ERP entry with the same external_reference. The "
-        "report never writes; repairs are a separate, explicit action (POST /api/admin/recovery for pending postings)."
+        "report never writes. Repairs are separate, explicit actions: POST /api/admin/recovery retries pending "
+        "postings now, and POST /api/admin/operations/{type}/{reference}/resume re-drives one that ran out of retries."
     )
     return evidence
 
@@ -735,8 +736,4 @@ def _restart_count() -> int:
 
 
 def _verdict(evidence: Evidence) -> str:
-    return (
-        "All checks passed."
-        if evidence.passed
-        else f"Failed checks: {[k for k, ok in evidence.checks.items() if not ok]}"
-    )
+    return "\n".join(f"- {'✔' if ok else '✘ FAILED:'} {name}" for name, ok in evidence.checks.items())
