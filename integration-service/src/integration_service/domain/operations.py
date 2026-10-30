@@ -7,7 +7,7 @@
                      │
                      └─▶ NEEDS_RECONCILIATION (Fineract's record contradicts the request)
 
-FINERACT_PENDING means "Fineract may or may not have it": it is left only by looking the operation up in Fineract.
+FINERACT_PENDING means Fineract may or may not have it. Exit only after a Fineract lookup.
 """
 
 from enum import StrEnum

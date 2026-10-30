@@ -12,7 +12,7 @@ from integration_service.gateways.errors import (
     RejectedError,
 )
 from integration_service.gateways.faults import FaultConfig, FaultInjector, FineractFault
-from integration_service.gateways.fineract import _error_detail, _is_transient_conflict
+from integration_service.gateways.fineract import _error_detail, _is_permission_denied, _is_transient_conflict
 from integration_service.gateways.http import JsonApi
 
 Handler = Callable[[httpx.Request], httpx.Response]
@@ -20,7 +20,7 @@ Handler = Callable[[httpx.Request], httpx.Response]
 
 def api(handler: Handler) -> JsonApi:
     client = httpx.Client(base_url="http://fineract", transport=httpx.MockTransport(handler))
-    return JsonApi("fineract", client, _error_detail, _is_transient_conflict)
+    return JsonApi("fineract", client, _error_detail, _is_transient_conflict, _is_permission_denied)
 
 
 def raising(error: type[httpx.HTTPError]) -> Handler:
@@ -63,6 +63,9 @@ def test_a_missing_resource_is_none_not_an_error() -> None:
         (504, OutcomeUnknownError),
         (503, NotAppliedError),
         (429, NotAppliedError),
+        (408, NotAppliedError),
+        (401, NotAppliedError),
+        (407, NotAppliedError),
         (400, RejectedError),
         (403, RejectedError),
     ],
@@ -93,6 +96,24 @@ def test_rejections_carry_fineracts_reason() -> None:
         api(answering(403, body)).post("/loans", {})
     assert raised.value.message == "Not approved"
     assert raised.value.status_code == 403
+
+
+def test_a_missing_fineract_permission_is_not_applied() -> None:
+    body = {
+        "userMessageGlobalisationCode": "error.msg.not.authorized",
+        "errors": [{"userMessageGlobalisationCode": "error.msg.not.authorized"}],
+    }
+    with pytest.raises(NotAppliedError):
+        api(answering(403, body)).post("/loans/external-id/LN-1", {})
+
+
+def test_a_fineract_domain_rule_violation_is_a_rejection() -> None:
+    body = {
+        "userMessageGlobalisationCode": "validation.msg.domain.rule.violation",
+        "errors": [{"userMessageGlobalisationCode": "error.msg.loan.disbursal.not.allowed"}],
+    }
+    with pytest.raises(RejectedError):
+        api(answering(403, body)).post("/loans/external-id/LN-1", {})
 
 
 class Recorder(httpx.BaseTransport):

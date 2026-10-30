@@ -2,10 +2,11 @@
 
 from typing import Any
 
-from sqlalchemy import case, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
 from integration_service.domain.fineract import FineractLoanTransaction
+from integration_service.domain.money import plain_decimal
 from integration_service.domain.operations import OperationStatus, OperationType
 from integration_service.errors import ApiError, ErrorCode
 from integration_service.gateways.fineract import FineractGateway
@@ -54,8 +55,8 @@ class Queries:
             "loan_reference": loan.loan_reference,
             "external_reference": loan.external_reference,
             "client_uid": loan.client_uid,
-            "principal": _money(loan.principal),
-            "annual_interest_rate": _money(loan.annual_interest_rate),
+            "principal": plain_decimal(loan.principal),
+            "annual_interest_rate": plain_decimal(loan.annual_interest_rate),
             "term_months": loan.term_months,
             "submitted_on": loan.submitted_on.isoformat(),
             "status": None,
@@ -67,11 +68,11 @@ class Queries:
             "status": in_fineract.status.value,
             "fineract_status": in_fineract.fineract_status,
             "outstanding": {
-                "principal": _money(balances.principal_outstanding),
-                "interest": _money(balances.interest_outstanding),
-                "fees": _money(balances.fees_outstanding),
-                "penalties": _money(balances.penalties_outstanding),
-                "total": _money(balances.total_outstanding),
+                "principal": plain_decimal(balances.principal_outstanding),
+                "interest": plain_decimal(balances.interest_outstanding),
+                "fees": plain_decimal(balances.fees_outstanding),
+                "penalties": plain_decimal(balances.penalties_outstanding),
+                "total": plain_decimal(balances.total_outstanding),
             },
             "transactions": [_fineract_transaction(transaction) for transaction in in_fineract.transactions],
         }
@@ -79,12 +80,11 @@ class Queries:
     def transaction(self, external_reference: str) -> dict[str, Any]:
         """Everything known about one money movement, in one call: its lifecycle, Fineract's record, the ERP entry."""
         with self._session_factory() as session:
+            # At most one: money references are unique across both types (uq_operations_money_reference).
             operation = session.scalar(
-                select(Operation)
-                .where(Operation.external_reference == external_reference, Operation.type.in_(MONEY_OPERATIONS))
-                # A FAILED attempt that never reached Fineract matters less than one that did.
-                .order_by(case((Operation.status == OperationStatus.FAILED, 1), else_=0), Operation.id.desc())
-                .limit(1)
+                select(Operation).where(
+                    Operation.external_reference == external_reference, Operation.type.in_(MONEY_OPERATIONS)
+                )
             )
             if operation is None:
                 raise ApiError(404, ErrorCode.NOT_FOUND, f"no disbursement or repayment {external_reference}")
@@ -131,16 +131,12 @@ def _fineract_transaction(transaction: FineractLoanTransaction) -> dict[str, Any
         "type": transaction.type.value,
         "fineract_type": transaction.fineract_type,
         "transaction_date": transaction.transaction_date.isoformat(),
-        "amount": _money(transaction.amount),
-        "principal_portion": _money(transaction.principal),
-        "interest_portion": _money(transaction.interest),
-        "fee_portion": _money(transaction.fees),
-        "penalty_portion": _money(transaction.penalties),
-        "overpayment_portion": _money(transaction.overpayment),
-        "outstanding_after": _money(transaction.outstanding_after),
+        "amount": plain_decimal(transaction.amount),
+        "principal_portion": plain_decimal(transaction.principal),
+        "interest_portion": plain_decimal(transaction.interest),
+        "fee_portion": plain_decimal(transaction.fees),
+        "penalty_portion": plain_decimal(transaction.penalties),
+        "overpayment_portion": plain_decimal(transaction.overpayment),
+        "outstanding_after": plain_decimal(transaction.outstanding_after),
         "reversed": transaction.reversed,
     }
-
-
-def _money(value: Any) -> str:
-    return format(value.normalize(), "f")

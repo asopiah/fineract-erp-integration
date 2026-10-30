@@ -41,3 +41,7 @@ class Settings(BaseSettings):
 
     # Exposes /api/admin/faults so simulations can make Fineract fail on demand. Never enable outside a test stack.
     fault_injection_enabled: bool = False
+
+    def recovery_delay(self, attempts: int) -> float:
+        """Seconds to wait after the given number of failed attempts."""
+        return min(self.recovery_backoff_cap_seconds, self.recovery_backoff_seconds * 2.0 ** (attempts - 1))

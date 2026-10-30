@@ -166,7 +166,7 @@ def reconcile(body: ReconciliationRequest, services: ServicesDep) -> dict[str, A
         Criteria(
             from_date=body.from_date,
             to_date=body.to_date,
-            external_references=frozenset(body.external_references) if body.external_references else None,
+            external_references=frozenset(body.external_references) if body.external_references is not None else None,
         )
     )
 

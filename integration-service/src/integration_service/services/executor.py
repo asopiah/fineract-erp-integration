@@ -25,7 +25,12 @@ from sqlalchemy.orm.exc import StaleDataError
 
 from integration_service.domain.accounting import UnmappableTransactionError
 from integration_service.domain.fineract import FineractLoanTransaction
-from integration_service.domain.operations import OperationStatus, OperationType, ensure_transition
+from integration_service.domain.operations import (
+    ALLOWED_TRANSITIONS,
+    OperationStatus,
+    OperationType,
+    ensure_transition,
+)
 from integration_service.errors import ApiError, ErrorCode
 from integration_service.gateways.erp import ErpGateway
 from integration_service.gateways.errors import GatewayError, NotAppliedError, OutcomeUnknownError, RejectedError
@@ -34,7 +39,7 @@ from integration_service.models import Operation
 from integration_service.observability import log_context
 from integration_service.services import operation_store
 from integration_service.services.handlers import MoneyMovement, OperationHandler
-from integration_service.services.operation_store import BusinessKeyTakenError, lease_expiry
+from integration_service.services.operation_store import BusinessKeyTakenError, db_now_plus
 from integration_service.settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -77,6 +82,7 @@ class OperationExecutor:
         """Operator repair: re-drives the ERP posting of a money movement Fineract recorded (NEEDS_RECONCILIATION)."""
 
         def resume(session: Session, operation: Operation) -> None:
+            self._confirm_still_recorded(session, operation)
             self._move(session, operation, OperationStatus.ERP_PENDING)
             self._advance(session, operation)
 
@@ -99,17 +105,24 @@ class OperationExecutor:
                     session.rollback()
                     logger.warning("lease lost: another executor now owns this operation; stopping")
                     return
-                except Exception:
+                except Exception as error:
                     session.rollback()
-                    operation_store.release(session, operation_id, lease)
-                    raise
+                    if not operation.status.in_flight:
+                        operation_store.release(session, operation_id, lease)
+                        raise
+                    # The outcome may be unknown: back off and count the attempt, never FAIL.
+                    logger.exception("unexpected failure while in flight")
+                    try:
+                        self._defer(session, operation, f"unexpected {type(error).__name__}: {error}")
+                    except LeaseLostError:
+                        return
                 session.rollback()
                 operation_store.release(session, operation_id, lease)
 
     def _advance(self, session: Session, operation: Operation) -> None:
         handler = self._handlers[operation.type]
         # An operation found in FINERACT_PENDING was interrupted mid-call: Fineract may already have it.
-        may_have_reached_fineract = operation.status is OperationStatus.FINERACT_PENDING
+        may_have_applied = operation.status is OperationStatus.FINERACT_PENDING
         while True:
             match operation.status:
                 case OperationStatus.RECEIVED:
@@ -117,7 +130,7 @@ class OperationExecutor:
                 case OperationStatus.FAILED if operation.retryable:
                     self._move(session, operation, OperationStatus.FINERACT_PENDING, error=None, retryable=False)
                 case OperationStatus.FINERACT_PENDING:
-                    if not self._settle_in_fineract(session, operation, handler, may_have_reached_fineract):
+                    if not self._settle_in_fineract(session, operation, handler, may_have_applied):
                         return
                 case OperationStatus.FINERACT_DONE:
                     self._crash_if_requested()
@@ -126,7 +139,7 @@ class OperationExecutor:
                     else:
                         self._complete(session, operation, handler)
                 case OperationStatus.ERP_PENDING:
-                    if not self._post_journal(session, operation, handler):
+                    if not self._post_journal(session, operation):
                         return
                 case _:
                     return
@@ -146,6 +159,7 @@ class OperationExecutor:
             except RejectedError as rejection:
                 # Fineract's own uniqueness may be what refused us: an earlier attempt may have committed after all.
                 try:
+                    self._renew_lease(session, operation)
                     record = handler.find(session, operation)
                 except GatewayError as failure:
                     last_failure, may_have_applied = failure.message, True
@@ -158,7 +172,9 @@ class OperationExecutor:
                 last_failure, may_have_applied = failure.message, True
             except NotAppliedError as failure:
                 last_failure = failure.message
-            except (GatewayError, ValueError, KeyError) as failure:
+            except LeaseLostError:
+                raise
+            except Exception as failure:
                 # Not a classified outcome (an unparseable answer, missing reference data): never conclude anything.
                 logger.exception("unexpected failure talking to Fineract")
                 last_failure, may_have_applied = f"{type(failure).__name__}: {failure}", True
@@ -178,8 +194,10 @@ class OperationExecutor:
         if record is not None:
             logger.info("already in Fineract, not submitting again", extra={"status": operation.status})
             return record
+        self._renew_lease(session, operation)
         handler.submit(session, operation)
         # From here on Fineract has the command: failing to confirm it means "unknown", never "not applied".
+        self._renew_lease(session, operation)
         try:
             record = handler.find(session, operation)
         except GatewayError as failure:
@@ -202,8 +220,8 @@ class OperationExecutor:
 
     # --- ERP -----------------------------------------------------------------------------------------------------
 
-    def _post_journal(self, session: Session, operation: Operation, handler: OperationHandler[Any]) -> bool:
-        assert isinstance(handler, MoneyMovement)
+    def _post_journal(self, session: Session, operation: Operation) -> bool:
+        handler = self._money_movement(operation)
         try:
             draft = handler.journal_entry(session, operation)
         except UnmappableTransactionError as error:
@@ -223,6 +241,27 @@ class OperationExecutor:
             self._complete(session, operation, handler)
         return True
 
+    def _confirm_still_recorded(self, session: Session, operation: Operation) -> None:
+        """Operator repair posts the stored record only while Fineract still holds it, unreversed and unchanged."""
+        handler = self._money_movement(operation)
+        try:
+            record = handler.find(session, operation)
+        except GatewayError as failure:
+            message = f"could not confirm the transaction in Fineract: {failure.message}"
+            raise ApiError(503, ErrorCode.FINERACT_UNAVAILABLE, message) from failure
+        if record is None:
+            problem: str | None = f"Fineract no longer has {operation.external_reference}"
+        else:
+            problem = handler.stored_contradiction(session, operation, record)
+        if problem is not None:
+            raise ApiError(409, ErrorCode.NOT_RESUMABLE, f"{problem}; resolve it in Fineract first")
+
+    def _money_movement(self, operation: Operation) -> MoneyMovement:
+        handler = self._handlers[operation.type]
+        if not isinstance(handler, MoneyMovement):
+            raise TypeError(f"{operation.type} has no ERP journal entry")
+        return handler
+
     # --- Transitions ---------------------------------------------------------------------------------------------
 
     def _move(self, session: Session, operation: Operation, target: OperationStatus, **changes: Any) -> None:
@@ -231,7 +270,7 @@ class OperationExecutor:
         operation.status = target
         operation.attempts = 0
         operation.next_attempt_at = None
-        operation.lease_expires_at = lease_expiry(self._settings.lease_seconds)
+        operation.lease_expires_at = db_now_plus(self._settings.lease_seconds)
         for name, value in changes.items():
             setattr(operation, name, value)
         try:
@@ -261,14 +300,13 @@ class OperationExecutor:
     def _defer(self, session: Session, operation: Operation, reason: str) -> None:
         """Keeps the status and leaves the next attempt to recovery, with capped exponential backoff."""
         operation.attempts += 1
-        if operation.attempts >= self._settings.recovery_max_attempts:
+        exhausted = operation.attempts >= self._settings.recovery_max_attempts
+        # RECEIVED and FINERACT_DONE cannot be handed to a human; they keep retrying at the capped delay.
+        if exhausted and OperationStatus.NEEDS_RECONCILIATION in ALLOWED_TRANSITIONS[operation.status]:
             self._needs_reconciliation(session, operation, f"gave up after {operation.attempts} attempts: {reason}")
             return
-        delay = min(
-            self._settings.recovery_backoff_cap_seconds,
-            self._settings.recovery_backoff_seconds * 2 ** (operation.attempts - 1),
-        )
-        operation.next_attempt_at = lease_expiry(delay)
+        delay = self._settings.recovery_delay(operation.attempts)
+        operation.next_attempt_at = db_now_plus(delay)
         self._commit(session)
         logger.warning(
             "deferred to recovery (attempt %d, next in %.1fs): %s",
@@ -280,7 +318,7 @@ class OperationExecutor:
 
     def _renew_lease(self, session: Session, operation: Operation) -> None:
         """Before every external call: extends the lease, and finds out early if it was lost."""
-        operation.lease_expires_at = lease_expiry(self._settings.lease_seconds)
+        operation.lease_expires_at = db_now_plus(self._settings.lease_seconds)
         self._commit(session)
 
     def _pause(self, attempt: int) -> None:

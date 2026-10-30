@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 import sys
 import uuid
 from collections.abc import Awaitable, Callable
@@ -11,6 +12,8 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, Request, Response
 
 CORRELATION_ID_HEADER = "X-Correlation-ID"
+# The integration service's rule: reference characters, at most 100 of them.
+_VALID_CORRELATION_ID = re.compile(r"[A-Za-z0-9._:-]{1,100}")
 
 CallNext = Callable[[Request], Awaitable[Response]]
 
@@ -44,12 +47,19 @@ def configure_logging(service: str) -> None:
     logging.basicConfig(level=logging.INFO, handlers=[handler], force=True)
 
 
+def accepted_correlation_id(header: str | None) -> str:
+    """The caller's correlation id if it is safe to log, otherwise a fresh one."""
+    if header is not None and _VALID_CORRELATION_ID.fullmatch(header):
+        return header
+    return str(uuid.uuid4())
+
+
 def install_correlation_middleware(app: FastAPI) -> None:
     """Accepts the caller's correlation id (or mints one) and echoes it on every response."""
 
     @app.middleware("http")
     async def propagate_correlation_id(request: Request, call_next: CallNext) -> Response:
-        token = correlation_id.set(request.headers.get(CORRELATION_ID_HEADER) or str(uuid.uuid4()))
+        token = correlation_id.set(accepted_correlation_id(request.headers.get(CORRELATION_ID_HEADER)))
         try:
             response = await call_next(request)
             response.headers[CORRELATION_ID_HEADER] = correlation_id.get() or ""

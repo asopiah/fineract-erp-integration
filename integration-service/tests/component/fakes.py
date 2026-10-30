@@ -35,7 +35,7 @@ class Fault(Enum):
     UNKNOWN_BEFORE = auto()  # answer lost, and in fact nothing happened
     UNKNOWN_AFTER = auto()  # answer lost after the effect was committed
     MISSING = auto()  # (lookups only) briefly does not see a committed record
-    GARBAGE = auto()  # (lookups only) an answer that cannot be parsed
+    GARBAGE = auto()  # an answer that cannot be parsed (a command's is lost after the effect was committed)
 
 
 class Scripted:
@@ -75,6 +75,8 @@ class Scripted:
             self.calls.append(method)
             if fault is Fault.UNKNOWN_AFTER:
                 raise OutcomeUnknownError(self._system, f"{method}: injected timeout after processing")
+            if fault is Fault.GARBAGE:
+                raise ValueError(f"{method}: injected unparseable answer")
 
     def _lookup[T](self, method: str, find: Callable[[], T | None]) -> T | None:
         with self._lock:

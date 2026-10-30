@@ -69,3 +69,12 @@ def test_errors_carry_the_callers_correlation_id(client: TestClient) -> None:
     assert error["code"] == "VALIDATION_ERROR"
     assert error["correlation_id"] == "corr-42"
     assert error["details"][0]["field"] == "type"
+
+
+def test_an_oversized_correlation_id_is_replaced(client: TestClient) -> None:
+    oversized = "x" * 101
+    response = client.post("/api/accounts", json={**ACCOUNT, "type": "ASSETS"}, headers={"X-Correlation-ID": oversized})
+
+    replacement = response.headers["X-Correlation-ID"]
+    assert replacement != oversized
+    assert response.json()["error"]["correlation_id"] == replacement

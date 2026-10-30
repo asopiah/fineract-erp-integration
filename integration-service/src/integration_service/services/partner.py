@@ -1,17 +1,7 @@
 """The partner's state-changing use cases.
 
-Each one checks local preconditions, claims the external reference (``operation_store.claim``), lets the executor
-carry the operation as far as it can, and reports the operation's state:
-
-=====================================  =================================================================
-Operation state                        Response
-=====================================  =================================================================
-completed by this request              201 with the result
-completed earlier (a replay)           200 with the same result
-in flight or awaiting reconciliation   202 with the current status (never a second execution)
-failed                                 the stored error (a retryable failure is executed again instead)
-same reference, different payload      409 IDEMPOTENCY_CONFLICT
-=====================================  =================================================================
+Each one checks local preconditions, claims the external reference, lets the executor carry the operation as far as
+it can, and answers with the operation's state (see ``_outcome``).
 """
 
 from collections.abc import Callable, Iterator
@@ -173,15 +163,14 @@ class PartnerService:
             )
 
     def _outcome(self, operation_id: int, executed: bool) -> Outcome:
+        """201 or 200 (a replay) with the result, the stored error, or 202 with the status while unfinished."""
         with self._session_factory() as session:
             operation = session.get_one(Operation, operation_id)
             match operation.status:
                 case OperationStatus.COMPLETED:
-                    assert operation.result is not None
-                    return Outcome(201 if executed else 200, operation.result)
+                    return Outcome(201 if executed else 200, _stored(operation.result, operation))
                 case OperationStatus.FAILED:
-                    assert operation.error is not None
-                    raise ApiError.from_stored(operation.error)
+                    raise ApiError.from_stored(_stored(operation.error, operation))
                 case OperationStatus.NEEDS_RECONCILIATION:
                     reason = (operation.error or {}).get("reason", "see the operations view")
                     return Outcome(202, pending_body(operation, f"needs manual reconciliation: {reason}"))
@@ -217,6 +206,12 @@ def _translating_taken_keys(operation_type: OperationType, key_taken: Callable[[
         if key_taken is None:
             raise
         raise key_taken() from error
+
+
+def _stored(body: dict[str, Any] | None, operation: Operation) -> dict[str, Any]:
+    if body is None:
+        raise RuntimeError(f"{operation.status} operation {operation.id} has nothing stored to answer with")
+    return body
 
 
 def pending_body(operation: Operation, detail: str) -> dict[str, Any]:

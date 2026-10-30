@@ -1,10 +1,5 @@
-"""Finishes interrupted work: on startup, every few seconds, and on demand (``POST /api/admin/recovery``).
-
-No queue or separate worker is needed. The operations table is the durable queue: every operation's status is
-committed before each external call, and a lease names its current owner. An operation whose owner died (lease
-expired) or whose backoff has elapsed is simply executed again by the same executor the request used. That is safe
-because the executor looks Fineract up before submitting and the ERP is idempotent on the external reference.
-"""
+"""Finishes interrupted work on startup, every few seconds, and on demand. The operations table is the queue:
+an operation whose lease expired or whose backoff elapsed is executed again by the same executor."""
 
 import logging
 import threading
@@ -71,9 +66,8 @@ class Recovery:
     def resume_erp_posting(self, operation_type: OperationType, external_reference: str) -> OperationStatus:
         """Explicit operator repair for a money movement in NEEDS_RECONCILIATION whose Fineract side is recorded.
 
-        Idempotent: it posts the journal derived from Fineract's stored record, which the ERP accepts once.
-        Operations whose Fineract side is not settled (unknown outcome given up, contradicting record) are refused:
-        they need a decision in Fineract first.
+        Idempotent: the ERP accepts the journal once. Refused unless Fineract still holds the stored transaction,
+        unreversed and unchanged; anything else needs a decision in Fineract first.
         """
         with self._session_factory() as session:
             operation = operation_store.find(session, operation_type, external_reference)

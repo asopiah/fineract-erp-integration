@@ -7,7 +7,6 @@ account, one Fineract GL account (Fineract enforces it, see the Fineract patch) 
 
 import logging
 from collections.abc import Collection
-from datetime import timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
@@ -20,6 +19,7 @@ from integration_service.gateways.errors import GatewayError, RejectedError
 from integration_service.gateways.fineract import FineractGateway
 from integration_service.models import GlAccountSync
 from integration_service.observability import log_context
+from integration_service.services.operation_store import db_now_plus
 from integration_service.settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -115,11 +115,7 @@ class GlAccountSynchronizer:
         row.status = SyncStatus.FAILED
         row.attempts += 1
         row.last_error = reason[:500]
-        delay = min(
-            self._settings.recovery_backoff_cap_seconds,
-            self._settings.recovery_backoff_seconds * 2 ** (row.attempts - 1),
-        )
-        row.next_attempt_at = func.now() + timedelta(seconds=delay) if retry else None
+        row.next_attempt_at = db_now_plus(self._settings.recovery_delay(row.attempts)) if retry else None
         logger.warning("GL account sync failed: %s", reason, extra={"status": SyncStatus.FAILED})
 
 

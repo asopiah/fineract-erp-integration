@@ -23,6 +23,7 @@ from integration_service.domain.fineract import (
     LoanTransactionType,
 )
 from integration_service.domain.gl_accounts import fineract_gl_type
+from integration_service.domain.money import plain_decimal
 from integration_service.gateways.errors import NotAppliedError
 from integration_service.gateways.http import JsonApi, json_or_empty, propagate_correlation_id
 from integration_service.settings import Settings
@@ -55,7 +56,7 @@ class FineractGateway:
             transport=transport,
             event_hooks={"request": [propagate_correlation_id]},
         )
-        self._api = JsonApi("fineract", client, _error_detail, _is_transient_conflict)
+        self._api = JsonApi("fineract", client, _error_detail, _is_transient_conflict, _is_permission_denied)
         self._reference_ids: dict[str, int] = {}
         self._reference_lock = threading.Lock()
 
@@ -132,13 +133,13 @@ class FineractGateway:
                 "loanType": "individual",
                 "clientId": fineract_client_id,
                 "productId": self._loan_product_id(),
-                "principal": str(principal),
+                "principal": plain_decimal(principal),
                 "loanTermFrequency": term_months,
                 "loanTermFrequencyType": TERM_IN_MONTHS,
                 "numberOfRepayments": term_months,
                 "repaymentEvery": 1,
                 "repaymentFrequencyType": TERM_IN_MONTHS,
-                "interestRatePerPeriod": str(annual_interest_rate),
+                "interestRatePerPeriod": plain_decimal(annual_interest_rate),
                 "amortizationType": 1,  # equal installments
                 "interestType": 0,  # declining balance
                 "interestCalculationPeriodType": 1,  # same as repayment period
@@ -166,7 +167,7 @@ class FineractGateway:
             {
                 "externalId": external_reference,
                 "actualDisbursementDate": on.isoformat(),
-                "transactionAmount": str(amount),
+                "transactionAmount": plain_decimal(amount),
                 "paymentTypeId": self._payment_type_id(),
                 **DATE_FORMAT,
             },
@@ -179,7 +180,7 @@ class FineractGateway:
             {
                 "externalId": external_reference,
                 "transactionDate": on.isoformat(),
-                "transactionAmount": str(amount),
+                "transactionAmount": plain_decimal(amount),
                 "paymentTypeId": self._payment_type_id(),
                 **DATE_FORMAT,
             },
@@ -293,3 +294,9 @@ def _is_transient_conflict(response: httpx.Response) -> bool:
     """Fineract answers 409 when a concurrent update won (the transaction rolled back) or the loan is locked by COB."""
     code, _ = _error_detail(response)
     return code is not None and (code.startswith("error.msg.platform.service.") or code == "error.msg.loan.locked")
+
+
+def _is_permission_denied(response: httpx.Response) -> bool:
+    """Fineract answers 403 for broken business rules too; only this code means our user lacks a permission."""
+    code, _ = _error_detail(response)
+    return response.status_code == 403 and code == "error.msg.not.authorized"

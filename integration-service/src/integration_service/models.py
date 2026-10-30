@@ -93,9 +93,7 @@ class Operation(Base):
     # The executor responsible for the operation, and until when. Taken and released only by its token.
     lease_owner: Mapped[str | None] = mapped_column(String(36))
     lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    version: Mapped[int] = mapped_column(Integer, server_default="1")
-    # Optimistic locking: every ORM update checks and bumps ``version``, so a writer holding stale state fails
-    # instead of overwriting a newer status.
+    version: Mapped[int] = mapped_column(Integer, server_default="1")  # optimistic locking: stale writers fail
     __mapper_args__ = {"version_id_col": version}  # noqa: RUF012
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

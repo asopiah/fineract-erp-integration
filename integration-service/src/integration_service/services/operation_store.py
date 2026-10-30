@@ -1,12 +1,7 @@
 """Operations in the database: claiming an external reference, leasing work, finding operations.
 
-The database decides every race here. Two requests can never both own a reference: ``(type, external_reference)`` is
-unique (money references are unique across types), and the business keys an operation reserves (a client uid, a
-loan's single approval or disbursement) are unique too.
-
-A lease makes one executor at a time responsible for an operation. It is taken with an atomic conditional update and
-identified by an owner token; the row's ``version`` (optimistic locking) makes any write by a former owner fail.
-Times come from ``clock_timestamp()``, the database's wall clock, not the start of a transaction.
+Unique constraints decide every race: on the reference and on the business keys an operation reserves. A lease is
+taken with one conditional update; the row's ``version`` makes any write by a former owner fail.
 """
 
 import uuid
@@ -31,8 +26,7 @@ Reserve = Callable[[Session, Operation], None]
 class Claim:
     operation_id: int
     is_new: bool
-    # The lease token of a new operation (its claimer executes it); None for an existing one.
-    lease: str | None = None
+    lease: str | None = None  # set only for a new operation, which its claimer executes
 
 
 class ReferenceReusedError(Exception):
@@ -53,8 +47,8 @@ class BusinessKeyTakenError(Exception):
         self.constraint: str | None = getattr(diagnostics, "constraint_name", None)
 
 
-def lease_expiry(seconds: float) -> ColumnElement[datetime]:
-    """``seconds`` from now, by the database's wall clock (``now()`` would be the transaction's start)."""
+def db_now_plus(seconds: float) -> ColumnElement[datetime]:
+    """The database's wall clock plus ``seconds`` (``now()`` would be the transaction's start)."""
     return func.clock_timestamp(type_=DateTime(timezone=True)) + timedelta(seconds=seconds)
 
 
@@ -89,7 +83,7 @@ def claim(
         loan_reference=loan_reference,
         correlation_id=current_correlation_id(),
         lease_owner=lease,
-        lease_expires_at=lease_expiry(lease_seconds),
+        lease_expires_at=db_now_plus(lease_seconds),
     )
     session.add(operation)
     try:
@@ -140,7 +134,7 @@ def try_lease(
     taken = session.execute(
         update(Operation)
         .where(*conditions)
-        .values(lease_owner=lease, lease_expires_at=lease_expiry(lease_seconds), version=Operation.version + 1)
+        .values(lease_owner=lease, lease_expires_at=db_now_plus(lease_seconds), version=Operation.version + 1)
         .execution_options(synchronize_session=False)
     )
     session.commit()

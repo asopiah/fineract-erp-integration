@@ -13,7 +13,6 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
@@ -22,6 +21,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from integration_service.domain.erp import ErpJournalEntry
 from integration_service.domain.fineract import FineractLoanTransaction, LoanTransactionType
+from integration_service.domain.money import plain_decimal
 from integration_service.gateways.erp import ErpGateway
 from integration_service.gateways.fineract import FineractGateway
 from integration_service.models import Loan
@@ -77,10 +77,10 @@ class Reconciler:
     def reconcile(self, criteria: Criteria) -> dict[str, Any]:
         if criteria.external_references is not None:
             fineract_side, erp_side = self._by_references(criteria.external_references)
-        else:
-            assert criteria.from_date is not None
-            assert criteria.to_date is not None
+        elif criteria.from_date is not None and criteria.to_date is not None:
             fineract_side, erp_side = self._by_dates(criteria.from_date, criteria.to_date)
+        else:
+            raise ValueError("reconciliation needs external references or a date range")
 
         items = []
         for reference in sorted(fineract_side.keys() | erp_side.keys()):
@@ -119,12 +119,9 @@ class Reconciler:
         return fineract_side, erp_side
 
     def _fineract_transactions(self) -> Iterator[tuple[str, FineractSide]]:
-        """Money transactions on every loan the integration originated, keyed by external reference, including ones
-        posted directly in Fineract. Fineract finds a transaction by external id only within a loan, so each loan is
-        read once.
+        """Money transactions on every loan the integration originated, keyed by external reference.
 
-        A transaction without an external reference (posted by hand in Fineract) gets a descriptive key of its own,
-        so several of them are reported separately and never collapse into one.
+        Transactions posted by hand in Fineract have no reference; each gets a descriptive key so none collapse.
         """
         with self._session_factory() as session:
             in_fineract = select(Loan.loan_reference).where(Loan.fineract_loan_id.isnot(None)).order_by(Loan.id)
@@ -159,7 +156,7 @@ def _item(
         else {
             "type": fineract.transaction.type.value,
             "transaction_date": fineract.transaction.transaction_date.isoformat(),
-            "amount": _money(fineract.transaction.amount),
+            "amount": plain_decimal(fineract.transaction.amount),
             "reversed": fineract.transaction.reversed,
         },
         "erp": None
@@ -168,10 +165,6 @@ def _item(
             "entry_number": erp.entry_number,
             "type": erp.transaction_type,
             "entry_date": erp.entry_date.isoformat(),
-            "amount": _money(erp.total),
+            "amount": plain_decimal(erp.total),
         },
     }
-
-
-def _money(value: Decimal) -> str:
-    return format(value.normalize(), "f")

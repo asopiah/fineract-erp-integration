@@ -1,5 +1,6 @@
 """JSON-over-HTTP calls with one classification of failures for every downstream system."""
 
+import logging
 from collections.abc import Callable
 from typing import Any
 
@@ -8,14 +9,19 @@ import httpx
 from integration_service.gateways.errors import GatewayError, NotAppliedError, OutcomeUnknownError, RejectedError
 from integration_service.observability import CORRELATION_ID_HEADER, current_correlation_id
 
+logger = logging.getLogger(__name__)
+
 # Refused before any processing: safe to send again after a pause.
-_NOT_APPLIED_STATUSES = frozenset({429, 503})
+_NOT_APPLIED_STATUSES = frozenset({408, 429, 503})
+# Our credentials were refused before any processing: safe to resend once the configuration is fixed.
+_UNAUTHORIZED_STATUSES = frozenset({401, 407})
 # The server may have committed before failing to answer.
 _UNKNOWN_STATUSES = frozenset({500, 502, 504})
 # The request never reached the server.
 _NOT_DELIVERED = (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)
 
 ErrorDetail = Callable[[httpx.Response], tuple[str | None, str]]
+ResponseCheck = Callable[[httpx.Response], bool]
 
 
 def propagate_correlation_id(request: httpx.Request) -> None:
@@ -25,20 +31,21 @@ def propagate_correlation_id(request: httpx.Request) -> None:
 
 
 class JsonApi:
-    """A downstream system. ``error_detail`` extracts (code, message) from that system's error bodies;
-    ``transient_conflict`` says whether a 409 means "rolled back, try again" rather than a business conflict."""
+    """A downstream system, with its own reading of error bodies, of retryable 409s and of permission refusals."""
 
     def __init__(
         self,
         system: str,
         client: httpx.Client,
         error_detail: ErrorDetail,
-        transient_conflict: Callable[[httpx.Response], bool] = lambda _: False,
+        transient_conflict: ResponseCheck = lambda _: False,
+        permission_denied: ResponseCheck = lambda _: False,
     ) -> None:
         self._system = system
         self._client = client
         self._error_detail = error_detail
         self._transient_conflict = transient_conflict
+        self._permission_denied = permission_denied
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any | None:
         """The resource, or ``None`` if it does not exist. A failed read never changed anything: ``NotAppliedError``."""
@@ -76,7 +83,12 @@ class JsonApi:
             return
         code, message = self._error_detail(response)
         error_type: type[GatewayError]
-        if read_only or status in _NOT_APPLIED_STATUSES or (status == 409 and self._transient_conflict(response)):
+        if status in _UNAUTHORIZED_STATUSES or self._permission_denied(response):
+            logger.error(
+                "%s refused our credentials or permissions (HTTP %d): check the configuration", self._system, status
+            )
+            error_type = NotAppliedError
+        elif read_only or status in _NOT_APPLIED_STATUSES or (status == 409 and self._transient_conflict(response)):
             error_type = NotAppliedError
         elif status in _UNKNOWN_STATUSES:
             error_type = OutcomeUnknownError

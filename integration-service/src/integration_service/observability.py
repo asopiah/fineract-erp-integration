@@ -6,6 +6,7 @@ Every log line has the same fields. Values bound with ``log_context`` apply to e
 
 import json
 import logging
+import re
 import sys
 import uuid
 from collections.abc import Awaitable, Callable, Iterator, Mapping
@@ -17,6 +18,8 @@ from types import MappingProxyType
 from fastapi import FastAPI, Request, Response
 
 CORRELATION_ID_HEADER = "X-Correlation-ID"
+# The same characters as external references, and short enough for the correlation_id column.
+_VALID_CORRELATION_ID = re.compile(r"[A-Za-z0-9._:-]{1,100}")
 
 LOG_FIELDS = (
     "correlation_id",
@@ -42,6 +45,13 @@ def log_context(**fields: object) -> Iterator[None]:
         yield
     finally:
         _context.reset(token)
+
+
+def accepted_correlation_id(header: str | None) -> str:
+    """The caller's correlation id if it is safe to store and log, otherwise a fresh one."""
+    if header is not None and _VALID_CORRELATION_ID.fullmatch(header):
+        return header
+    return str(uuid.uuid4())
 
 
 def current_correlation_id() -> str | None:
@@ -82,7 +92,7 @@ def install_correlation_middleware(app: FastAPI) -> None:
 
     @app.middleware("http")
     async def propagate_correlation_id(request: Request, call_next: CallNext) -> Response:
-        correlation_id = request.headers.get(CORRELATION_ID_HEADER) or str(uuid.uuid4())
+        correlation_id = accepted_correlation_id(request.headers.get(CORRELATION_ID_HEADER))
         with log_context(correlation_id=correlation_id):
             response = await call_next(request)
         response.headers[CORRELATION_ID_HEADER] = correlation_id

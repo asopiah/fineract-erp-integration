@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from integration_service.commands import ExternalReference
 
@@ -153,7 +153,13 @@ class GlAccountSyncOut(BaseModel):
 class ReconciliationRequest(BaseModel):
     from_date: date | None = None
     to_date: date | None = None
-    external_references: list[ExternalReference] | None = None
+    external_references: list[ExternalReference] | None = Field(default=None, min_length=1)
+
+    @model_validator(mode="after")
+    def dates_in_order(self) -> "ReconciliationRequest":
+        if self.from_date is not None and self.to_date is not None and self.from_date > self.to_date:
+            raise ValueError("from_date cannot be after to_date")
+        return self
 
 
 class ReconciliationItem(BaseModel):

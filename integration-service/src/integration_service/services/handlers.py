@@ -1,15 +1,7 @@
 """How each operation type is carried out in Fineract (and, for money, mirrored into the ERP).
 
-A handler answers four questions for the executor:
-
-* ``find``: does Fineract already have this operation? Always asked before ``submit``, so a retry after a timeout or
-  a crash never submits twice.
-* ``submit``: send the command to Fineract.
-* ``contradiction``: does what Fineract recorded disagree with the request? (Then a human must look.)
-* ``record``: keep what Fineract recorded, and build the response body.
-
-``release`` undoes what claiming the operation reserved, once Fineract has definitively rejected it, so a corrected
-request with a new reference can use the same business keys.
+The executor always calls ``find`` before ``submit``, so a retry never submits twice. ``release`` frees the business
+keys an operation reserved, and is called only once Fineract has definitively rejected it.
 """
 
 from abc import ABC, abstractmethod
@@ -28,6 +20,7 @@ from integration_service.domain.fineract import (
     FineractLoanTransaction,
     LoanTransactionType,
 )
+from integration_service.domain.money import plain_decimal
 from integration_service.domain.operations import OperationType
 from integration_service.gateways.fineract import FineractGateway
 from integration_service.models import Client, Loan, LoanTransaction, Operation
@@ -124,8 +117,8 @@ class LoanApplication(OperationHandler[FineractLoan]):
             "external_reference": loan.external_reference,
             "loan_reference": loan.loan_reference,
             "client_uid": loan.client_uid,
-            "principal": _money(loan.principal),
-            "annual_interest_rate": _money(loan.annual_interest_rate),
+            "principal": plain_decimal(loan.principal),
+            "annual_interest_rate": plain_decimal(loan.annual_interest_rate),
             "term_months": loan.term_months,
             "submitted_on": loan.submitted_on.isoformat(),
             "expected_disbursement_on": loan.expected_disbursement_on.isoformat(),
@@ -179,6 +172,18 @@ class MoneyMovement(OperationHandler[FineractLoanTransaction]):
             return f"Fineract transaction {operation.external_reference} has been reversed"
         return None
 
+    def stored_contradiction(
+        self, session: Session, operation: Operation, record: FineractLoanTransaction
+    ) -> str | None:
+        """Does Fineract's current record disagree with the request, or with what was stored from it earlier?"""
+        problem = self.contradiction(operation, record)
+        if problem is not None:
+            return problem
+        stored = _transaction(session, operation.external_reference)
+        if _breakdown(record) != _breakdown(_recorded(stored)):
+            return f"Fineract's record of {operation.external_reference} changed since it was stored"
+        return None
+
     def record(self, session: Session, operation: Operation, record: FineractLoanTransaction) -> None:
         if session.scalar(
             select(LoanTransaction.id).where(LoanTransaction.external_reference == operation.external_reference)
@@ -203,22 +208,7 @@ class MoneyMovement(OperationHandler[FineractLoanTransaction]):
 
     def journal_entry(self, session: Session, operation: Operation) -> JournalEntryDraft:
         """Built only from what Fineract recorded (the stored transaction), so every attempt sends the same entry."""
-        stored = _transaction(session, operation.external_reference)
-        posted = FineractLoanTransaction(
-            internal_id=stored.fineract_transaction_id,
-            external_reference=stored.external_reference,
-            type=stored.type,
-            fineract_type=stored.type.value,
-            transaction_date=stored.transaction_date,
-            amount=stored.amount,
-            principal=stored.principal_portion,
-            interest=stored.interest_portion,
-            fees=stored.fee_portion,
-            penalties=stored.penalty_portion,
-            overpayment=stored.overpayment_portion,
-            outstanding_after=stored.outstanding_after,
-            reversed=False,
-        )
+        posted = _recorded(_transaction(session, operation.external_reference))
         return journal_entry_for(posted, operation.external_reference, _loan_reference(operation), self._ledger)
 
     def record_journal(self, session: Session, operation: Operation, entry: ErpJournalEntry) -> None:
@@ -265,28 +255,59 @@ def transaction_body(transaction: LoanTransaction) -> dict[str, Any]:
         "loan_reference": transaction.loan_reference,
         "type": transaction.type.value,
         "transaction_date": transaction.transaction_date.isoformat(),
-        "amount": _money(transaction.amount),
-        "principal_portion": _money(transaction.principal_portion),
-        "interest_portion": _money(transaction.interest_portion),
-        "fee_portion": _money(transaction.fee_portion),
-        "penalty_portion": _money(transaction.penalty_portion),
-        "overpayment_portion": _money(transaction.overpayment_portion),
-        "outstanding_after": _money(transaction.outstanding_after),
+        "amount": plain_decimal(transaction.amount),
+        "principal_portion": plain_decimal(transaction.principal_portion),
+        "interest_portion": plain_decimal(transaction.interest_portion),
+        "fee_portion": plain_decimal(transaction.fee_portion),
+        "penalty_portion": plain_decimal(transaction.penalty_portion),
+        "overpayment_portion": plain_decimal(transaction.overpayment_portion),
+        "outstanding_after": plain_decimal(transaction.outstanding_after),
         "erp_entry_number": transaction.erp_entry_number,
     }
 
 
-def _money(value: Decimal) -> str:
-    return format(value.normalize(), "f")
+def _recorded(stored: LoanTransaction) -> FineractLoanTransaction:
+    # Only unreversed transactions are stored; operator repair re-checks that in Fineract first.
+    return FineractLoanTransaction(
+        internal_id=stored.fineract_transaction_id,
+        external_reference=stored.external_reference,
+        type=stored.type,
+        fineract_type=stored.type.value,
+        transaction_date=stored.transaction_date,
+        amount=stored.amount,
+        principal=stored.principal_portion,
+        interest=stored.interest_portion,
+        fees=stored.fee_portion,
+        penalties=stored.penalty_portion,
+        overpayment=stored.overpayment_portion,
+        outstanding_after=stored.outstanding_after,
+        reversed=False,
+    )
+
+
+def _breakdown(transaction: FineractLoanTransaction) -> tuple[object, ...]:
+    return (
+        transaction.internal_id,
+        transaction.type,
+        transaction.transaction_date,
+        transaction.amount,
+        transaction.principal,
+        transaction.interest,
+        transaction.fees,
+        transaction.penalties,
+        transaction.overpayment,
+    )
 
 
 def _client_uid(operation: Operation) -> str:
-    assert operation.client_uid is not None, "client operations always carry a client_uid"
+    if operation.client_uid is None:
+        raise ValueError(f"{operation.type} {operation.external_reference} has no client_uid")
     return operation.client_uid
 
 
 def _loan_reference(operation: Operation) -> str:
-    assert operation.loan_reference is not None, "loan operations always carry a loan_reference"
+    if operation.loan_reference is None:
+        raise ValueError(f"{operation.type} {operation.external_reference} has no loan_reference")
     return operation.loan_reference
 
 

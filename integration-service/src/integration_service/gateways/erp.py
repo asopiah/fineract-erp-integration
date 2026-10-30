@@ -8,6 +8,7 @@ import httpx
 
 from integration_service.domain.accounting import JournalEntryDraft
 from integration_service.domain.erp import ErpAccount, ErpJournalEntry
+from integration_service.domain.money import plain_decimal
 from integration_service.gateways.http import JsonApi, json_or_empty, propagate_correlation_id
 from integration_service.settings import Settings
 
@@ -43,7 +44,11 @@ class ErpGateway:
             "transaction_type": draft.transaction_type,
             "memo": draft.memo,
             "lines": [
-                {"account_code": line.account_code, "debit": str(line.debit), "credit": str(line.credit)}
+                {
+                    "account_code": line.account_code,
+                    "debit": plain_decimal(line.debit),
+                    "credit": plain_decimal(line.credit),
+                }
                 for line in draft.lines
             ],
         }
