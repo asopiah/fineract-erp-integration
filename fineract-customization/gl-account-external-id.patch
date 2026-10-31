@@ -1089,22 +1089,12 @@ index 0000000..b388a67
 +        return parent;
 +    }
 +}
-diff --git a/fineract-provider/src/main/resources/db/changelog/tenant/changelog-tenant.xml b/fineract-provider/src/main/resources/db/changelog/tenant/changelog-tenant.xml
-index c603611..e848667 100644
---- a/fineract-provider/src/main/resources/db/changelog/tenant/changelog-tenant.xml
-+++ b/fineract-provider/src/main/resources/db/changelog/tenant/changelog-tenant.xml
-@@ -259,4 +259,5 @@
-     <include file="parts/0238_transaction_summary_report_update_originator_inline_join.xml" relativeToChangelogFile="true" />
-     <include file="parts/0239_add_retained_earning_job.xml" relativeToChangelogFile="true"/>
-     <include file="parts/0240_add_retained_earning_global_configuration.xml" relativeToChangelogFile="true"/>
-+    <include file="parts/0242_add_gl_account_external_id.xml" relativeToChangelogFile="true"/>
- </databaseChangeLog>
-diff --git a/fineract-provider/src/main/resources/db/changelog/tenant/parts/0242_add_gl_account_external_id.xml b/fineract-provider/src/main/resources/db/changelog/tenant/parts/0242_add_gl_account_external_id.xml
+diff --git a/fineract-provider/src/main/resources/db/custom-changelog/0001_gl_account_external_id.xml b/fineract-provider/src/main/resources/db/custom-changelog/0001_gl_account_external_id.xml
 new file mode 100644
-index 0000000..0e795bf
+index 0000000..81351ba
 --- /dev/null
-+++ b/fineract-provider/src/main/resources/db/changelog/tenant/parts/0242_add_gl_account_external_id.xml
-@@ -0,0 +1,38 @@
++++ b/fineract-provider/src/main/resources/db/custom-changelog/0001_gl_account_external_id.xml
+@@ -0,0 +1,39 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!--
 +
@@ -1132,7 +1122,8 @@ index 0000000..0e795bf
 +    <!--
 +        External id of a GL account: the reference assigned by the system that owns the chart of accounts.
 +        Nullable, so existing accounts and creates without one are unaffected (NULLs never collide in a unique index).
-+        Numbered 0242 because 0241 is already taken by final-changelog-tenant.xml.
++        Lives in db/custom-changelog, Fineract's extension point for installation-specific changes, so it never
++        collides with upstream's own numbered changelogs.
 +    -->
 +    <changeSet author="fineract" id="1">
 +        <addColumn tableName="acc_gl_account">

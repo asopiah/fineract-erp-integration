@@ -15,11 +15,11 @@ convention and reuses Fineract's own `ExternalId` type, its JPA converter and it
 
 | # | Requirement | How it is enforced |
 |---|---|---|
-| 1 | External reference stored and unique | Column `acc_gl_account.external_id` + unique constraint `acc_gl_external_id` (Liquibase `0242`) |
+| 1 | External reference stored and unique | Column `acc_gl_account.external_id` + unique constraint `acc_gl_external_id` |
 | 2 | Same reference, identical payload → existing account | `createGLAccount` finds the account and returns its id; nothing is inserted |
 | 3 | Same reference, different payload → conflict | `GLAccountExternalIdConflictException`, answered **409** by its own mapper |
 | 4 | Fineract permissions | Unchanged `CREATE_GLACCOUNT` command; the lookup needs `READ_GLACCOUNT` |
-| 5 | Liquibase | `db/changelog/tenant/parts/0242_add_gl_account_external_id.xml` |
+| 5 | Liquibase | `db/custom-changelog/0001_gl_account_external_id.xml`, Fineract's extension point for installation-specific changes |
 | 6 | JUnit unit and integration tests | See [Tests](#tests) |
 
 **"Identical"** means every attribute the caller supplies: GL code, name, type, usage, parent, tag, description and
@@ -91,9 +91,11 @@ retried; all 50 requests returned 200, and each round produced exactly one accou
 * **Existing accounts can't be linked yet.** An account created without an external id can't get one later (`PUT`
   refuses it), and creating it again with one is a duplicate GL code. Allowing `PUT` to set the external id once,
   while it is empty, is the natural next step for onboarding an existing chart.
-* **Liquibase numbering.** `0242` is the next free number in 1.15.0. On an upgrade, if upstream ships its own `0242`,
-  this file keeps working (Liquibase identifies a changeSet by file path, id and author), but it should be renamed
-  into a fork-specific range to stay readable.
+* **Liquibase lives in `db/custom-changelog`.** Fineract runs every file there on each tenant, after its own
+  changelogs (`db.changelog-master.xml`, `includeAll path="db/custom-changelog"`). So the patch never edits upstream's
+  numbered changelog, and an upgrade can't collide with it.
+* **Upgrading.** The patch also applies cleanly to Fineract 1.16.1, the newest tag (checked with `git apply --check`;
+  not built or tested there, since 1.16 moves to JDK 25 and Gradle 9).
 * **An upstream quirk.** Fineract maps a duplicate GL code by searching the error text for `acc_gl_code`. On
   PostgreSQL the constraint is called `acc_gl_account_gl_code_key` (verified), so that match fails there. The patch
   doesn't depend on constraint names.
@@ -108,7 +110,7 @@ transient failure. A business key with a definition check is the right tool here
 
 | Layer | Files |
 |---|---|
-| Schema | `0242_add_gl_account_external_id.xml`, `changelog-tenant.xml` |
+| Schema | `db/custom-changelog/0001_gl_account_external_id.xml` |
 | Domain | `GLAccount` (field, `fromJson`, `hasSameDefinitionAs`), `GLAccountRepository.findOneByExternalId` |
 | Input | `GLAccountJsonInputParams.EXTERNAL_ID`, `GLAccountCommand` (validation), `GLAccountCommandFromApiJsonDeserializer` |
 | Write | `GLAccountWritePlatformServiceJpaRepositoryImpl`, `UniqueConstraintViolations` |
@@ -158,6 +160,9 @@ profile `test`. The target restarts Fineract with that profile (`docker/fineract
 always restarts it normally afterwards, even when a test fails.
 
 Scope: the GL area the patch touches, not Fineract's whole suite (thousands of tests, hours).
+
+A scripted demo of behaviours 1–4 against the running Fineract, with the 403 and the API user's least privilege, is
+the *Fineract GL patch* simulation (`make simulate-gl-patch`, evidence in [SIMULATIONS.md](../SIMULATIONS.md)).
 
 Recorded runs: `../evidence/java-unit-tests.log`, `../evidence/java-integration-tests.log`,
 `../evidence/java-regression-tests.log` and `../evidence/build-dockerfile.log`.
