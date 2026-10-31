@@ -303,13 +303,23 @@ patch).
 
 ## AI assistance and references
 
-The brief allows AI assistants and online references, as long as they are disclosed.
+The brief allows AI assistants and online references, as long as their use is disclosed.
 
-* **AI assistance.** I built this with an AI coding assistant (Claude, in Claude Code) as a pair programmer. It
-  helped with:
-  * exploring Fineract's command pipeline, retry and error-mapping code;
-  * drafting the Java patch, the Python services, the tests, the simulations and these documents.
+**AI assistance.** I used an AI coding assistant (Claude, in Claude Code) throughout:
 
-  I directed the design, and reviewed, ran and verified everything. All evidence in `evidence/` and
-  [SIMULATIONS.md](SIMULATIONS.md) comes from real runs.
-* Apache Fineract source (tag `1.15.0`) was the primary reference for every Fineract behaviour relied on here.
+| For | How |
+| --- | --- |
+| Learning | Exploring Fineract's source: the command pipeline, the retry configuration, error mapping, Liquibase |
+| Code | Generating most of the code (the Java patch, both Python services, the simulations) from my design and instructions |
+| Testing | Writing tests, running the suites and simulations, and investigating failures |
+| Review | Independent review rounds whose findings are listed under [Found in review](#found-in-review) |
+| Documentation | Drafting these documents |
+
+I set the design and the approach: extending Fineract's own command, the operations table as the state machine and
+work queue, lookup-before-submit, Fineract as the source of every amount. I directed each step, reviewed every
+change, and can explain and modify any part. All evidence in `evidence/` and [SIMULATIONS.md](SIMULATIONS.md) comes
+from real runs.
+
+**References.**
+
+* Apache Fineract's source at tag `1.15.0`, for every Fineract behaviour relied on here.
