@@ -1,5 +1,7 @@
 # Fineract ↔ ERP integration
 
+[![CI](https://github.com/asopiah/fineract-erp-integration/actions/workflows/ci.yml/badge.svg)](https://github.com/asopiah/fineract-erp-integration/actions/workflows/ci.yml)
+
 A financing partner sends loan requests. **Apache Fineract** (the core banking system) records the loans and the
 money. An **ERP** (the accounting system) owns the chart of accounts and gets a balanced journal entry for every money
 movement. The **integration service** in between keeps all three in step, and keeps the books right when requests are
