@@ -12,7 +12,7 @@ against that stack, in this order. All passed.
 | `readme-walkthrough.log` | The README's eight walkthrough steps, run verbatim; output identical to the README | the commands in README § 3 |
 | `python-tests.log` | Ruff, format check and `mypy --strict` clean; 121 integration-service and 22 Mock ERP tests pass, against real PostgreSQL | `make test-python` |
 | `stack-tests.log` | All 15 simulations pass as automated tests against the running stack | `make test-stack` |
-| `simulate.log` | Console output of the run that wrote [`../SIMULATIONS.md`](../SIMULATIONS.md) (15/15 PASS) | `make simulate` |
+| `simulate.log` | Console output of the run that wrote [`../SIMULATIONS.md`](../SIMULATIONS.md) (15/15 PASS). Regenerated later the same day, after the J1–J5 explanations were reworded to answer the brief's questions directly, on a stack built from the final Dockerfile. | `make simulate` |
 | `java-unit-tests.log` | 19 JUnit tests: the customization's 18 plus upstream's GL service test | `make test-java` |
 | `java-integration-tests.log` | 10 JUnit integration tests against the running Fineract: replay, 409, 5 × 10 concurrent creates, permission denied, immutable external id, lookup | `make test-java-it` |
 | `java-race-retries.txt` | 33 concurrent inserts lost the unique-constraint race during those tests; all were resolved by Fineract's command retry | Fineract log during `make test-java-it` |

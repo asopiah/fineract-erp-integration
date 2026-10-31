@@ -18,9 +18,14 @@ it describes: Fineract through its own API, the ERP through its own API, the int
 Fineract and ERP values are shown exactly as those systems return them (for example `4125599.0` from Fineract).
 Each simulation is also an automated test (`make test-stack`).
 
-| Simulation | Result |
-| --- | --- |
+## Evidence at a glance
+
+| Simulation | What it covers in the brief | Run it again | Result |
+| --- | --- | --- | --- |
 {summary}
+
+The Java side has its own logs in [`evidence/`](evidence/README.md): unit tests, integration tests with 5 rounds of 10
+concurrent creates, and Fineract's own GL tests on the patched build.
 """
 
 
@@ -35,7 +40,8 @@ def main() -> int:
 
     stack = Stack()
     results = []
-    for name in arguments.names or list(SCENARIOS):
+    names = arguments.names or list(SCENARIOS)
+    for name in names:
         try:
             evidence = SCENARIOS[name](stack)
         finally:
@@ -44,7 +50,10 @@ def main() -> int:
         results.append(evidence)
 
     if arguments.output:
-        summary = "\n".join(f"| {e.title} | {'PASS' if e.passed else 'FAIL'} |" for e in results)
+        summary = "\n".join(
+            f"| {e.title} | {e.covers} | `make simulate-{name}` | {'PASS' if e.passed else 'FAIL'} |"
+            for name, e in zip(names, results, strict=True)
+        )
         header = HEADER.format(timestamp=datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), summary=summary)
         arguments.output.write_text(header + "\n" + "\n".join(e.to_markdown() for e in results))
     return 0 if all(evidence.passed for evidence in results) else 1

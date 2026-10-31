@@ -3,6 +3,19 @@
 Trade-offs, the reasons behind them, what was deliberately not built, and what is weak. Assumptions made where the
 brief was open are listed at the end, together with the disclosure of AI assistance and references.
 
+## At a glance
+
+| The brief asks about | Decision | Why, in one line | Details |
+| --- | --- | --- | --- |
+| The customization mechanism | Extend Fineract's own `GLACCOUNT/CREATE` command | Keeps permissions, maker-checker, audit and retry; a wrapper would enforce nothing inside Fineract | [↓](#fineract-customization-extend-the-create-command) |
+| Sync vs async | Synchronous partner calls; the `operations` table is the durable queue | One source of truth for in-flight work; a broker would need reconciling against it | [↓](#synchronous-calls-no-queue) |
+| Database constraints | Unique keys and a once-per-loan index decide every race | Application checks give good errors; constraints make them true under concurrency | [↓](#database-constraints-are-the-arbiter) |
+| Idempotency | `(type, external_reference)` plus a fingerprint of the normalized request | Same request replays, a different one is a 409, and it survives restarts | [↓](#idempotency) |
+| Retries | Look up before every resend; 3 tries in the request, then up to 20 in the background | A financial call is never repeated without first checking whether it happened | [↓](#retries-and-partial-failure) |
+| Partial failure | Each step is committed before the next call; recovery resumes from there | After any crash the row says exactly what is known | [↓](#retries-and-partial-failure) |
+| What I chose not to build | Stretch tier, automatic reversals, multi-currency, a broker | Each is out of the brief's core, or would add a second source of truth | [↓](#what-i-chose-not-to-build) |
+| Known weaknesses | One instance assumed; local-grade security; reconciliation reads Fineract live | Stated plainly, with what production would need | [↓](#known-weaknesses) |
+
 ## Fineract customization: extend the CREATE command
 
 The options were a new endpoint, an extension of the existing GL command handler, or a Fineract-side component.
@@ -22,6 +35,9 @@ The options were a new endpoint, an extension of the existing GL command handler
 * **409, not 403.** Fineract answers domain-rule exceptions with 403, the same status as "no permission". A dedicated
   mapper returns 409, so a client can tell "this id already means something else" from "you may not".
 * **Not used: Fineract's `Idempotency-Key`.** It does not compare payloads, and it replays cached errors.
+* **No new permission.** A synced account is still a GL account create, so the existing `CREATE_GLACCOUNT`
+  permission governs it, and the API user holds exactly that, nothing broader. A separate `SYNC_GLACCOUNT` command
+  would mean a second create path inside Fineract to keep consistent with the first.
 
 The details, including the edge cases, are in [fineract-customization/README.md](fineract-customization/README.md).
 

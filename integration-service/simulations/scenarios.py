@@ -455,10 +455,26 @@ def erp_down_after_fineract(stack: Stack) -> Evidence:
     )
     evidence.check("still one repayment", len(stack.fineract_transactions(loan, "repayment")) == 1)
     evidence.actual = _verdict(evidence)
-    evidence.explanation = (
-        "The operation stays ERP_PENDING with a backoff schedule; recovery re-derives the same journal from the stored "
-        "Fineract transaction and posts it. Double posting is impossible: Fineract is never called again (its step is "
-        "done) and the ERP is idempotent on the external reference."
+    evidence.explanation = "\n\n".join(
+        [
+            (
+                "**Status?** `ERP_PENDING`: Fineract has the repayment, the journal entry is owed. The partner got "
+                "202."
+            ),
+            (
+                "**Retried?** Yes. Recovery retries with backoff (2 s, 4 s, 8 s … capped at 300 s, at most 20 "
+                "attempts), then hands the operation to a human as NEEDS_RECONCILIATION."
+            ),
+            (
+                "**How does the ERP catch up?** Recovery rebuilds the journal entry from the Fineract transaction "
+                "stored with the operation and posts it; nothing is recomputed."
+            ),
+            (
+                "**How is double posting prevented?** Fineract is never called again, because its step is recorded as"
+                " done. The ERP is unique on external_reference and compares payloads, so a repeated post returns the"
+                " entry it already holds."
+            ),
+        ]
     )
     return evidence
 
@@ -498,10 +514,18 @@ def fineract_down(stack: Stack) -> Evidence:
         "retry succeeds once", retry.status_code == 201 and len(stack.fineract_transactions(loan, "disbursement")) == 1
     )
     evidence.actual = _verdict(evidence)
-    evidence.explanation = (
-        "A connection that never opened is classified 'not applied': nothing can have happened in Fineract, so the "
-        "operation is FAILED with retryable=true and the same reference may be sent again. It frees the loan's "
-        "disbursement slot, since FAILED operations are excluded from the once-per-loan index."
+    evidence.explanation = "\n\n".join(
+        [
+            "**What does the caller get?** 503 `FINERACT_UNAVAILABLE`.",
+            (
+                "**Is anything persisted?** Only the operation row: FAILED, retryable. Nothing in Fineract (the "
+                "connection never opened) and nothing in the ERP."
+            ),
+            (
+                "**Safe to retry?** Yes, with the same reference: a retryable failure runs again. It also frees the "
+                "loan's disbursement slot, because FAILED operations don't count against the one-per-loan rule."
+            ),
+        ]
     )
     return evidence
 
@@ -532,10 +556,19 @@ def fineract_timeout_after_send(stack: Stack) -> Evidence:
     evidence.check("one disbursement", len(stack.fineract_transactions(loan, "disbursement")) == 1)
     evidence.check("found by lookup, not resubmitted", any("already in Fineract" in line for line in trail))
     evidence.actual = _verdict(evidence)
-    evidence.explanation = (
-        "The read timeout after sending is an unknown outcome. The next attempt starts with GET "
-        "/loans/external-id/{loan}/transactions/external-id/{reference}, finds the transaction and continues; had the "
-        "lookup failed too, the operation would stay FINERACT_PENDING for recovery — never FAILED."
+    evidence.explanation = "\n\n".join(
+        [
+            (
+                "**How do you know whether it succeeded?** The reference is sent as the transaction's Fineract "
+                "externalId. The lost answer is an unknown outcome, so the next attempt starts with `GET "
+                "/loans/external-id/{loan}/transactions/external-id/{reference}`, finds the disbursement, and "
+                "continues without sending it again."
+            ),
+            (
+                "Had the lookup failed too, the operation would stay FINERACT_PENDING for recovery. An unknown "
+                "outcome is never turned into FAILED, and never blindly resent."
+            ),
+        ]
     )
     return evidence
 
@@ -567,9 +600,18 @@ def erp_timeout_after_write(stack: Stack) -> Evidence:
     evidence.check("completed by the retry", completed)
     evidence.check("exactly one journal entry", len(entries) == 1)
     evidence.actual = _verdict(evidence)
-    evidence.explanation = (
-        "The ERP enforces uniqueness on external_reference and compares payloads. The retry sends the identical entry "
-        "(derived from the stored Fineract transaction), so the ERP answers 200 with the entry it already has."
+    evidence.explanation = "\n\n".join(
+        [
+            (
+                "**What happens on retry?** The same entry is sent again, rebuilt from the stored Fineract "
+                "transaction. The ERP is unique on external_reference and compares payloads, so it answers 200 with "
+                "the entry it already wrote."
+            ),
+            (
+                "**Prove one journal entry exists:** the ERP's database holds exactly one entry for the reference "
+                "(field 5)."
+            ),
+        ]
     )
     return evidence
 
@@ -618,10 +660,15 @@ def crash_before_erp(stack: Stack) -> Evidence:
         len(stack.fineract_transactions(loan, "disbursement")) == 1 and stack.erp_entry(reference) is not None,
     )
     evidence.actual = _verdict(evidence)
-    evidence.explanation = (
-        "Each status is committed before the next external call, so the restart finds FINERACT_DONE with the dead "
-        "process's lease. When the lease expires, the recovery sweep runs the same executor: Fineract is already done, "
-        "so only the ERP entry is posted."
+    evidence.explanation = "\n\n".join(
+        [
+            (
+                "**How is it recovered on restart?** Each status is committed before the next external call, so after"
+                " the crash the row says FINERACT_DONE, under the dead process's lease. The container restarts; the "
+                "recovery sweep runs at startup and every 5 seconds. Once the lease expires, the sweep runs the same "
+                "executor: Fineract's step is already done, so only the ERP entry is posted."
+            ),
+        ]
     )
     return evidence
 
