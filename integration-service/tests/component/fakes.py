@@ -213,9 +213,10 @@ class FakeErp(Scripted):
     def __init__(self) -> None:
         super().__init__("erp")
         self.entries: dict[str, JournalEntryDraft] = {}
+        self.accounts: list[ErpAccount] = []
 
     def list_accounts(self) -> list[ErpAccount]:
-        return []
+        return list(self.accounts)
 
     def post_journal_entry(self, draft: JournalEntryDraft) -> ErpJournalEntry:
         def apply() -> None:

@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     recovery_interval_seconds: float = 5.0
     recovery_enabled: bool = True
 
+    # The loan product's currency. ERP accounts in any other currency are not synced to Fineract.
+    ledger_currency: str = "RWF"
+
     # Exposes /api/admin/faults so simulations can make Fineract fail on demand. Never enable outside a test stack.
     fault_injection_enabled: bool = False
 

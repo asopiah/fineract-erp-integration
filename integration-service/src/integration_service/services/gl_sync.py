@@ -50,12 +50,17 @@ class GlAccountSynchronizer:
     def retry_due(self) -> int:
         """Recovery: retries FAILED accounts whose failure was transient and whose backoff has elapsed."""
         with self._session_factory() as session:
-            due = session.scalars(
-                select(GlAccountSync).where(
-                    GlAccountSync.status == SyncStatus.FAILED, GlAccountSync.next_attempt_at <= func.now()
+            due = set(
+                session.scalars(
+                    select(GlAccountSync.external_reference).where(
+                        GlAccountSync.status == SyncStatus.FAILED, GlAccountSync.next_attempt_at <= func.now()
+                    )
                 )
-            ).all()
-            accounts = [_as_erp_account(row) for row in due]
+            )
+        if not due:
+            return 0
+        # Re-read the ERP, the owner of the account's definition, rather than retry from a local copy.
+        accounts = [account for account in self._erp.list_accounts() if account.external_reference in due]
         for account in accounts:
             self._sync(account)
         return len(accounts)
@@ -71,6 +76,10 @@ class GlAccountSynchronizer:
         with self._session_factory() as session, log_context(external_reference=account.external_reference):
             row = self._locked_mapping(session, account)
             if row is None or row.status is SyncStatus.SYNCED:
+                session.commit()
+                return
+            if account.currency != self._settings.ledger_currency:
+                self._failed(row, f"currency {account.currency} is not {self._settings.ledger_currency}", retry=False)
                 session.commit()
                 return
             try:
@@ -117,13 +126,3 @@ class GlAccountSynchronizer:
         row.last_error = reason[:500]
         row.next_attempt_at = db_now_plus(self._settings.recovery_delay(row.attempts)) if retry else None
         logger.warning("GL account sync failed: %s", reason, extra={"status": SyncStatus.FAILED})
-
-
-def _as_erp_account(row: GlAccountSync) -> ErpAccount:
-    return ErpAccount(
-        code=row.code,
-        name=row.name,
-        type=row.erp_type,
-        currency="",
-        external_reference=row.external_reference,
-    )

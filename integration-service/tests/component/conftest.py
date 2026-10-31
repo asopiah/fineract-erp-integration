@@ -41,6 +41,7 @@ class System:
     recovery: Recovery
     queries: Queries
     session_factory: sessionmaker[Session]
+    gl_sync: GlAccountSynchronizer
 
     def operation(self, external_reference: str) -> Operation:
         with self.session_factory() as session:
@@ -109,5 +110,6 @@ def system(clean_database: str) -> Iterator[System]:
         recovery=Recovery(session_factory, executor, gl_sync, settings),
         queries=Queries(session_factory, gateway),
         session_factory=session_factory,
+        gl_sync=gl_sync,
     )
     session_factory.kw["bind"].dispose()
