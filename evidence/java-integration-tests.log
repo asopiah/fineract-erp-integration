@@ -67,35 +67,35 @@ Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 m
 > Task :fineract-accounting:compileJava UP-TO-DATE
 > Task :fineract-accounting:processResources UP-TO-DATE
 > Task :fineract-accounting:classes UP-TO-DATE
-> Task :fineract-accounting:jar
+> Task :fineract-accounting:jar UP-TO-DATE
 
 > Task :fineract-branch:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
 
-> Task :fineract-branch:compileJava FROM-CACHE
-> Task :fineract-branch:processResources
-> Task :fineract-branch:classes
-> Task :fineract-branch:jar
+> Task :fineract-branch:compileJava UP-TO-DATE
+> Task :fineract-branch:processResources UP-TO-DATE
+> Task :fineract-branch:classes UP-TO-DATE
+> Task :fineract-branch:jar UP-TO-DATE
 
 > Task :fineract-cob:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 managed classes from 2 modules
 
-> Task :fineract-cob:compileJava FROM-CACHE
+> Task :fineract-cob:compileJava UP-TO-DATE
 > Task :fineract-cob:processResources NO-SOURCE
 > Task :fineract-cob:classes UP-TO-DATE
-> Task :fineract-cob:jar
-> Task :fineract-command-audit:compileJava FROM-CACHE
-> Task :fineract-command-audit:processResources
-> Task :fineract-command-audit:classes
-> Task :fineract-command-audit:jar
-> Task :fineract-command-jdbc:compileJava FROM-CACHE
-> Task :fineract-command-jdbc:processResources
-> Task :fineract-command-jdbc:classes
-> Task :fineract-command-jdbc:jar
-> Task :fineract-document:compileJava FROM-CACHE
+> Task :fineract-cob:jar UP-TO-DATE
+> Task :fineract-command-audit:compileJava UP-TO-DATE
+> Task :fineract-command-audit:processResources UP-TO-DATE
+> Task :fineract-command-audit:classes UP-TO-DATE
+> Task :fineract-command-audit:jar UP-TO-DATE
+> Task :fineract-command-jdbc:compileJava UP-TO-DATE
+> Task :fineract-command-jdbc:processResources UP-TO-DATE
+> Task :fineract-command-jdbc:classes UP-TO-DATE
+> Task :fineract-command-jdbc:jar UP-TO-DATE
+> Task :fineract-document:compileJava UP-TO-DATE
 > Task :fineract-document:processResources NO-SOURCE
 > Task :fineract-document:classes UP-TO-DATE
-> Task :fineract-document:jar
+> Task :fineract-document:jar UP-TO-DATE
 
 > Task :fineract-investor:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-investor with 122 managed classes from 8 modules
@@ -106,18 +106,18 @@ Generated EclipseLink static weaving persistence.xml for :fineract-loan with 114
 > Task :fineract-rates:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
 
-> Task :fineract-rates:compileJava FROM-CACHE
-> Task :fineract-rates:processResources
-> Task :fineract-rates:classes
-> Task :fineract-rates:jar
-> Task :fineract-loan:compileJava FROM-CACHE
-> Task :fineract-loan:processResources
-> Task :fineract-loan:classes
-> Task :fineract-loan:jar
-> Task :fineract-investor:compileJava FROM-CACHE
-> Task :fineract-investor:processResources
-> Task :fineract-investor:classes
-> Task :fineract-investor:jar
+> Task :fineract-rates:compileJava UP-TO-DATE
+> Task :fineract-rates:processResources UP-TO-DATE
+> Task :fineract-rates:classes UP-TO-DATE
+> Task :fineract-rates:jar UP-TO-DATE
+> Task :fineract-loan:compileJava UP-TO-DATE
+> Task :fineract-loan:processResources UP-TO-DATE
+> Task :fineract-loan:classes UP-TO-DATE
+> Task :fineract-loan:jar UP-TO-DATE
+> Task :fineract-investor:compileJava UP-TO-DATE
+> Task :fineract-investor:processResources UP-TO-DATE
+> Task :fineract-investor:classes UP-TO-DATE
+> Task :fineract-investor:jar UP-TO-DATE
 
 > Task :fineract-loan-origination:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-loan-origination with 142 managed classes from 9 modules
@@ -125,108 +125,109 @@ Generated EclipseLink static weaving persistence.xml for :fineract-loan-originat
 > Task :fineract-working-capital-loan:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-working-capital-loan with 139 managed classes from 8 modules
 
-> Task :fineract-working-capital-loan:compileJava FROM-CACHE
-> Task :fineract-working-capital-loan:processResources
-> Task :fineract-working-capital-loan:classes
-> Task :fineract-working-capital-loan:jar
-> Task :fineract-loan-origination:compileJava FROM-CACHE
-> Task :fineract-loan-origination:processResources
-> Task :fineract-loan-origination:classes
-> Task :fineract-loan-origination:jar
-> Task :fineract-mix:compileJava FROM-CACHE
+> Task :fineract-working-capital-loan:compileJava UP-TO-DATE
+> Task :fineract-working-capital-loan:processResources UP-TO-DATE
+> Task :fineract-working-capital-loan:classes UP-TO-DATE
+> Task :fineract-working-capital-loan:jar UP-TO-DATE
+> Task :fineract-loan-origination:compileJava UP-TO-DATE
+> Task :fineract-loan-origination:processResources UP-TO-DATE
+> Task :fineract-loan-origination:classes UP-TO-DATE
+> Task :fineract-loan-origination:jar UP-TO-DATE
+> Task :fineract-mix:compileJava UP-TO-DATE
 > Task :fineract-mix:processResources NO-SOURCE
 > Task :fineract-mix:classes UP-TO-DATE
-> Task :fineract-mix:jar
+> Task :fineract-mix:jar UP-TO-DATE
 
 > Task :fineract-progressive-loan:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-progressive-loan with 117 managed classes from 8 modules
 
-> Task :fineract-progressive-loan:compileJava FROM-CACHE
-> Task :fineract-progressive-loan:processResources
-> Task :fineract-progressive-loan:classes
-> Task :fineract-progressive-loan:jar
+> Task :fineract-progressive-loan:compileJava UP-TO-DATE
+> Task :fineract-progressive-loan:processResources UP-TO-DATE
+> Task :fineract-progressive-loan:classes UP-TO-DATE
+> Task :fineract-progressive-loan:jar UP-TO-DATE
 
 > Task :fineract-provider:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
 
-> Task :fineract-report:compileJava FROM-CACHE
+> Task :fineract-report:compileJava UP-TO-DATE
 > Task :fineract-report:processResources NO-SOURCE
 > Task :fineract-report:classes UP-TO-DATE
-> Task :fineract-report:jar
+> Task :fineract-report:jar UP-TO-DATE
 
 > Task :fineract-savings:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
 
-> Task :fineract-savings:compileJava FROM-CACHE
-> Task :fineract-savings:processResources
-> Task :fineract-savings:classes
-> Task :fineract-savings:jar
+> Task :fineract-savings:compileJava UP-TO-DATE
+> Task :fineract-savings:processResources UP-TO-DATE
+> Task :fineract-savings:classes UP-TO-DATE
+> Task :fineract-savings:jar UP-TO-DATE
 
 > Task :fineract-security:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-security with 42 managed classes from 2 modules
 
-> Task :fineract-security:compileJava FROM-CACHE
+> Task :fineract-security:compileJava UP-TO-DATE
 > Task :fineract-security:processResources NO-SOURCE
 > Task :fineract-security:classes UP-TO-DATE
-> Task :fineract-security:jar
-> Task :fineract-provider:compileJava FROM-CACHE
+> Task :fineract-security:jar UP-TO-DATE
+> Task :fineract-provider:compileJava UP-TO-DATE
 > Task :fineract-provider:generateGitProperties
-> Task :fineract-provider:generateRebelMain
-> Task :fineract-provider:processResources
+> Task :fineract-provider:generateRebelMain UP-TO-DATE
+> Task :fineract-provider:processResources UP-TO-DATE
 > Task :fineract-provider:classes
-> Task :fineract-provider:prepareInputYaml
-> Task :fineract-provider:resolve
+> Task :fineract-provider:prepareInputYaml UP-TO-DATE
+> Task :fineract-provider:resolve UP-TO-DATE
 > Task :fineract-client:buildJavaSdk FROM-CACHE
-> Task :fineract-client:cleanupGeneratedJavaFiles
+> Task :fineract-client:cleanupGeneratedJavaFiles UP-TO-DATE
 > Task :fineract-client:licenseFormatMain UP-TO-DATE
-> Task :fineract-client:buildTypescriptAngularSdk FROM-CACHE
-> Task :fineract-client:buildAsciidoc FROM-CACHE
-> Task :fineract-client:spotlessMisc FROM-CACHE
+> Task :fineract-client:buildTypescriptAngularSdk UP-TO-DATE
+> Task :fineract-client:buildAsciidoc UP-TO-DATE
+> Task :fineract-client:spotlessMisc UP-TO-DATE
 > Task :fineract-client:spotlessMiscApply UP-TO-DATE
-> Task :fineract-client:compileJava FROM-CACHE
-> Task :fineract-client:processResources
-> Task :fineract-client:classes
-> Task :fineract-client:jar
-> Task :fineract-client-feign:buildJavaSdk FROM-CACHE
-> Task :fineract-client-feign:cleanupGeneratedJavaFiles
+> Task :fineract-client:compileJava UP-TO-DATE
+> Task :fineract-client:processResources UP-TO-DATE
+> Task :fineract-client:classes UP-TO-DATE
+> Task :fineract-client:jar UP-TO-DATE
+> Task :fineract-client-feign:buildJavaSdk UP-TO-DATE
+> Task :fineract-client-feign:cleanupGeneratedJavaFiles UP-TO-DATE
 > Task :fineract-client-feign:licenseFormatMain UP-TO-DATE
-> Task :fineract-client-feign:spotlessMisc FROM-CACHE
+> Task :fineract-client-feign:spotlessMisc UP-TO-DATE
 > Task :fineract-client-feign:spotlessMiscApply UP-TO-DATE
-> Task :fineract-client-feign:compileJava FROM-CACHE
-> Task :fineract-client-feign:processResources
-> Task :fineract-client-feign:classes
-> Task :fineract-client-feign:jar
-> Task :fineract-provider:jar
+> Task :fineract-client-feign:compileJava UP-TO-DATE
+> Task :fineract-client-feign:processResources UP-TO-DATE
+> Task :fineract-client-feign:classes UP-TO-DATE
+> Task :fineract-client-feign:jar UP-TO-DATE
+> Task :fineract-provider:jar UP-TO-DATE
 > Task :integration-tests:compileJava NO-SOURCE
 > Task :integration-tests:processResources NO-SOURCE
 > Task :integration-tests:classes UP-TO-DATE
-> Task :integration-tests:compileTestJava FROM-CACHE
-> Task :integration-tests:processTestResources
-> Task :integration-tests:testClasses
+> Task :integration-tests:compileTestJava UP-TO-DATE
+> Task :integration-tests:processTestResources UP-TO-DATE
+> Task :integration-tests:testClasses UP-TO-DATE
 
 > Task :integration-tests:test
 
 [0K[1morg.apache.fineract.integrationtests.accounting.GLAccountExternalIdIntegrationTest[m
 
 [0K[1m  Test [22munknownExternalIdIsNotFound()[32m PASSED[m
-[0K[1m  Test [22msameExternalIdWithADifferentDefinitionIsAConflict()[32m PASSED[33m (1.7s)[m
+[0K[1m  Test [22msameExternalIdWithADifferentDefinitionIsAConflict()[32m PASSED[m
 [0K[1m  Test [22midenticalCreateIsAReplayOfTheSameAccount()[32m PASSED[m
 [0K[1m  Test [22mcreateIsProtectedByFineractPermissions()[32m PASSED[m
 
 [0K[1m  concurrentIdenticalCreatesResolveToOneAccount()[m
 
-[0K[1m    Test [22mrepetition 1 of 5[32m PASSED[33m (1.2s)[m
+[0K[1m    Test [22mrepetition 1 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 2 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 3 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 4 of 5[32m PASSED[33m (1.1s)[m
 [0K[1m    Test [22mrepetition 5 of 5[32m PASSED[33m (1.1s)[m
 
 [0K[1m  Test [22mexternalIdCannotBeChangedAfterCreate()[32m PASSED[m
+[0K[1m  Test [22manAccountOwnedByAnotherSystemCannotBeChangedOrDeletedInFineract()[32m PASSED[m
 
-[0K[1;32mSUCCESS: [39mExecuted 10 tests in 11s[m
+[0K[1;32mSUCCESS: [39mExecuted 11 tests in 9.2s[m
 
 
-[Incubating] Problems report is available at: file:///private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
+[Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
 
 Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
 
@@ -234,5 +235,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 13s
-115 actionable tasks: 55 executed, 25 from cache, 35 up-to-date
+BUILD SUCCESSFUL in 24s
+115 actionable tasks: 17 executed, 1 from cache, 97 up-to-date

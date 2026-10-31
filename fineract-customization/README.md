@@ -31,6 +31,9 @@ is not part of it. So an account disabled in Fineract still replays, and a repla
 * The external id is optional. Creates without one behave exactly as before.
 * Up to 100 characters. A blank value is rejected (400) rather than treated as "none".
 * It is set on create only. Any `PUT` that includes `externalId` is rejected with 400, even with the current value.
+* **An account with an external id is owned by the ERP.** Fineract refuses to update or delete it (409
+  `error.msg.glaccount.externally.owned`); it is changed in the ERP, the system that owns it. Accounts without an
+  external id behave exactly as before.
 * Matching is exact and case-sensitive on PostgreSQL. MySQL/MariaDB compare with the column's collation, which is
   usually case-insensitive; only PostgreSQL was tested.
 
@@ -114,7 +117,7 @@ transient failure. A business key with a definition check is the right tool here
 | Domain | `GLAccount` (field, `fromJson`, `hasSameDefinitionAs`), `GLAccountRepository.findOneByExternalId` |
 | Input | `GLAccountJsonInputParams.EXTERNAL_ID`, `GLAccountCommand` (validation), `GLAccountCommandFromApiJsonDeserializer` |
 | Write | `GLAccountWritePlatformServiceJpaRepositoryImpl`, `UniqueConstraintViolations` |
-| Errors | `GLAccountExternalIdConflictException` (+ 409 mapper), `GLAccountExternalIdRaceException`, `GLAccountNotFoundException` |
+| Errors | `GLAccountExternalIdConflictException` (+ 409 mapper), `GLAccountExternallyOwnedException`, `GLAccountExternalIdRaceException`, `GLAccountNotFoundException` |
 | Read | `GLAccountData.externalId`, `GLAccountReadPlatformService(Impl).retrieveGLAccountByExternalId`, `GLAccountsApiResource`, Swagger |
 
 ## Build
@@ -141,10 +144,10 @@ make test-java-regression  # upstream's GL integration tests + ours (restarts Fi
 | Kind | Class | Covers |
 |---|---|---|
 | Unit | `GLAccountDefinitionTest` (fineract-core) | what counts as the same definition |
-| Unit | `GLAccountExternalIdCreateTest` | replay, conflict, GL code clash, the lookup window, race hand-off, other integrity errors |
+| Unit | `GLAccountExternalIdCreateTest` | replay, conflict, GL code clash, the lookup window, race hand-off, other integrity errors, no update or delete of an ERP-owned account |
 | Unit | `GLAccountExternalIdValidationTest` | blank and over-long external ids, external id on update |
 | Unit | `UniqueConstraintViolationsTest` | SQL-state detection for PostgreSQL and MySQL |
-| Integration | `GLAccountExternalIdIntegrationTest` | replay, 409, 10 concurrent creates × 5, permission denied (403), immutable external id, 404 lookup |
+| Integration | `GLAccountExternalIdIntegrationTest` | replay, 409, 10 concurrent creates × 5, permission denied (403), immutable external id, ERP-owned account cannot be changed or deleted (409), 404 lookup |
 | Regression | `GLAccountIntegrationTest` (upstream, unchanged) | create, update, delete, and refusing to delete an account with children, a product mapping or journal entries |
 
 The integration tests log in as Fineract's default admin (`mifos`); the permission test creates its own read-only

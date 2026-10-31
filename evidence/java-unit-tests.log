@@ -1,35 +1,14 @@
-git clone --depth 1 --branch 1.15.0 https://github.com/apache/fineract.git upstream/fineract
-Cloning into 'upstream/fineract'...
-Note: switching to 'd5636847ac556c30b437254c353f05526d172b97'.
-
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by switching back to a branch.
-
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -c with the switch command. Example:
-
-  git switch -c <new-branch-name>
-
-Or undo this operation with:
-
-  git switch -
-
-Turn off this advice by setting config variable advice.detachedHead to false
-
-Updating files:  80% (6260/7772)Updating files:  81% (6296/7772)Updating files:  82% (6374/7772)Updating files:  83% (6451/7772)Updating files:  84% (6529/7772)Updating files:  85% (6607/7772)Updating files:  86% (6684/7772)Updating files:  87% (6762/7772)Updating files:  88% (6840/7772)Updating files:  89% (6918/7772)Updating files:  90% (6995/7772)Updating files:  91% (7073/7772)Updating files:  92% (7151/7772)Updating files:  93% (7228/7772)Updating files:  94% (7306/7772)Updating files:  95% (7384/7772)Updating files:  96% (7462/7772)Updating files:  97% (7539/7772)Updating files:  98% (7617/7772)Updating files:  99% (7695/7772)Updating files: 100% (7772/7772)Updating files: 100% (7772/7772), done.
-test "$(git -C upstream/fineract rev-parse HEAD)" = "d5636847ac556c30b437254c353f05526d172b97"
-patch applied
+patch already applied
 cd upstream/fineract && ./gradlew :fineract-core:test --rerun --tests 'org.apache.fineract.accounting.glaccount.*' :fineract-accounting:test --rerun --tests 'org.apache.fineract.accounting.glaccount.*'
-> Task :buildSrc:extractPluginRequests FROM-CACHE
-> Task :buildSrc:generatePluginAdapters FROM-CACHE
-> Task :buildSrc:compileJava FROM-CACHE
-> Task :buildSrc:compileGroovy FROM-CACHE
-> Task :buildSrc:compileGroovyPlugins FROM-CACHE
-> Task :buildSrc:pluginDescriptors
-> Task :buildSrc:processResources
-> Task :buildSrc:classes
-> Task :buildSrc:jar
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy UP-TO-DATE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
 
 > Configure project :
 matching ref: TAG - 1.15.0
@@ -40,77 +19,59 @@ matching ref: TAG - 1.15.0
 
 project version: 1.15.0
 
-> Task :spotlessInternalRegisterDependencies
-> Task :fineract-validation:compileJava FROM-CACHE
-> Task :fineract-validation:processResources
-> Task :fineract-validation:classes
-> Task :fineract-command:compileJava FROM-CACHE
-> Task :fineract-validation:jar
-> Task :fineract-command:processResources
-> Task :fineract-command:classes
-> Task :fineract-command:jar
-> Task :fineract-avro-schemas:preprocessAvroSchemas
-> Task :fineract-avro-schemas:spotlessJson FROM-CACHE
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
+> Task :fineract-avro-schemas:preprocessAvroSchemas UP-TO-DATE
+> Task :fineract-avro-schemas:spotlessJson UP-TO-DATE
+> Task :fineract-validation:compileJava UP-TO-DATE
 > Task :fineract-avro-schemas:spotlessJsonApply UP-TO-DATE
+> Task :fineract-command:compileJava UP-TO-DATE
+> Task :fineract-command:processResources UP-TO-DATE
+> Task :fineract-validation:processResources UP-TO-DATE
+> Task :fineract-command:classes UP-TO-DATE
+> Task :fineract-validation:classes UP-TO-DATE
+> Task :fineract-command:jar UP-TO-DATE
+> Task :fineract-validation:jar UP-TO-DATE
+> Task :fineract-avro-schemas:buildJavaSdk UP-TO-DATE
+> Task :fineract-avro-schemas:compileJava UP-TO-DATE
+> Task :fineract-avro-schemas:processResources UP-TO-DATE
+> Task :fineract-avro-schemas:classes UP-TO-DATE
+> Task :fineract-avro-schemas:jar UP-TO-DATE
 
 > Task :fineract-tax:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
 
 > Task :fineract-tax:processResources NO-SOURCE
 
+> Task :fineract-core:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
+
 > Task :fineract-charge:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
 
-> Task :fineract-charge:processResources
+> Task :fineract-charge:processResources UP-TO-DATE
+> Task :fineract-core:compileJava UP-TO-DATE
+> Task :fineract-core:processResources NO-SOURCE
+> Task :fineract-core:classes UP-TO-DATE
+> Task :fineract-core:jar UP-TO-DATE
+> Task :fineract-tax:compileJava UP-TO-DATE
+> Task :fineract-tax:classes UP-TO-DATE
+> Task :fineract-core:compileTestJava UP-TO-DATE
+> Task :fineract-tax:jar UP-TO-DATE
+> Task :fineract-core:processTestResources UP-TO-DATE
+> Task :fineract-core:testClasses UP-TO-DATE
 
 > Task :fineract-accounting:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
 
-> Task :fineract-accounting:processResources
+> Task :fineract-accounting:processResources UP-TO-DATE
 > Task :fineract-accounting:processTestResources NO-SOURCE
-
-> Task :fineract-core:generateStaticWeavingPersistenceXml
-Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
-
-> Task :fineract-core:processResources NO-SOURCE
-> Task :fineract-core:processTestResources
-> Task :fineract-avro-schemas:buildJavaSdk
-> Task :fineract-avro-schemas:compileJava FROM-CACHE
-> Task :fineract-avro-schemas:processResources
-> Task :fineract-avro-schemas:classes
-> Task :fineract-avro-schemas:jar
-> Task :fineract-core:compileJava FROM-CACHE
-> Task :fineract-core:classes UP-TO-DATE
-> Task :fineract-core:jar
-> Task :fineract-tax:compileJava FROM-CACHE
-> Task :fineract-tax:classes UP-TO-DATE
-> Task :fineract-tax:jar
-> Task :fineract-charge:compileJava FROM-CACHE
-> Task :fineract-charge:classes
-> Task :fineract-charge:jar
-> Task :fineract-accounting:compileJava FROM-CACHE
-> Task :fineract-accounting:classes
-> Task :fineract-accounting:compileTestJava
-> Task :fineract-accounting:testClasses
-
-> Task :fineract-core:compileTestJava
-/private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/upstream/fineract/fineract-core/src/test/java/org/apache/fineract/batch/service/BatchApiServiceImplTest.java:122: warning: [unchecked] unchecked method invocation: method setRetryExceptions in class ExecuteCommandProperties is applied to given types
-        settings.getInstances().getExecuteCommand().setRetryExceptions(new Class[] { RetryException.class });
-                                                                      ^
-  required: Class<? extends Throwable>[]
-  found:    Class[]
-/private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/upstream/fineract/fineract-core/src/test/java/org/apache/fineract/batch/service/BatchApiServiceImplTest.java:122: warning: [unchecked] unchecked conversion
-        settings.getInstances().getExecuteCommand().setRetryExceptions(new Class[] { RetryException.class });
-                                                                       ^
-  required: Class<? extends Throwable>[]
-  found:    Class[]
-/private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/upstream/fineract/fineract-core/src/test/java/org/apache/fineract/batch/service/BatchApiServiceImplTest.java:131: warning: [unchecked] unchecked generic array creation for varargs parameter of type List<BatchRequestPreprocessor>[]
-        Mockito.reset(batchPreprocessors);
-                     ^
-3 warnings
-
-> Task :fineract-core:testClasses
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :fineract-charge:compileJava UP-TO-DATE
+> Task :fineract-charge:classes UP-TO-DATE
+> Task :fineract-charge:jar UP-TO-DATE
+> Task :fineract-accounting:compileJava UP-TO-DATE
+> Task :fineract-accounting:classes UP-TO-DATE
+> Task :fineract-accounting:compileTestJava UP-TO-DATE
+> Task :fineract-accounting:testClasses UP-TO-DATE
 
 > Task :fineract-core:test
 
@@ -120,8 +81,9 @@ OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader clas
 [0K[1m  Test [22manyCallerSuppliedDifferenceIsADifferentDefinition()[32m PASSED[m
 [0K[1m  Test [22msameCallerSuppliedAttributesAreTheSameDefinition()[32m PASSED[m
 
-[0K[1;32mSUCCESS: [39mExecuted 3 tests in 713ms[m
+[0K[1;32mSUCCESS: [39mExecuted 3 tests in 854ms[m
 
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 
 > Task :fineract-accounting:test
 
@@ -134,9 +96,11 @@ OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader clas
 
 [0K[1morg.apache.fineract.accounting.glaccount.service.GLAccountExternalIdCreateTest[m
 
-[0K[1m  Test [22mglCodeOwnedByAnotherAccountIsADuplicateDecidedBeforeTheInsert()[32m PASSED[33m (1.3s)[m
+[0K[1m  Test [22mglCodeOwnedByAnotherAccountIsADuplicateDecidedBeforeTheInsert()[32m PASSED[33m (1.2s)[m
+[0K[1m  Test [22manAccountOwnedByAnotherSystemCannotBeUpdatedInFineract()[32m PASSED[m
 [0K[1m  Test [22mknownExternalIdUnderAnotherGlCodeIsAConflict()[32m PASSED[m
 [0K[1m  Test [22mnewExternalIdCreatesTheAccountAndReturnsItsExternalId()[32m PASSED[m
+[0K[1m  Test [22manAccountOwnedByAnotherSystemCannotBeDeletedInFineract()[32m PASSED[m
 [0K[1m  Test [22mdifferentDefinitionUnderAKnownExternalIdIsAConflict()[32m PASSED[m
 [0K[1m  Test [22midenticalReplayReturnsTheExistingAccountWithoutInserting()[32m PASSED[m
 [0K[1m  Test [22motherIntegrityViolationsAreNotRetried()[32m PASSED[m
@@ -153,10 +117,10 @@ OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader clas
 [0K[1m  Test [22mrecognizesPostgresqlUniqueViolationAnywhereInTheCauseChain()[32m PASSED[m
 [0K[1m  Test [22mignoresOtherIntegrityViolations()[32m PASSED[m
 
-[0K[1;32mSUCCESS: [39mExecuted 16 tests in 2.3s[m
+[0K[1;32mSUCCESS: [39mExecuted 18 tests in 2.3s[m
 
 
-[Incubating] Problems report is available at: file:///private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
+[Incubating] Problems report is available at: file:///Users/sopia/workspace/assessments/fineract-erp-integration/upstream/fineract/build/reports/problems/problems-report.html
 
 Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
 
@@ -164,5 +128,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 24s
-40 actionable tasks: 26 executed, 13 from cache, 1 up-to-date
+BUILD SUCCESSFUL in 7s
+40 actionable tasks: 6 executed, 34 up-to-date

@@ -26,4 +26,4 @@ tests/stack/test_simulations.py::test_simulation[reconciliation] PASSED  [ 88%]
 tests/stack/test_simulations.py::test_simulation[reversal] PASSED        [ 94%]
 tests/stack/test_simulations.py::test_simulation[trace] PASSED           [100%]
 
-================ 17 passed, 129 deselected in 100.52s (0:01:40) ================
+================ 17 passed, 129 deselected in 102.97s (0:01:42) ================

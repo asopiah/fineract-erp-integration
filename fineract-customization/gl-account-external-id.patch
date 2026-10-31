@@ -111,10 +111,10 @@ index f7b673e..0c0128c 100644
          if (!dataValidationErrors.isEmpty()) {
 diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictException.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictException.java
 new file mode 100644
-index 0000000..d40953e
+index 0000000..f2724d0
 --- /dev/null
 +++ b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictException.java
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,39 @@
 +/**
 + * Licensed to the Apache Software Foundation (ASF) under one
 + * or more contributor license agreements. See the NOTICE file
@@ -145,14 +145,18 @@ index 0000000..d40953e
 +public class GLAccountExternalIdConflictException extends AbstractPlatformDomainRuleException {
 +
 +    public GLAccountExternalIdConflictException(final ExternalId externalId) {
-+        super("error.msg.glaccount.external.id.conflict",
++        this("error.msg.glaccount.external.id.conflict",
 +                "General Ledger Account with external id " + externalId.getValue() + " already exists with a different definition",
-+                externalId.getValue());
++                externalId);
++    }
++
++    protected GLAccountExternalIdConflictException(final String code, final String message, final ExternalId externalId) {
++        super(code, message, externalId.getValue());
 +    }
 +}
 diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictExceptionMapper.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictExceptionMapper.java
 new file mode 100644
-index 0000000..0e833e1
+index 0000000..85e59ef
 --- /dev/null
 +++ b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternalIdConflictExceptionMapper.java
 @@ -0,0 +1,60 @@
@@ -206,8 +210,8 @@ index 0000000..0e833e1
 +        final ApiParameterError error = ApiParameterError.generalError(exception.getGlobalisationMessageCode(),
 +                exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
 +        final ApiGlobalErrorResponse body = ApiGlobalErrorResponse.create(Status.CONFLICT.getStatusCode(),
-+                exception.getGlobalisationMessageCode(), "The external id is already used by a GL account with a different definition.",
-+                exception.getDefaultUserMessage(), List.of(error));
++                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessage(),
++                List.of(error));
 +        return Response.status(Status.CONFLICT).entity(body).type(MediaType.APPLICATION_JSON).build();
 +    }
 +
@@ -256,6 +260,45 @@ index 0000000..c88a54e
 +
 +    public GLAccountExternalIdRaceException(final ExternalId externalId, final Throwable cause) {
 +        super("Concurrent create of General Ledger Account with external id " + externalId.getValue(), cause);
++    }
++}
+diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternallyOwnedException.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternallyOwnedException.java
+new file mode 100644
+index 0000000..08b6a7e
+--- /dev/null
++++ b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/exception/GLAccountExternallyOwnedException.java
+@@ -0,0 +1,33 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements. See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership. The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License. You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied. See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.fineract.accounting.glaccount.exception;
++
++import org.apache.fineract.infrastructure.core.domain.ExternalId;
++
++/**
++ * An update or delete of a GL account that another system owns (it has an external id). Answered with 409 by the
++ * conflict mapper, as a subtype of {@link GLAccountExternalIdConflictException}.
++ */
++public class GLAccountExternallyOwnedException extends GLAccountExternalIdConflictException {
++
++    public GLAccountExternallyOwnedException(final ExternalId externalId) {
++        super("error.msg.glaccount.externally.owned", "General Ledger Account with external id " + externalId.getValue()
++                + " is owned by the system that assigned that id; change or remove it there", externalId);
 +    }
 +}
 diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/serialization/GLAccountCommandFromApiJsonDeserializer.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/serialization/GLAccountCommandFromApiJsonDeserializer.java
@@ -365,7 +408,7 @@ index aa21b56..3f9a17c 100644
      public List<GLAccountData> retrieveAllEnabledDetailGLAccounts(final GLAccountType accountType) {
          return retrieveAllGLAccounts(accountType.getValue(), null, GLAccountUsage.DETAIL.getValue(), null, false,
 diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/GLAccountWritePlatformServiceJpaRepositoryImpl.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/GLAccountWritePlatformServiceJpaRepositoryImpl.java
-index 0b86e2f..595a2e3 100644
+index 0b86e2f..9865b79 100644
 --- a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/GLAccountWritePlatformServiceJpaRepositoryImpl.java
 +++ b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/GLAccountWritePlatformServiceJpaRepositoryImpl.java
 @@ -19,6 +19,7 @@
@@ -376,16 +419,17 @@ index 0b86e2f..595a2e3 100644
  import lombok.RequiredArgsConstructor;
  import org.apache.fineract.accounting.common.AccountingConstants;
  import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
-@@ -28,6 +29,8 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
+@@ -28,6 +29,9 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
  import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
  import org.apache.fineract.accounting.glaccount.exception.GLAccountDisableException;
  import org.apache.fineract.accounting.glaccount.exception.GLAccountDuplicateException;
 +import org.apache.fineract.accounting.glaccount.exception.GLAccountExternalIdConflictException;
 +import org.apache.fineract.accounting.glaccount.exception.GLAccountExternalIdRaceException;
++import org.apache.fineract.accounting.glaccount.exception.GLAccountExternallyOwnedException;
  import org.apache.fineract.accounting.glaccount.exception.GLAccountInvalidDeleteException;
  import org.apache.fineract.accounting.glaccount.exception.GLAccountInvalidDeleteException.GlAccountInvalidDeleteReason;
  import org.apache.fineract.accounting.glaccount.exception.GLAccountInvalidParentException;
-@@ -43,7 +46,9 @@ import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrappe
+@@ -43,7 +47,9 @@ import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrappe
  import org.apache.fineract.infrastructure.core.api.JsonCommand;
  import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
  import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -395,7 +439,7 @@ index 0b86e2f..595a2e3 100644
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  import org.springframework.dao.DataIntegrityViolationException;
-@@ -71,6 +76,8 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
+@@ -71,6 +77,8 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
      @Transactional
      @Override
      public CommandProcessingResult createGLAccount(final JsonCommand command) {
@@ -404,7 +448,7 @@ index 0b86e2f..595a2e3 100644
          try {
              final GLAccountCommand accountCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
              accountCommand.validateForCreate();
-@@ -93,23 +100,69 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
+@@ -93,23 +101,79 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
  
              final GLAccount glAccount = GLAccount.fromJson(parentGLAccount, command, glAccountTagType);
  
@@ -467,6 +511,16 @@ index 0b86e2f..595a2e3 100644
 +        return createResult(command, existing);
 +    }
 +
++    /**
++     * An account with an external id belongs to the system that owns the chart of accounts: it is changed or removed
++     * there, never in Fineract.
++     */
++    private static void ensureNotOwnedByAnotherSystem(final GLAccount glAccount) {
++        if (!glAccount.getExternalId().isEmpty()) {
++            throw new GLAccountExternallyOwnedException(glAccount.getExternalId());
++        }
++    }
++
 +    private static CommandProcessingResult createResult(final JsonCommand command, final GLAccount glAccount) {
 +        return new CommandProcessingResultBuilder() //
 +                .withCommandId(command.commandId()) //
@@ -478,6 +532,22 @@ index 0b86e2f..595a2e3 100644
      @Transactional
      @Override
      public CommandProcessingResult updateGLAccount(final Long glAccountId, final JsonCommand command) {
+@@ -127,6 +191,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
+             // is the glAccount valid
+             final GLAccount glAccount = this.glAccountRepository.findById(glAccountId)
+                     .orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
++            ensureNotOwnedByAnotherSystem(glAccount);
+ 
+             final Map<String, Object> changesOnly = glAccount.update(command);
+ 
+@@ -191,6 +256,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
+     public CommandProcessingResult deleteGLAccount(final Long glAccountId) {
+         final GLAccount glAccount = this.glAccountRepository.findById(glAccountId)
+                 .orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
++        ensureNotOwnedByAnotherSystem(glAccount);
+ 
+         // validate this isn't a header account that has children
+         if (glAccount.isHeaderAccount() && !glAccount.getChildren().isEmpty()) {
 diff --git a/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/UniqueConstraintViolations.java b/fineract-accounting/src/main/java/org/apache/fineract/accounting/glaccount/service/UniqueConstraintViolations.java
 new file mode 100644
 index 0000000..9030d03
@@ -609,10 +679,10 @@ index 0000000..8a72017
 +}
 diff --git a/fineract-accounting/src/test/java/org/apache/fineract/accounting/glaccount/service/GLAccountExternalIdCreateTest.java b/fineract-accounting/src/test/java/org/apache/fineract/accounting/glaccount/service/GLAccountExternalIdCreateTest.java
 new file mode 100644
-index 0000000..1e96560
+index 0000000..b0d9001
 --- /dev/null
 +++ b/fineract-accounting/src/test/java/org/apache/fineract/accounting/glaccount/service/GLAccountExternalIdCreateTest.java
-@@ -0,0 +1,192 @@
+@@ -0,0 +1,212 @@
 +/**
 + * Licensed to the Apache Software Foundation (ASF) under one
 + * or more contributor license agreements. See the NOTICE file
@@ -649,6 +719,7 @@ index 0000000..1e96560
 +import org.apache.fineract.accounting.glaccount.exception.GLAccountDuplicateException;
 +import org.apache.fineract.accounting.glaccount.exception.GLAccountExternalIdConflictException;
 +import org.apache.fineract.accounting.glaccount.exception.GLAccountExternalIdRaceException;
++import org.apache.fineract.accounting.glaccount.exception.GLAccountExternallyOwnedException;
 +import org.apache.fineract.accounting.glaccount.serialization.GLAccountCommandFromApiJsonDeserializer;
 +import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 +import org.apache.fineract.accounting.producttoaccountmapping.domain.ProductToGLAccountMappingRepository;
@@ -783,6 +854,25 @@ index 0000000..1e96560
 +        when(glAccountRepository.saveAndFlush(any(GLAccount.class))).thenThrow(integrityViolation("22001")); // value too long
 +
 +        assertThrows(PlatformDataIntegrityException.class, () -> service.createGLAccount(createCommand("Loan Receivable")));
++    }
++
++    @Test
++    void anAccountOwnedByAnotherSystemCannotBeUpdatedInFineract() {
++        when(glAccountRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingAccount("Loan Receivable")));
++        String json = "{\"name\": \"Renamed in Fineract\"}";
++        JsonCommand update = JsonCommand.from(json, JsonParser.parseString(json), JSON_HELPER, null, null, null, null, null, null,
++                null, null, null, null, null, null, null, null);
++
++        assertThrows(GLAccountExternallyOwnedException.class, () -> service.updateGLAccount(EXISTING_ID, update));
++        verify(glAccountRepository, never()).saveAndFlush(any());
++    }
++
++    @Test
++    void anAccountOwnedByAnotherSystemCannotBeDeletedInFineract() {
++        when(glAccountRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingAccount("Loan Receivable")));
++
++        assertThrows(GLAccountExternallyOwnedException.class, () -> service.deleteGLAccount(EXISTING_ID));
++        verify(glAccountRepository, never()).delete(any(GLAccount.class));
 +    }
 +
 +    private static GLAccount existingAccount(final String name) {
@@ -1136,10 +1226,10 @@ index 0000000..81351ba
 +</databaseChangeLog>
 diff --git a/integration-tests/src/test/java/org/apache/fineract/integrationtests/accounting/GLAccountExternalIdIntegrationTest.java b/integration-tests/src/test/java/org/apache/fineract/integrationtests/accounting/GLAccountExternalIdIntegrationTest.java
 new file mode 100644
-index 0000000..5b6f04e
+index 0000000..0afe140
 --- /dev/null
 +++ b/integration-tests/src/test/java/org/apache/fineract/integrationtests/accounting/GLAccountExternalIdIntegrationTest.java
-@@ -0,0 +1,216 @@
+@@ -0,0 +1,230 @@
 +/**
 + * Licensed to the Apache Software Foundation (ASF) under one
 + * or more contributor license agreements. See the NOTICE file
@@ -1289,6 +1379,20 @@ index 0000000..5b6f04e
 +        JsonPath stored = findByExternalId(admin, externalId).jsonPath();
 +        assertEquals(id, stored.getLong("id"));
 +        assertEquals("Bank", stored.getString("name"));
++    }
++
++    @Test
++    void anAccountOwnedByAnotherSystemCannotBeChangedOrDeletedInFineract() {
++        String externalId = uniqueExternalId();
++        long id = create(admin, account(externalId, "Bank")).jsonPath().getLong("resourceId");
++
++        Response update = request(admin).body(Map.of("name", "Renamed in Fineract")).put(GL_ACCOUNTS + "/" + id);
++        Response delete = request(admin).delete(GL_ACCOUNTS + "/" + id);
++
++        assertEquals(409, update.statusCode());
++        assertEquals("error.msg.glaccount.externally.owned", update.jsonPath().getString("userMessageGlobalisationCode"));
++        assertEquals(409, delete.statusCode());
++        assertEquals("Bank", findByExternalId(admin, externalId).jsonPath().getString("name"));
 +    }
 +
 +    @Test

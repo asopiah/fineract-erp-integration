@@ -13,16 +13,16 @@ against that stack, in this order. All passed.
 | `python-tests.log` | Ruff, format check and `mypy --strict` clean; 129 integration-service and 22 Mock ERP tests pass, against real PostgreSQL | `make test-python` |
 | `stack-tests.log` | All 17 simulations pass as automated tests against the running stack | `make test-stack` |
 | `simulate.log` | Console output of the run that wrote [`../SIMULATIONS.md`](../SIMULATIONS.md) (17/17 PASS). | `make simulate` |
-| `java-unit-tests.log` | 19 JUnit tests: the customization's 18 plus upstream's GL service test | `make test-java` |
-| `java-integration-tests.log` | 10 JUnit integration tests against the running Fineract: replay, 409, 5 × 10 concurrent creates, permission denied, immutable external id, lookup | `make test-java-it` |
+| `java-unit-tests.log` | 21 JUnit tests: the customization's 20 plus upstream's GL service test | `make test-java` |
+| `java-integration-tests.log` | 11 JUnit integration tests against the running Fineract: replay, 409, 5 × 10 concurrent creates, permission denied, immutable external id, ERP-owned account cannot be changed or deleted, lookup | `make test-java-it` |
 | `java-race-retries.txt` | 33 concurrent inserts lost the unique-constraint race during those tests; all were resolved by Fineract's command retry | Fineract log during `make test-java-it` |
 | `java-regression-tests.log` | Fineract's own `GLAccountIntegrationTest` (4 tests) passes unchanged on the patched build, next to our 10 | `make test-java-regression` |
 | `postman-run.log` | The Postman collection runs the lifecycle: 19 requests, 22 assertions, 0 failures | `npx newman run postman/collection.json` |
 | `build-patched.log` | The same patch built with a local JDK 21 and Fineract's own Jib setup, the faster path (1 min 38 s here, with Gradle's cache warm from earlier builds) | `make fineract-image` |
 
-**Later the same evening**, the repayment reversal and simulation I2c (Fineract alone) were added. `python-tests.log`, `stack-tests.log`, `simulate.log`
+**Later the same evening**, the repayment reversal, simulation I2c (Fineract alone) and the Fineract rule that ERP-owned GL accounts can't be changed or deleted were added; the Java unit and integration logs were rerun for that. `python-tests.log`, `stack-tests.log`, `simulate.log`
 and SIMULATIONS.md were then regenerated on the running stack (built from the final Dockerfile, the integration
-service rebuilt with the reversal, the bootstrap re-run to grant `ADJUST_LOAN`). The Java side did not change.
+service rebuilt with the reversal, the bootstrap re-run to grant `ADJUST_LOAN`). The Fineract image for those runs was built with `make fineract-image`; `stack-up.log` remains the earlier from-source build.
 
 **Earlier, kept for reference**
 
