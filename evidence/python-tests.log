@@ -1,11 +1,14 @@
+python3.12 -m venv /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/.venv
+/private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/.venv/bin/pip install -q --upgrade pip
+/private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/.venv/bin/pip install -q -e './mock-erp[dev]' -e './integration-service[dev]'
 == mock-erp
 All checks passed!
 22 files already formatted
 Success: no issues found in 16 source files
 == integration-service
 All checks passed!
-67 files already formatted
-Success: no issues found in 45 source files
+70 files already formatted
+Success: no issues found in 46 source files
 docker compose up -d --wait postgres
  Container fineract-erp-postgres-1  Running
  Container fineract-erp-postgres-1  Waiting
@@ -13,37 +16,39 @@ docker compose up -d --wait postgres
 == mock-erp
 ============================= test session starts ==============================
 platform darwin -- Python 3.12.9, pytest-8.3.4, pluggy-1.7.0
-rootdir: /Users/sopia/workspace/assessments/fineract-erp-integration/mock-erp
+rootdir: /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/mock-erp
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.15.1
-collected 21 items
+collected 22 items
 
-tests/test_accounts.py ........                                          [ 38%]
-tests/test_faults.py ...                                                 [ 52%]
-tests/test_fingerprint.py ..                                             [ 61%]
+tests/test_accounts.py .........                                         [ 40%]
+tests/test_faults.py ...                                                 [ 54%]
+tests/test_fingerprint.py ..                                             [ 63%]
 tests/test_journals.py ........                                          [100%]
 
-============================== 21 passed in 5.48s ==============================
+============================== 22 passed in 4.23s ==============================
 == integration-service
 ============================= test session starts ==============================
 platform darwin -- Python 3.12.9, pytest-8.3.4, pluggy-1.7.0
-rootdir: /Users/sopia/workspace/assessments/fineract-erp-integration/integration-service
+rootdir: /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/integration-service
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.15.1
-collected 114 items / 14 deselected / 100 selected
+collected 136 items / 15 deselected / 121 selected
 
-tests/component/test_failures.py ........                                [  8%]
-tests/component/test_idempotency.py .......                              [ 15%]
-tests/component/test_once_per_loan.py ......                             [ 21%]
-tests/component/test_review_findings.py ........                         [ 29%]
+tests/component/test_failures.py ........                                [  6%]
+tests/component/test_gl_sync.py ...                                      [  9%]
+tests/component/test_idempotency.py .......                              [ 14%]
+tests/component/test_once_per_loan.py ......                             [ 19%]
+tests/component/test_review_findings.py ............                     [ 29%]
 tests/component/test_schema.py .                                         [ 30%]
-tests/unit/test_accounting.py ......                                     [ 36%]
-tests/unit/test_gateway_outcomes.py .....................                [ 57%]
-tests/unit/test_gl_accounts.py ........                                  [ 65%]
-tests/unit/test_identifiers.py ...........                               [ 76%]
-tests/unit/test_reconciliation_rule.py .....                             [ 81%]
-tests/unit/test_state_machine.py ...................                     [100%]
+tests/unit/test_accounting.py ......                                     [ 35%]
+tests/unit/test_gateway_outcomes.py ..........................           [ 57%]
+tests/unit/test_gl_accounts.py ........                                  [ 63%]
+tests/unit/test_identifiers.py ...........                               [ 72%]
+tests/unit/test_reconciliation_rule.py .....                             [ 76%]
+tests/unit/test_state_machine.py ...................                     [ 92%]
+tests/unit/test_wire_formats.py .........                                [100%]
 
-====================== 100 passed, 14 deselected in 7.62s ======================
+====================== 121 passed, 15 deselected in 7.59s ======================

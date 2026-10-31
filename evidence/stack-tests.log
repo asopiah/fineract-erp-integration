@@ -1,26 +1,27 @@
-cd integration-service && /Users/sopia/workspace/assessments/fineract-erp-integration/.venv/bin/pytest -m stack -v
+cd integration-service && /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/.venv/bin/pytest -m stack -v
 ============================= test session starts ==============================
-platform darwin -- Python 3.12.9, pytest-8.3.4, pluggy-1.7.0 -- /Users/sopia/workspace/assessments/fineract-erp-integration/.venv/bin/python3.12
+platform darwin -- Python 3.12.9, pytest-8.3.4, pluggy-1.7.0 -- /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/.venv/bin/python3.12
 cachedir: .pytest_cache
-rootdir: /Users/sopia/workspace/assessments/fineract-erp-integration/integration-service
+rootdir: /private/tmp/claude-501/-Users-sopia-workspace-assessments/ffeea893-9b16-4165-8f20-b60a46fd85e2/scratchpad/final/fineract-erp-integration/integration-service
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.15.1
-collecting ... collected 114 items / 100 deselected / 14 selected
+collecting ... collected 136 items / 121 deselected / 15 selected
 
-tests/stack/test_simulations.py::test_simulation[client] PASSED          [  7%]
-tests/stack/test_simulations.py::test_simulation[gl-sync] PASSED         [ 14%]
-tests/stack/test_simulations.py::test_simulation[lifecycle] PASSED       [ 21%]
-tests/stack/test_simulations.py::test_simulation[duplicates] PASSED      [ 28%]
-tests/stack/test_simulations.py::test_simulation[concurrent-same] PASSED [ 35%]
-tests/stack/test_simulations.py::test_simulation[concurrent-different] PASSED [ 42%]
-tests/stack/test_simulations.py::test_simulation[concurrent-repayments] PASSED [ 50%]
-tests/stack/test_simulations.py::test_simulation[erp-down] PASSED        [ 57%]
-tests/stack/test_simulations.py::test_simulation[fineract-down] PASSED   [ 64%]
-tests/stack/test_simulations.py::test_simulation[fineract-timeout] PASSED [ 71%]
-tests/stack/test_simulations.py::test_simulation[erp-timeout] PASSED     [ 78%]
-tests/stack/test_simulations.py::test_simulation[crash] PASSED           [ 85%]
-tests/stack/test_simulations.py::test_simulation[reconciliation] PASSED  [ 92%]
+tests/stack/test_simulations.py::test_simulation[gl-patch] PASSED        [  6%]
+tests/stack/test_simulations.py::test_simulation[client] PASSED          [ 13%]
+tests/stack/test_simulations.py::test_simulation[gl-sync] PASSED         [ 20%]
+tests/stack/test_simulations.py::test_simulation[lifecycle] PASSED       [ 26%]
+tests/stack/test_simulations.py::test_simulation[duplicates] PASSED      [ 33%]
+tests/stack/test_simulations.py::test_simulation[concurrent-same] PASSED [ 40%]
+tests/stack/test_simulations.py::test_simulation[concurrent-different] PASSED [ 46%]
+tests/stack/test_simulations.py::test_simulation[concurrent-repayments] PASSED [ 53%]
+tests/stack/test_simulations.py::test_simulation[erp-down] PASSED        [ 60%]
+tests/stack/test_simulations.py::test_simulation[fineract-down] PASSED   [ 66%]
+tests/stack/test_simulations.py::test_simulation[fineract-timeout] PASSED [ 73%]
+tests/stack/test_simulations.py::test_simulation[erp-timeout] PASSED     [ 80%]
+tests/stack/test_simulations.py::test_simulation[crash] PASSED           [ 86%]
+tests/stack/test_simulations.py::test_simulation[reconciliation] PASSED  [ 93%]
 tests/stack/test_simulations.py::test_simulation[trace] PASSED           [100%]
 
-================ 14 passed, 100 deselected in 86.25s (0:01:26) =================
+================ 15 passed, 121 deselected in 81.65s (0:01:21) =================

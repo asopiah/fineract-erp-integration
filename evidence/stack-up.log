@@ -2,7 +2,6 @@ docker compose build mock-erp integration-service
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [mock-erp internal] load .dockerignore
-#1 transferring context:
 #1 transferring context: 156B done
 #1 DONE 0.0s
 
@@ -11,32 +10,126 @@ docker compose build mock-erp integration-service
 #2 DONE 0.0s
 
 #3 [mock-erp internal] load metadata for docker.io/library/python:3.12.9-slim-bookworm
-#3 DONE 3.3s
+#3 DONE 3.4s
 
-#4 [mock-erp 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
+#4 [mock-erp internal] load build context
+#4 transferring context: 33.47kB done
 #4 DONE 0.0s
 
-#5 [mock-erp internal] load build context
-#5 transferring context: 1.49kB done
-#5 DONE 0.0s
+#5 [mock-erp 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
+#5 resolve docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44 0.0s done
+#5 sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44 9.12kB / 9.12kB done
+#5 sha256:40011d5cf225eb43b650ec158d4a59ca3110e6566ddfd3f506824db6153761cf 1.75kB / 1.75kB done
+#5 sha256:916619b289581c9a4f2941745a09b2934cee4bd354049355b4d4d53485d67573 5.52kB / 5.52kB done
+#5 DONE 0.1s
 
 #6 [mock-erp 2/5] WORKDIR /app
-#6 CACHED
+#6 DONE 0.0s
 
 #7 [mock-erp 3/5] COPY pyproject.toml ./
-#7 CACHED
+#7 DONE 0.0s
 
 #8 [mock-erp 4/5] COPY src ./src
-#8 CACHED
+#8 DONE 0.0s
 
 #9 [mock-erp 5/5] RUN pip install .
-#9 CACHED
+#9 1.579 Processing /app
+#9 1.581   Installing build dependencies: started
+#9 6.302   Installing build dependencies: finished with status 'done'
+#9 6.317   Getting requirements to build wheel: started
+#9 6.727   Getting requirements to build wheel: finished with status 'done'
+#9 6.732   Preparing metadata (pyproject.toml): started
+#9 7.123   Preparing metadata (pyproject.toml): finished with status 'done'
+#9 7.725 Collecting fastapi==0.115.6 (from mock-erp==1.0.0)
+#9 8.130   Downloading fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
+#9 8.356 Collecting uvicorn==0.34.0 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 8.459   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+#9 8.823 Collecting pydantic==2.10.4 (from mock-erp==1.0.0)
+#9 8.953   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+#9 9.089 Collecting pydantic-settings==2.7.1 (from mock-erp==1.0.0)
+#9 9.185   Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
+#9 10.47 Collecting SQLAlchemy==2.0.36 (from mock-erp==1.0.0)
+#9 10.58   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (9.7 kB)
+#9 10.71 Collecting psycopg==3.2.3 (from psycopg[binary]==3.2.3->mock-erp==1.0.0)
+#9 10.81   Downloading psycopg-3.2.3-py3-none-any.whl.metadata (4.3 kB)
+#9 11.29 Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->mock-erp==1.0.0)
+#9 11.39   Downloading starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
+#9 11.62 Collecting typing-extensions>=4.8.0 (from fastapi==0.115.6->mock-erp==1.0.0)
+#9 11.72   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#9 12.49 Collecting psycopg-binary==3.2.3 (from psycopg[binary]==3.2.3->mock-erp==1.0.0)
+#9 12.64   Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (2.8 kB)
+#9 12.76 Collecting annotated-types>=0.6.0 (from pydantic==2.10.4->mock-erp==1.0.0)
+#9 12.86   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#9 17.84 Collecting pydantic-core==2.27.2 (from pydantic==2.10.4->mock-erp==1.0.0)
+#9 17.94   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (6.6 kB)
+#9 18.11 Collecting python-dotenv>=0.21.0 (from pydantic-settings==2.7.1->mock-erp==1.0.0)
+#9 18.31   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+#9 19.30 Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.36->mock-erp==1.0.0)
+#9 19.46   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (3.8 kB)
+#9 19.63 Collecting click>=7.0 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 19.75   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#9 19.88 Collecting h11>=0.8 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 19.98   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#9 20.25 Collecting httptools>=0.6.3 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 20.40   Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (3.5 kB)
+#9 20.68 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 20.80   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.4 kB)
+#9 21.10 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 21.20   Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (5.1 kB)
+#9 21.78 Collecting watchfiles>=0.13 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 21.97   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (4.9 kB)
+#9 22.75 Collecting websockets>=10.4 (from uvicorn[standard]==0.34.0->mock-erp==1.0.0)
+#9 22.87   Downloading websockets-17.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (6.3 kB)
+#9 23.08 Collecting anyio<5,>=3.4.0 (from starlette<0.42.0,>=0.40.0->fastapi==0.115.6->mock-erp==1.0.0)
+#9 23.18   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#9 23.32 Collecting idna>=2.8 (from anyio<5,>=3.4.0->starlette<0.42.0,>=0.40.0->fastapi==0.115.6->mock-erp==1.0.0)
+#9 23.42   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#9 23.56 Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
+#9 23.77 Downloading psycopg-3.2.3-py3-none-any.whl (197 kB)
+#9 24.07 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#9 24.92 Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
+#9 25.03 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.2 MB)
+#9 31.93    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 489.4 kB/s eta 0:00:00
+#9 32.03 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#9 32.25 Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (4.4 MB)
+#9 43.89    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 383.6 kB/s eta 0:00:00
+#9 44.09 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.8 MB)
+#9 48.81    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 386.6 kB/s eta 0:00:00
+#9 48.91 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#9 49.03 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#9 49.44 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (611 kB)
+#9 50.90    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 611.7/611.7 kB 402.6 kB/s eta 0:00:00
+#9 50.99 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#9 51.16 Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (549 kB)
+#9 52.48    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 549.2/549.2 kB 464.8 kB/s eta 0:00:00
+#9 52.57 Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+#9 52.71 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (775 kB)
+#9 54.67    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 775.1/775.1 kB 417.4 kB/s eta 0:00:00
+#9 54.77 Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
+#9 55.00 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#9 55.16 Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.4 MB)
+#9 67.47    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 356.8 kB/s eta 0:00:00
+#9 67.59 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (454 kB)
+#9 68.73 Downloading websockets-17.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (227 kB)
+#9 69.43 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+#9 69.94 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#9 70.18 Building wheels for collected packages: mock-erp
+#9 70.19   Building wheel for mock-erp (pyproject.toml): started
+#9 70.74   Building wheel for mock-erp (pyproject.toml): finished with status 'done'
+#9 70.74   Created wheel for mock-erp: filename=mock_erp-1.0.0-py3-none-any.whl size=15304 sha256=d52cea62d4dbeca1149ac6430d8c5a3201bcb362ac4dd48167e0b50f2dc6ffec
+#9 70.74   Stored in directory: /tmp/pip-ephem-wheel-cache-8klfluh_/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#9 70.75 Successfully built mock-erp
+#9 70.77 Installing collected packages: websockets, uvloop, typing-extensions, pyyaml, python-dotenv, psycopg-binary, idna, httptools, h11, greenlet, click, annotated-types, uvicorn, SQLAlchemy, pydantic-core, psycopg, anyio, watchfiles, starlette, pydantic, pydantic-settings, fastapi, mock-erp
+#9 72.96 Successfully installed SQLAlchemy-2.0.36 annotated-types-0.8.0 anyio-4.15.1 click-8.5.0 fastapi-0.115.6 greenlet-3.5.6 h11-0.16.0 httptools-0.9.0 idna-3.20 mock-erp-1.0.0 psycopg-3.2.3 psycopg-binary-3.2.3 pydantic-2.10.4 pydantic-core-2.27.2 pydantic-settings-2.7.1 python-dotenv-1.2.4 pyyaml-6.0.3 starlette-0.41.3 typing-extensions-4.16.0 uvicorn-0.34.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.4
+#9 72.96 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#9 DONE 73.4s
 
 #10 [mock-erp] exporting to image
-#10 exporting layers done
-#10 writing image sha256:eaa34a7e9b8e84c39d85c8a211bd04e598ec3041713f461a16a1f7f1ee7ec2a4 done
+#10 exporting layers
+#10 exporting layers 0.2s done
+#10 writing image sha256:db007045e77b448221dab9d76bcb8da6c814b6dfca6077fae11b1630c20c61aa done
 #10 naming to docker.io/library/fineract-erp-mock-erp done
-#10 DONE 0.0s
+#10 DONE 0.3s
 
 #11 [integration-service internal] load .dockerignore
 #11 transferring context: 156B done
@@ -47,141 +140,642 @@ docker compose build mock-erp integration-service
 #12 DONE 0.0s
 
 #3 [integration-service internal] load metadata for docker.io/library/python:3.12.9-slim-bookworm
-#3 DONE 3.7s
+#3 DONE 4.4s
 
-#4 [integration-service 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
-#4 DONE 0.0s
+#5 [integration-service 1/5] FROM docker.io/library/python:3.12.9-slim-bookworm@sha256:48a11b7ba705fd53bf15248d1f94d36c39549903c5d59edcfa2f3f84126e7b44
+#5 DONE 0.1s
 
 #13 [integration-service internal] load build context
-#13 transferring context: 80.76kB 0.0s done
+#13 transferring context: 183.90kB 0.0s done
 #13 DONE 0.0s
 
 #6 [integration-service 2/5] WORKDIR /app
 #6 CACHED
 
 #14 [integration-service 3/5] COPY pyproject.toml ./
-#14 CACHED
+#14 DONE 0.0s
 
 #15 [integration-service 4/5] COPY src ./src
 #15 DONE 0.0s
 
 #16 [integration-service 5/5] RUN pip install .
-#16 1.517 Processing /app
-#16 1.519   Installing build dependencies: started
-#16 4.599   Installing build dependencies: finished with status 'done'
-#16 4.603   Getting requirements to build wheel: started
-#16 4.943   Getting requirements to build wheel: finished with status 'done'
-#16 4.944   Preparing metadata (pyproject.toml): started
-#16 5.265   Preparing metadata (pyproject.toml): finished with status 'done'
-#16 5.899 Collecting fastapi==0.115.6 (from integration-service==1.0.0)
-#16 6.220   Downloading fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
-#16 6.371 Collecting uvicorn==0.34.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 6.467   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
-#16 6.811 Collecting pydantic==2.10.4 (from integration-service==1.0.0)
-#16 6.963   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
-#16 7.099 Collecting pydantic-settings==2.7.1 (from integration-service==1.0.0)
-#16 7.205   Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
-#16 7.936 Collecting SQLAlchemy==2.0.36 (from integration-service==1.0.0)
-#16 8.040   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (9.7 kB)
-#16 8.160 Collecting psycopg==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
-#16 8.265   Downloading psycopg-3.2.3-py3-none-any.whl.metadata (4.3 kB)
-#16 8.469 Collecting alembic==1.14.0 (from integration-service==1.0.0)
-#16 8.572   Downloading alembic-1.14.0-py3-none-any.whl.metadata (7.4 kB)
-#16 8.695 Collecting httpx==0.28.1 (from integration-service==1.0.0)
-#16 8.800   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
-#16 8.979 Collecting Mako (from alembic==1.14.0->integration-service==1.0.0)
-#16 9.084   Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
-#16 9.222 Collecting typing-extensions>=4 (from alembic==1.14.0->integration-service==1.0.0)
-#16 9.320   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
-#16 9.523 Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->integration-service==1.0.0)
-#16 9.630   Downloading starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
-#16 9.796 Collecting anyio (from httpx==0.28.1->integration-service==1.0.0)
-#16 9.903   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
-#16 10.04 Collecting certifi (from httpx==0.28.1->integration-service==1.0.0)
-#16 10.15   Downloading certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
-#16 10.30 Collecting httpcore==1.* (from httpx==0.28.1->integration-service==1.0.0)
-#16 10.41   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
-#16 10.56 Collecting idna (from httpx==0.28.1->integration-service==1.0.0)
-#16 10.66   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
-#16 11.03 Collecting psycopg-binary==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
-#16 11.16   Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (2.8 kB)
-#16 11.26 Collecting annotated-types>=0.6.0 (from pydantic==2.10.4->integration-service==1.0.0)
-#16 11.36   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
-#16 13.52 Collecting pydantic-core==2.27.2 (from pydantic==2.10.4->integration-service==1.0.0)
-#16 13.68   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (6.6 kB)
-#16 13.81 Collecting python-dotenv>=0.21.0 (from pydantic-settings==2.7.1->integration-service==1.0.0)
-#16 13.91   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
-#16 14.67 Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.36->integration-service==1.0.0)
-#16 14.83   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (3.8 kB)
-#16 14.96 Collecting click>=7.0 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 15.06   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
-#16 15.17 Collecting h11>=0.8 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 15.35   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
-#16 15.54 Collecting httptools>=0.6.3 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 15.65   Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (3.5 kB)
-#16 15.85 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 15.96   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.4 kB)
-#16 16.14 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 16.30   Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (5.1 kB)
-#16 16.61 Collecting watchfiles>=0.13 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 16.71   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (4.9 kB)
-#16 17.13 Collecting websockets>=10.4 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
-#16 17.25   Downloading websockets-17.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (6.3 kB)
-#16 17.67 Collecting MarkupSafe>=2.0 (from Mako->alembic==1.14.0->integration-service==1.0.0)
-#16 17.77   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
-#16 17.88 Downloading alembic-1.14.0-py3-none-any.whl (233 kB)
-#16 18.18 Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
-#16 18.41 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
-#16 18.52 Downloading psycopg-3.2.3-py3-none-any.whl (197 kB)
-#16 18.67 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
-#16 18.93 Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
-#16 19.03 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.2 MB)
-#16 19.27    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 13.9 MB/s eta 0:00:00
-#16 19.45 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
-#16 19.55 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
-#16 19.66 Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (4.4 MB)
-#16 19.90    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 21.1 MB/s eta 0:00:00
-#16 20.07 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.8 MB)
-#16 20.17    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 24.7 MB/s eta 0:00:00
-#16 20.27 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
-#16 20.39 Downloading click-8.5.0-py3-none-any.whl (125 kB)
-#16 20.51 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (611 kB)
-#16 20.54    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 611.7/611.7 kB 23.1 MB/s eta 0:00:00
-#16 20.65 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
-#16 20.77 Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (549 kB)
-#16 20.80    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 549.2/549.2 kB 15.9 MB/s eta 0:00:00
-#16 20.90 Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
-#16 21.02 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (775 kB)
-#16 21.26    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 775.1/775.1 kB 4.6 MB/s eta 0:00:00
-#16 21.36 Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
-#16 21.55 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
-#16 22.81 Downloading idna-3.20-py3-none-any.whl (69 kB)
-#16 22.95 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
-#16 23.12 Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.4 MB)
-#16 28.21    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 839.6 kB/s eta 0:00:00
-#16 28.38 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (454 kB)
-#16 29.02 Downloading websockets-17.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (227 kB)
-#16 29.41 Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
-#16 29.64 Downloading mako-1.4.3-py3-none-any.whl (80 kB)
-#16 29.81 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
-#16 29.98 Building wheels for collected packages: integration-service
-#16 30.00   Building wheel for integration-service (pyproject.toml): started
-#16 31.07   Building wheel for integration-service (pyproject.toml): finished with status 'done'
-#16 31.08   Created wheel for integration-service: filename=integration_service-1.0.0-py3-none-any.whl size=62807 sha256=a40eff62b86ea5358ff789be9bab28ea07ba07f5f50473c60dea34f597201af8
-#16 31.08   Stored in directory: /tmp/pip-ephem-wheel-cache-vz2dvhom/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
-#16 31.12 Successfully built integration-service
-#16 31.22 Installing collected packages: websockets, uvloop, typing-extensions, pyyaml, python-dotenv, psycopg-binary, MarkupSafe, idna, httptools, h11, greenlet, click, certifi, annotated-types, uvicorn, SQLAlchemy, pydantic-core, psycopg, Mako, httpcore, anyio, watchfiles, starlette, pydantic, httpx, alembic, pydantic-settings, fastapi, integration-service
-#16 34.59 Successfully installed Mako-1.4.3 MarkupSafe-3.0.4 SQLAlchemy-2.0.36 alembic-1.14.0 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 greenlet-3.5.6 h11-0.16.0 httpcore-1.0.9 httptools-0.9.0 httpx-0.28.1 idna-3.20 integration-service-1.0.0 psycopg-3.2.3 psycopg-binary-3.2.3 pydantic-2.10.4 pydantic-core-2.27.2 pydantic-settings-2.7.1 python-dotenv-1.2.4 pyyaml-6.0.3 starlette-0.41.3 typing-extensions-4.16.0 uvicorn-0.34.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.3
-#16 34.59 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
-#16 DONE 35.8s
+#16 0.931 Processing /app
+#16 0.932   Installing build dependencies: started
+#16 4.042   Installing build dependencies: finished with status 'done'
+#16 4.049   Getting requirements to build wheel: started
+#16 4.457   Getting requirements to build wheel: finished with status 'done'
+#16 4.460   Preparing metadata (pyproject.toml): started
+#16 4.873   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 5.402 Collecting fastapi==0.115.6 (from integration-service==1.0.0)
+#16 5.731   Downloading fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
+#16 5.891 Collecting uvicorn==0.34.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 5.986   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+#16 6.674 Collecting pydantic==2.10.4 (from integration-service==1.0.0)
+#16 6.763   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+#16 6.898 Collecting pydantic-settings==2.7.1 (from integration-service==1.0.0)
+#16 7.005   Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
+#16 8.552 Collecting SQLAlchemy==2.0.36 (from integration-service==1.0.0)
+#16 8.661   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (9.7 kB)
+#16 8.802 Collecting psycopg==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
+#16 8.903   Downloading psycopg-3.2.3-py3-none-any.whl.metadata (4.3 kB)
+#16 9.055 Collecting alembic==1.14.0 (from integration-service==1.0.0)
+#16 9.160   Downloading alembic-1.14.0-py3-none-any.whl.metadata (7.4 kB)
+#16 9.312 Collecting httpx==0.28.1 (from integration-service==1.0.0)
+#16 9.410   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#16 9.542 Collecting Mako (from alembic==1.14.0->integration-service==1.0.0)
+#16 9.642   Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+#16 9.837 Collecting typing-extensions>=4 (from alembic==1.14.0->integration-service==1.0.0)
+#16 9.924   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#16 10.09 Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->integration-service==1.0.0)
+#16 10.19   Downloading starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
+#16 10.36 Collecting anyio (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.46   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#16 10.60 Collecting certifi (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.69   Downloading certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+#16 10.88 Collecting httpcore==1.* (from httpx==0.28.1->integration-service==1.0.0)
+#16 10.98   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+#16 11.11 Collecting idna (from httpx==0.28.1->integration-service==1.0.0)
+#16 11.21   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#16 12.26 Collecting psycopg-binary==3.2.3 (from psycopg[binary]==3.2.3->integration-service==1.0.0)
+#16 12.36   Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (2.8 kB)
+#16 12.55 Collecting annotated-types>=0.6.0 (from pydantic==2.10.4->integration-service==1.0.0)
+#16 12.65   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#16 18.50 Collecting pydantic-core==2.27.2 (from pydantic==2.10.4->integration-service==1.0.0)
+#16 18.60   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (6.6 kB)
+#16 18.77 Collecting python-dotenv>=0.21.0 (from pydantic-settings==2.7.1->integration-service==1.0.0)
+#16 18.87   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+#16 20.04 Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.36->integration-service==1.0.0)
+#16 20.15   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl.metadata (3.8 kB)
+#16 20.35 Collecting click>=7.0 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 20.45   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#16 20.58 Collecting h11>=0.8 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 20.69   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#16 21.01 Collecting httptools>=0.6.3 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 21.12   Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (3.5 kB)
+#16 21.41 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 21.51   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.4 kB)
+#16 21.82 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 21.98   Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (5.1 kB)
+#16 22.50 Collecting watchfiles>=0.13 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 22.60   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (4.9 kB)
+#16 23.57 Collecting websockets>=10.4 (from uvicorn[standard]==0.34.0->integration-service==1.0.0)
+#16 23.68   Downloading websockets-17.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (6.3 kB)
+#16 24.24 Collecting MarkupSafe>=2.0 (from Mako->alembic==1.14.0->integration-service==1.0.0)
+#16 24.34   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+#16 24.51 Downloading alembic-1.14.0-py3-none-any.whl (233 kB)
+#16 24.92 Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
+#16 25.85 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#16 26.08 Downloading psycopg-3.2.3-py3-none-any.whl (197 kB)
+#16 26.48 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#16 27.76 Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
+#16 27.92 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.2 MB)
+#16 36.73    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 365.9 kB/s eta 0:00:00
+#16 36.84 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#16 37.09 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#16 37.35 Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (4.4 MB)
+#16 47.96    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 417.5 kB/s eta 0:00:00
+#16 48.10 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.8 MB)
+#16 52.54    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 399.5 kB/s eta 0:00:00
+#16 52.65 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#16 52.82 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#16 53.24 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (611 kB)
+#16 54.81    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 611.7/611.7 kB 444.3 kB/s eta 0:00:00
+#16 54.92 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#16 55.08 Downloading httptools-0.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (549 kB)
+#16 56.39    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 549.2/549.2 kB 425.3 kB/s eta 0:00:00
+#16 56.58 Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+#16 56.72 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (775 kB)
+#16 58.69    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 775.1/775.1 kB 377.1 kB/s eta 0:00:00
+#16 58.80 Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
+#16 59.11 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+#16 59.50 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#16 59.84 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#16 60.17 Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.4 MB)
+#16 71.39    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 392.4 kB/s eta 0:00:00
+#16 71.51 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (454 kB)
+#16 72.86 Downloading websockets-17.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (227 kB)
+#16 73.57 Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
+#16 74.13 Downloading mako-1.4.3-py3-none-any.whl (80 kB)
+#16 74.51 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+#16 74.66 Building wheels for collected packages: integration-service
+#16 74.67   Building wheel for integration-service (pyproject.toml): started
+#16 75.09   Building wheel for integration-service (pyproject.toml): finished with status 'done'
+#16 75.09   Created wheel for integration-service: filename=integration_service-1.0.0-py3-none-any.whl size=63780 sha256=5c30e1a8f738941c9655641d0fdd548ab6a1474c2475eb7fa46719872178394c
+#16 75.09   Stored in directory: /tmp/pip-ephem-wheel-cache-fsayg7cs/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#16 75.09 Successfully built integration-service
+#16 75.12 Installing collected packages: websockets, uvloop, typing-extensions, pyyaml, python-dotenv, psycopg-binary, MarkupSafe, idna, httptools, h11, greenlet, click, certifi, annotated-types, uvicorn, SQLAlchemy, pydantic-core, psycopg, Mako, httpcore, anyio, watchfiles, starlette, pydantic, httpx, alembic, pydantic-settings, fastapi, integration-service
+#16 77.07 Successfully installed Mako-1.4.3 MarkupSafe-3.0.4 SQLAlchemy-2.0.36 alembic-1.14.0 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 greenlet-3.5.6 h11-0.16.0 httpcore-1.0.9 httptools-0.9.0 httpx-0.28.1 idna-3.20 integration-service-1.0.0 psycopg-3.2.3 psycopg-binary-3.2.3 pydantic-2.10.4 pydantic-core-2.27.2 pydantic-settings-2.7.1 python-dotenv-1.2.4 pyyaml-6.0.3 starlette-0.41.3 typing-extensions-4.16.0 uvicorn-0.34.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.4
+#16 77.08 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#16 DONE 77.6s
 
 #17 [integration-service] exporting to image
 #17 exporting layers
-#17 exporting layers 0.6s done
-#17 writing image sha256:75c24d9af65e994afe1b844ec032dda82a43ba21d7e30e7ad9d873bb929c5d55 0.0s done
+#17 exporting layers 0.3s done
+#17 writing image sha256:d2ed64324613cbb411ae3eec9bf8f1e7889a2a2758c1acd08c827d8e3e7348de done
 #17 naming to docker.io/fineract-erp/integration-service:local done
-#17 DONE 0.6s
+#17 DONE 0.3s
 docker compose up -d --wait postgres fineract mock-erp integration-service
+ fineract Pulling 
+ fineract Warning 
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [fineract internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [fineract internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.57kB done
+#2 DONE 0.0s
+
+#3 [fineract internal] load metadata for docker.io/library/eclipse-temurin:21.0.5_11-jdk-jammy
+#3 ...
+
+#4 [fineract internal] load metadata for docker.io/azul/zulu-openjdk-alpine:21
+#4 DONE 3.1s
+
+#3 [fineract internal] load metadata for docker.io/library/eclipse-temurin:21.0.5_11-jdk-jammy
+#3 DONE 3.3s
+
+#5 [fineract internal] load build context
+#5 transferring context: 72.89kB 0.0s done
+#5 DONE 0.0s
+
+#6 [fineract stage-1 1/2] FROM docker.io/azul/zulu-openjdk-alpine:21@sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f
+#6 resolve docker.io/azul/zulu-openjdk-alpine:21@sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f done
+#6 sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f 770B / 770B done
+#6 sha256:3d4a047f18221d7cae9c4478bb85c3c9a54ac7a0f39c2f3f4ddf72ce8f7f9e63 741B / 741B done
+#6 sha256:e12f04481b7eb053b3bc05fd3f4e554058e95b7b6fab7e594f0c6b29b7dadd0a 2.70kB / 2.70kB done
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 0B / 162.10MB 3.7s
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 8.39MB / 162.10MB 5.4s
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 16.78MB / 162.10MB 6.0s
+#6 ...
+
+#7 [fineract build 1/7] FROM docker.io/library/eclipse-temurin:21.0.5_11-jdk-jammy@sha256:021c3f5ab987cc52ec7f76e332e2e0c621bc4bf9376eaeff486c12ee9fb83acc
+#7 resolve docker.io/library/eclipse-temurin:21.0.5_11-jdk-jammy@sha256:021c3f5ab987cc52ec7f76e332e2e0c621bc4bf9376eaeff486c12ee9fb83acc done
+#7 sha256:021c3f5ab987cc52ec7f76e332e2e0c621bc4bf9376eaeff486c12ee9fb83acc 5.25kB / 5.25kB done
+#7 sha256:435835f232b6f659fef61e1c3fc9caf9621339894e10962d3ba6407ae55b05cf 1.94kB / 1.94kB done
+#7 sha256:f92741e6ac7eed82118c300922586fd16b047385c6b591e355d1b7b2f9f7a626 5.84kB / 5.84kB done
+#7 sha256:a186900671ab62e1dea364788f4e84c156e1825939914cfb5a6770be2b58b4da 27.36MB / 27.36MB 2.8s done
+#7 sha256:492b6b0c7bb7379413ae307e29619a183adb45a83f4e6a69bca92d486a6c0eb5 22.07MB / 22.07MB 3.7s done
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 41.94MB / 155.81MB 6.0s
+#7 sha256:b3d78cc4e2f5514272de4b254e5943a1da39abbc647fcd9edbbaa1a44da7f8c1 160B / 160B 3.6s done
+#7 extracting sha256:a186900671ab62e1dea364788f4e84c156e1825939914cfb5a6770be2b58b4da 1.0s done
+#7 sha256:d7d49c53eb287ef853213dbf74c95aef9959cf7602c05e692dce420df82eefa7 2.28kB / 2.28kB 4.6s done
+#7 extracting sha256:492b6b0c7bb7379413ae307e29619a183adb45a83f4e6a69bca92d486a6c0eb5 0.9s done
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 51.38MB / 155.81MB 7.0s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 59.77MB / 155.81MB 7.9s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 68.16MB / 155.81MB 8.5s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 76.55MB / 155.81MB 9.5s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 84.93MB / 155.81MB 10.2s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 93.32MB / 155.81MB 11.2s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 101.71MB / 155.81MB 12.6s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 110.10MB / 155.81MB 14.1s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 119.54MB / 155.81MB 15.5s
+#7 ...
+
+#6 [fineract stage-1 1/2] FROM docker.io/azul/zulu-openjdk-alpine:21@sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 78.64MB / 162.10MB 16.1s
+#6 ...
+
+#7 [fineract build 1/7] FROM docker.io/library/eclipse-temurin:21.0.5_11-jdk-jammy@sha256:021c3f5ab987cc52ec7f76e332e2e0c621bc4bf9376eaeff486c12ee9fb83acc
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 128.97MB / 155.81MB 16.5s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 137.36MB / 155.81MB 17.6s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 145.75MB / 155.81MB 18.6s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 154.14MB / 155.81MB 20.2s
+#7 sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 155.81MB / 155.81MB 21.1s done
+#7 extracting sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c
+#7 extracting sha256:5c339f4808ee660695c27a74195b7c9ba002675dbe564808fe98e2636638d21c 3.0s done
+#7 extracting sha256:b3d78cc4e2f5514272de4b254e5943a1da39abbc647fcd9edbbaa1a44da7f8c1 done
+#7 extracting sha256:d7d49c53eb287ef853213dbf74c95aef9959cf7602c05e692dce420df82eefa7 done
+#7 DONE 24.5s
+
+#6 [fineract stage-1 1/2] FROM docker.io/azul/zulu-openjdk-alpine:21@sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 145.75MB / 162.10MB 24.5s
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 154.14MB / 162.10MB 25.2s
+#6 sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 162.10MB / 162.10MB 26.0s done
+#6 extracting sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 0.1s
+#6 extracting sha256:949c0aa8920f8f4084c02f11db497f4197485beacdd26a889b2d8d343883045d 2.5s done
+#6 DONE 28.6s
+
+#8 [fineract build 2/7] RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+#8 0.928 Get:1 http://ports.ubuntu.com/ubuntu-ports jammy InRelease [270 kB]
+#8 3.405 Get:2 http://ports.ubuntu.com/ubuntu-ports jammy-updates InRelease [128 kB]
+#8 3.765 Get:3 http://ports.ubuntu.com/ubuntu-ports jammy-backports InRelease [127 kB]
+#8 4.215 Get:4 http://ports.ubuntu.com/ubuntu-ports jammy-security InRelease [129 kB]
+#8 5.267 Get:5 http://ports.ubuntu.com/ubuntu-ports jammy/restricted arm64 Packages [24.2 kB]
+#8 5.332 Get:6 http://ports.ubuntu.com/ubuntu-ports jammy/universe arm64 Packages [17.2 MB]
+#8 22.40 Get:7 http://ports.ubuntu.com/ubuntu-ports jammy/main arm64 Packages [1,758 kB]
+#8 23.44 Get:8 http://ports.ubuntu.com/ubuntu-ports jammy/multiverse arm64 Packages [224 kB]
+#8 23.45 Get:9 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 Packages [4,602 kB]
+#8 25.55 Get:10 http://ports.ubuntu.com/ubuntu-ports jammy-updates/restricted arm64 Packages [8,404 kB]
+#8 28.68 Get:11 http://ports.ubuntu.com/ubuntu-ports jammy-updates/multiverse arm64 Packages [81.6 kB]
+#8 28.68 Get:12 http://ports.ubuntu.com/ubuntu-ports jammy-updates/universe arm64 Packages [1,720 kB]
+#8 29.19 Get:13 http://ports.ubuntu.com/ubuntu-ports jammy-backports/universe arm64 Packages [33.7 kB]
+#8 29.20 Get:14 http://ports.ubuntu.com/ubuntu-ports jammy-backports/main arm64 Packages [82.5 kB]
+#8 29.20 Get:15 http://ports.ubuntu.com/ubuntu-ports jammy-security/universe arm64 Packages [1,424 kB]
+#8 29.76 Get:16 http://ports.ubuntu.com/ubuntu-ports jammy-security/main arm64 Packages [4,276 kB]
+#8 30.78 Get:17 http://ports.ubuntu.com/ubuntu-ports jammy-security/restricted arm64 Packages [8,103 kB]
+#8 32.40 Get:18 http://ports.ubuntu.com/ubuntu-ports jammy-security/multiverse arm64 Packages [75.6 kB]
+#8 32.71 Fetched 48.7 MB in 32s (1,499 kB/s)
+#8 32.71 Reading package lists...
+#8 33.54 Reading package lists...
+#8 34.20 Building dependency tree...
+#8 34.35 Reading state information...
+#8 34.48 The following additional packages will be installed:
+#8 34.48   git-man libcurl3-gnutls liberror-perl libgdbm-compat4 libgdbm6 libperl5.34
+#8 34.48   perl perl-base perl-modules-5.34
+#8 34.48 Suggested packages:
+#8 34.48   gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+#8 34.48   gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n perl-doc
+#8 34.48   libterm-readline-gnu-perl | libterm-readline-perl-perl make
+#8 34.48   libtap-harness-archive-perl
+#8 34.48 Recommended packages:
+#8 34.48   patch less ssh-client netbase
+#8 34.53 The following NEW packages will be installed:
+#8 34.53   git git-man libcurl3-gnutls liberror-perl libgdbm-compat4 libgdbm6
+#8 34.53   libperl5.34 perl perl-modules-5.34
+#8 34.53 The following packages will be upgraded:
+#8 34.53   perl-base
+#8 35.15 1 upgraded, 9 newly installed, 0 to remove and 81 not upgraded.
+#8 35.15 Need to get 14.2 MB of archives.
+#8 35.15 After this operation, 69.0 MB of additional disk space will be used.
+#8 35.15 Get:1 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 perl-base arm64 5.34.0-3ubuntu1.9 [1,711 kB]
+#8 39.08 Get:2 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 perl-modules-5.34 all 5.34.0-3ubuntu1.9 [2,977 kB]
+#8 40.27 Get:3 http://ports.ubuntu.com/ubuntu-ports jammy/main arm64 libgdbm6 arm64 1.23-1 [34.1 kB]
+#8 40.28 Get:4 http://ports.ubuntu.com/ubuntu-ports jammy/main arm64 libgdbm-compat4 arm64 1.23-1 [6,294 B]
+#8 40.28 Get:5 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libperl5.34 arm64 5.34.0-3ubuntu1.9 [4,724 kB]
+#8 42.11 Get:6 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 perl arm64 5.34.0-3ubuntu1.9 [232 kB]
+#8 42.17 Get:7 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libcurl3-gnutls arm64 7.81.0-1ubuntu1.30 [281 kB]
+#8 42.25 Get:8 http://ports.ubuntu.com/ubuntu-ports jammy/main arm64 liberror-perl all 0.17029-1 [26.5 kB]
+#8 42.25 Get:9 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 git-man all 1:2.34.1-1ubuntu1.18 [954 kB]
+#8 42.84 Get:10 http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 git arm64 1:2.34.1-1ubuntu1.18 [3,239 kB]
+#8 44.86 debconf: delaying package configuration, since apt-utils is not installed
+#8 44.88 Fetched 14.2 MB in 10s (1,398 kB/s)
+#8 44.90 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8316 files and directories currently installed.)
+#8 44.91 Preparing to unpack .../perl-base_5.34.0-3ubuntu1.9_arm64.deb ...
+#8 44.92 Unpacking perl-base (5.34.0-3ubuntu1.9) over (5.34.0-3ubuntu1.3) ...
+#8 45.55 Setting up perl-base (5.34.0-3ubuntu1.9) ...
+#8 45.57 Selecting previously unselected package perl-modules-5.34.
+#8 45.57 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8316 files and directories currently installed.)
+#8 45.57 Preparing to unpack .../0-perl-modules-5.34_5.34.0-3ubuntu1.9_all.deb ...
+#8 45.57 Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.9) ...
+#8 45.77 Selecting previously unselected package libgdbm6:arm64.
+#8 45.77 Preparing to unpack .../1-libgdbm6_1.23-1_arm64.deb ...
+#8 45.77 Unpacking libgdbm6:arm64 (1.23-1) ...
+#8 45.78 Selecting previously unselected package libgdbm-compat4:arm64.
+#8 45.78 Preparing to unpack .../2-libgdbm-compat4_1.23-1_arm64.deb ...
+#8 45.78 Unpacking libgdbm-compat4:arm64 (1.23-1) ...
+#8 45.80 Selecting previously unselected package libperl5.34:arm64.
+#8 45.80 Preparing to unpack .../3-libperl5.34_5.34.0-3ubuntu1.9_arm64.deb ...
+#8 45.80 Unpacking libperl5.34:arm64 (5.34.0-3ubuntu1.9) ...
+#8 45.96 Selecting previously unselected package perl.
+#8 45.96 Preparing to unpack .../4-perl_5.34.0-3ubuntu1.9_arm64.deb ...
+#8 45.96 Unpacking perl (5.34.0-3ubuntu1.9) ...
+#8 45.98 Selecting previously unselected package libcurl3-gnutls:arm64.
+#8 45.98 Preparing to unpack .../5-libcurl3-gnutls_7.81.0-1ubuntu1.30_arm64.deb ...
+#8 45.98 Unpacking libcurl3-gnutls:arm64 (7.81.0-1ubuntu1.30) ...
+#8 46.00 Selecting previously unselected package liberror-perl.
+#8 46.00 Preparing to unpack .../6-liberror-perl_0.17029-1_all.deb ...
+#8 46.00 Unpacking liberror-perl (0.17029-1) ...
+#8 46.01 Selecting previously unselected package git-man.
+#8 46.01 Preparing to unpack .../7-git-man_1%3a2.34.1-1ubuntu1.18_all.deb ...
+#8 46.01 Unpacking git-man (1:2.34.1-1ubuntu1.18) ...
+#8 46.03 Selecting previously unselected package git.
+#8 46.03 Preparing to unpack .../8-git_1%3a2.34.1-1ubuntu1.18_arm64.deb ...
+#8 46.04 Unpacking git (1:2.34.1-1ubuntu1.18) ...
+#8 46.13 Setting up libcurl3-gnutls:arm64 (7.81.0-1ubuntu1.30) ...
+#8 46.13 Setting up perl-modules-5.34 (5.34.0-3ubuntu1.9) ...
+#8 46.13 Setting up git-man (1:2.34.1-1ubuntu1.18) ...
+#8 46.14 Setting up libgdbm6:arm64 (1.23-1) ...
+#8 46.14 Setting up libgdbm-compat4:arm64 (1.23-1) ...
+#8 46.14 Setting up libperl5.34:arm64 (5.34.0-3ubuntu1.9) ...
+#8 46.15 Setting up perl (5.34.0-3ubuntu1.9) ...
+#8 46.15 Setting up liberror-perl (0.17029-1) ...
+#8 46.16 Setting up git (1:2.34.1-1ubuntu1.18) ...
+#8 46.16 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
+#8 DONE 46.3s
+
+#9 [fineract build 3/7] WORKDIR /fineract
+#9 DONE 0.0s
+
+#10 [fineract build 4/7] RUN git clone --depth 1 --branch "1.15.0" https://github.com/apache/fineract.git .     && test "$(git rev-parse HEAD)" = "d5636847ac556c30b437254c353f05526d172b97"
+#10 0.183 Cloning into '.'...
+#10 8.093 Note: switching to 'd5636847ac556c30b437254c353f05526d172b97'.
+#10 8.093 
+#10 8.093 You are in 'detached HEAD' state. You can look around, make experimental
+#10 8.093 changes and commit them, and you can discard any commits you make in this
+#10 8.093 state without impacting any branches by switching back to a branch.
+#10 8.093 
+#10 8.093 If you want to create a new branch to retain commits you create, you may
+#10 8.093 do so (now or later) by using -c with the switch command. Example:
+#10 8.093 
+#10 8.093   git switch -c <new-branch-name>
+#10 8.093 
+#10 8.093 Or undo this operation with:
+#10 8.093 
+#10 8.093   git switch -
+#10 8.093 
+#10 8.093 Turn off this advice by setting config variable advice.detachedHead to false
+#10 8.093 
+#10 DONE 9.2s
+
+#11 [fineract build 5/7] COPY gl-account-external-id.patch /tmp/
+#11 DONE 0.0s
+
+#12 [fineract build 6/7] RUN git apply /tmp/gl-account-external-id.patch
+#12 DONE 0.2s
+
+#13 [fineract build 7/7] RUN sed -i 's/-Xmx12g/-Xmx3g/' gradle.properties     && ./gradlew --no-daemon :fineract-provider:bootJar -x test     && cp "fineract-provider/build/libs/fineract-provider-1.15.0.jar" /fineract-provider.jar
+#13 0.352 Downloading https://services.gradle.org/distributions/gradle-8.14.5-bin.zip
+#13 2.763 .............10%.............20%.............30%.............40%.............50%..............60%.............70%.............80%.............90%.............100%
+#13 364.3 
+#13 364.3 Welcome to Gradle 8.14.5!
+#13 364.3 
+#13 364.3 Here are the highlights of this release:
+#13 364.3  - Java 24 support
+#13 364.3  - GraalVM Native Image toolchain selection
+#13 364.3  - Enhancements to test reporting
+#13 364.3  - Build Authoring improvements
+#13 364.3 
+#13 364.3 For more details see https://docs.gradle.org/8.14.5/release-notes.html
+#13 364.3 
+#13 364.3 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+#13 365.2 Daemon will be stopped at the end of the build 
+#13 417.6 > Task :buildSrc:extractPluginRequests
+#13 417.6 > Task :buildSrc:generatePluginAdapters
+#13 439.6 > Task :buildSrc:compileJava
+#13 443.9 > Task :buildSrc:compileGroovy
+#13 444.6 > Task :buildSrc:compileGroovyPlugins
+#13 444.6 > Task :buildSrc:pluginDescriptors
+#13 444.6 > Task :buildSrc:processResources
+#13 444.6 > Task :buildSrc:classes
+#13 444.7 > Task :buildSrc:jar
+#13 608.6 
+#13 608.6 > Configure project :
+#13 608.6 matching ref: TAG - 1.15.0
+#13 608.6   ref configuration: TAG - pattern: (\d+\.\d+\.\d+)
+#13 608.6     version: ${describe.tag.version.major}.${describe.tag.version.minor}.${describe.tag.version.patch}
+#13 608.6     describeTagPattern: .*(\d+\.\d+\.\d+).*
+#13 608.6     describeTagFirstParent: false
+#13 608.7 
+#13 608.7 project version: 1.15.0
+#13 673.9 
+#13 673.9 > Task :spotlessInternalRegisterDependencies
+#13 674.1 > Task :fineract-avro-schemas:preprocessAvroSchemas
+#13 674.2 > Task :fineract-avro-schemas:spotlessJson
+#13 674.2 > Task :fineract-avro-schemas:spotlessJsonApply
+#13 674.5 
+#13 674.5 > Task :fineract-charge:generateStaticWeavingPersistenceXml
+#13 674.5 Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
+#13 674.5 
+#13 674.5 > Task :fineract-accounting:generateStaticWeavingPersistenceXml
+#13 674.5 Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
+#13 674.5 
+#13 674.5 > Task :fineract-charge:processResources
+#13 674.5 > Task :fineract-accounting:processResources
+#13 674.8 
+#13 674.8 > Task :fineract-core:generateStaticWeavingPersistenceXml
+#13 674.8 Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
+#13 674.8 
+#13 674.8 > Task :fineract-core:processResources NO-SOURCE
+#13 674.8 
+#13 674.8 > Task :fineract-tax:generateStaticWeavingPersistenceXml
+#13 674.8 Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
+#13 674.8 
+#13 674.8 > Task :fineract-tax:processResources NO-SOURCE
+#13 674.8 > Task :fineract-command-audit:processResources
+#13 674.9 > Task :fineract-command-jdbc:processResources
+#13 674.9 > Task :fineract-document:processResources NO-SOURCE
+#13 674.9 
+#13 674.9 > Task :fineract-branch:generateStaticWeavingPersistenceXml
+#13 674.9 Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
+#13 674.9 
+#13 674.9 > Task :fineract-branch:processResources
+#13 675.0 
+#13 675.0 > Task :fineract-cob:generateStaticWeavingPersistenceXml
+#13 675.0 Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 managed classes from 2 modules
+#13 675.0 
+#13 675.0 > Task :fineract-cob:processResources NO-SOURCE
+#13 675.3 
+#13 675.3 > Task :fineract-rates:generateStaticWeavingPersistenceXml
+#13 675.3 Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
+#13 675.3 
+#13 675.3 > Task :fineract-rates:processResources
+#13 675.3 
+#13 675.3 > Task :fineract-investor:generateStaticWeavingPersistenceXml
+#13 675.3 Generated EclipseLink static weaving persistence.xml for :fineract-investor with 122 managed classes from 8 modules
+#13 675.4 
+#13 675.4 > Task :fineract-investor:processResources
+#13 675.4 
+#13 675.4 > Task :fineract-loan:generateStaticWeavingPersistenceXml
+#13 675.4 Generated EclipseLink static weaving persistence.xml for :fineract-loan with 114 managed classes from 7 modules
+#13 675.5 
+#13 675.5 > Task :fineract-loan:processResources
+#13 675.5 > Task :fineract-mix:processResources NO-SOURCE
+#13 675.6 
+#13 675.6 > Task :fineract-loan-origination:generateStaticWeavingPersistenceXml
+#13 675.6 Generated EclipseLink static weaving persistence.xml for :fineract-loan-origination with 142 managed classes from 9 modules
+#13 675.6 
+#13 675.6 > Task :fineract-loan-origination:processResources
+#13 675.8 
+#13 675.8 > Task :fineract-working-capital-loan:generateStaticWeavingPersistenceXml
+#13 675.8 Generated EclipseLink static weaving persistence.xml for :fineract-working-capital-loan with 139 managed classes from 8 modules
+#13 675.8 
+#13 675.8 > Task :fineract-progressive-loan:generateStaticWeavingPersistenceXml
+#13 675.8 Generated EclipseLink static weaving persistence.xml for :fineract-progressive-loan with 117 managed classes from 8 modules
+#13 675.8 
+#13 675.8 > Task :fineract-progressive-loan:processResources
+#13 675.8 > Task :fineract-report:processResources NO-SOURCE
+#13 675.9 > Task :fineract-working-capital-loan:processResources
+#13 676.3 
+#13 676.3 > Task :fineract-security:generateStaticWeavingPersistenceXml
+#13 676.3 Generated EclipseLink static weaving persistence.xml for :fineract-security with 42 managed classes from 2 modules
+#13 676.3 
+#13 676.3 > Task :fineract-security:processResources NO-SOURCE
+#13 676.3 
+#13 676.3 > Task :fineract-savings:generateStaticWeavingPersistenceXml
+#13 676.3 Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
+#13 676.4 
+#13 676.4 > Task :fineract-savings:processResources
+#13 677.4 
+#13 677.4 > Task :fineract-provider:generateStaticWeavingPersistenceXml
+#13 677.4 Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
+#13 678.9 
+#13 678.9 > Task :fineract-provider:generateGitProperties
+#13 678.9 > Task :fineract-provider:generateRebelMain
+#13 679.3 > Task :fineract-provider:processResources
+#13 679.4 > Task :fineract-provider:prepareInputYaml
+#13 680.7 > Task :fineract-avro-schemas:buildJavaSdk
+#13 689.4 > Task :fineract-validation:compileJava
+#13 689.4 > Task :fineract-validation:processResources
+#13 689.4 > Task :fineract-validation:classes
+#13 689.4 > Task :fineract-validation:jar
+#13 689.7 > Task :fineract-command:compileJava
+#13 689.7 > Task :fineract-command:processResources
+#13 689.7 > Task :fineract-command:classes
+#13 689.8 > Task :fineract-command:jar
+#13 690.0 > Task :fineract-avro-schemas:compileJava
+#13 690.1 > Task :fineract-avro-schemas:processResources
+#13 690.1 > Task :fineract-avro-schemas:classes
+#13 690.3 > Task :fineract-avro-schemas:jar
+#13 690.5 > Task :fineract-command-audit:compileJava
+#13 690.5 > Task :fineract-command-audit:classes
+#13 690.5 > Task :fineract-command-audit:jar
+#13 695.1 > Task :fineract-command-jdbc:compileJava
+#13 695.1 > Task :fineract-command-jdbc:classes
+#13 695.2 > Task :fineract-command-jdbc:jar
+#13 703.0 
+#13 703.0 > Task :fineract-core:compileJava
+#13 703.0 /fineract/fineract-core/src/main/java/org/apache/fineract/infrastructure/core/service/database/JavaType.java:364: warning: [deprecation] Date(String) in Date has been deprecated
+#13 703.0             case DATE -> new Date(s);
+#13 703.0                          ^
+#13 703.9 1 warning
+#13 709.6 
+#13 709.6 > Task :fineract-core:classes
+#13 709.8 > Task :fineract-core:jar
+#13 715.1 > Task :fineract-mix:compileJava
+#13 715.2 > Task :fineract-mix:classes
+#13 715.2 > Task :fineract-mix:jar
+#13 715.9 > Task :fineract-cob:compileJava
+#13 715.9 > Task :fineract-cob:classes
+#13 716.0 > Task :fineract-cob:jar
+#13 716.5 > Task :fineract-tax:compileJava
+#13 716.5 > Task :fineract-tax:classes
+#13 716.5 > Task :fineract-tax:jar
+#13 716.8 > Task :fineract-report:compileJava
+#13 716.8 > Task :fineract-report:classes
+#13 716.8 > Task :fineract-report:jar
+#13 717.4 > Task :fineract-rates:compileJava
+#13 717.4 > Task :fineract-rates:classes
+#13 717.4 > Task :fineract-rates:jar
+#13 718.5 > Task :fineract-charge:compileJava
+#13 718.5 > Task :fineract-charge:classes
+#13 718.5 > Task :fineract-charge:jar
+#13 721.4 
+#13 721.4 > Task :fineract-document:compileJava
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageWritePlatformServiceImpl.java:46: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.4 /fineract/fineract-document/src/main/java/org/apache/fineract/infrastructure/documentmanagement/service/ImageReadPlatformServiceImpl.java:35: warning: [deprecation] EntityImageIdAdapter in org.apache.fineract.infrastructure.documentmanagement.adapter has been deprecated
+#13 721.4 @RequiredArgsConstructor
+#13 721.4 ^
+#13 721.6 25 warnings
+#13 722.7 
+#13 722.7 > Task :fineract-security:compileJava
+#13 722.7 > Task :fineract-security:classes
+#13 722.8 > Task :fineract-security:jar
+#13 723.7 > Task :fineract-document:classes
+#13 723.8 > Task :fineract-document:jar
+#13 723.9 > Task :fineract-accounting:compileJava
+#13 723.9 > Task :fineract-accounting:classes
+#13 723.9 > Task :fineract-accounting:jar
+#13 726.6 > Task :fineract-branch:compileJava
+#13 726.6 > Task :fineract-branch:classes
+#13 726.6 > Task :fineract-branch:jar
+#13 727.4 > Task :fineract-savings:compileJava
+#13 727.4 > Task :fineract-savings:classes
+#13 727.4 > Task :fineract-savings:jar
+#13 733.1 > Task :fineract-loan:compileJava
+#13 733.1 > Task :fineract-loan:classes
+#13 733.3 > Task :fineract-loan:jar
+#13 737.6 > Task :fineract-progressive-loan:compileJava
+#13 737.6 > Task :fineract-progressive-loan:classes
+#13 737.7 > Task :fineract-progressive-loan:jar
+#13 738.9 > Task :fineract-investor:compileJava
+#13 739.0 > Task :fineract-investor:classes
+#13 739.0 > Task :fineract-investor:jar
+#13 741.1 > Task :fineract-working-capital-loan:compileJava
+#13 741.1 > Task :fineract-working-capital-loan:classes
+#13 741.2 > Task :fineract-working-capital-loan:jar
+#13 744.0 > Task :fineract-loan-origination:compileJava
+#13 744.0 > Task :fineract-loan-origination:classes
+#13 744.0 > Task :fineract-loan-origination:jar
+#13 764.6 
+#13 764.6 > Task :fineract-provider:compileJava
+#13 764.6 /fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/migration/TenantDatabaseUpgradeService.java:91: warning: [deprecation] ThreadLocalScopeManager in liquibase has been deprecated
+#13 764.6             Scope.setScopeManager(new ThreadLocalScopeManager());
+#13 764.6                                       ^
+#13 764.8 /fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/hooks/service/HookReadPlatformServiceImpl.java:104: warning: [removal] HookEventResultSetExtractor in org.apache.fineract.infrastructure.hooks.domain has been deprecated and marked for removal
+#13 764.8         final HookEventResultSetExtractor extractor = new HookEventResultSetExtractor();
+#13 764.8               ^
+#13 764.8 /fineract/fineract-provider/src/main/java/org/apache/fineract/infrastructure/hooks/service/HookReadPlatformServiceImpl.java:104: warning: [removal] HookEventResultSetExtractor in org.apache.fineract.infrastructure.hooks.domain has been deprecated and marked for removal
+#13 764.8         final HookEventResultSetExtractor extractor = new HookEventResultSetExtractor();
+#13 764.8                                                           ^
+#13 766.8 3 warnings
+#13 779.4 
+#13 779.4 > Task :fineract-provider:classes
+#13 809.4 > Task :fineract-provider:resolve
+#13 839.6 > Task :fineract-provider:resolveMainClassName
+#13 843.4 > Task :fineract-provider:bootJar
+#13 843.5 
+#13 843.5 [Incubating] Problems report is available at: file:///fineract/build/reports/problems/problems-report.html
+#13 843.5 
+#13 843.5 Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+#13 843.5 
+#13 843.5 You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+#13 843.5 
+#13 843.5 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+#13 843.5 
+#13 843.5 BUILD SUCCESSFUL in 14m 3s
+#13 843.5 95 actionable tasks: 95 executed
+#13 DONE 845.6s
+
+#14 [fineract stage-1 2/2] COPY --from=build /fineract-provider.jar /app/fineract-provider.jar
+#14 DONE 0.5s
+
+#15 [fineract] exporting to image
+#15 exporting layers
+#15 exporting layers 0.3s done
+#15 writing image sha256:9ac9c11d8ed061b635f77db9c16486f378861c01ae1fee8d0445a30abb6bcca4 done
+#15 naming to docker.io/library/fineract-gl-sync:1.15.0 done
+#15 DONE 0.4s
  Network fineract-erp_default  Creating
  Network fineract-erp_default  Created
  Volume "fineract-erp_postgres-data"  Creating
@@ -200,25 +794,25 @@ docker compose up -d --wait postgres fineract mock-erp integration-service
  Container fineract-erp-postgres-1  Waiting
  Container fineract-erp-postgres-1  Healthy
  Container fineract-erp-postgres-1  Healthy
- Container fineract-erp-fineract-1  Starting
  Container fineract-erp-mock-erp-1  Starting
- Container fineract-erp-mock-erp-1  Started
+ Container fineract-erp-fineract-1  Starting
  Container fineract-erp-fineract-1  Started
- Container fineract-erp-mock-erp-1  Waiting
+ Container fineract-erp-mock-erp-1  Started
  Container fineract-erp-postgres-1  Waiting
  Container fineract-erp-fineract-1  Waiting
+ Container fineract-erp-mock-erp-1  Waiting
  Container fineract-erp-postgres-1  Healthy
  Container fineract-erp-mock-erp-1  Healthy
  Container fineract-erp-fineract-1  Healthy
  Container fineract-erp-integration-service-1  Starting
  Container fineract-erp-integration-service-1  Started
- Container fineract-erp-postgres-1  Waiting
- Container fineract-erp-fineract-1  Waiting
  Container fineract-erp-mock-erp-1  Waiting
  Container fineract-erp-integration-service-1  Waiting
- Container fineract-erp-mock-erp-1  Healthy
- Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-postgres-1  Waiting
+ Container fineract-erp-fineract-1  Waiting
  Container fineract-erp-fineract-1  Healthy
+ Container fineract-erp-postgres-1  Healthy
+ Container fineract-erp-mock-erp-1  Healthy
  Container fineract-erp-integration-service-1  Healthy
 docker compose up bootstrap --exit-code-from bootstrap
  Container fineract-erp-postgres-1  Running
@@ -228,15 +822,14 @@ docker compose up bootstrap --exit-code-from bootstrap
  Container fineract-erp-bootstrap-1  Creating
  Container fineract-erp-bootstrap-1  Created
 Attaching to fineract-erp-bootstrap-1
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.501016+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created office Kigali Main Office", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.891661+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "enabled currency RWF", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:02.944866+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created payment type Bank Transfer", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:03.188149+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created API user integration_api", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.452789+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "GL accounts synchronized from the ERP", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.649010+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created loan product SME Asset Finance", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
-fineract-erp-bootstrap-1  | {"timestamp": "2026-10-27T02:00:04.649106+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "Fineract is configured", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:35.759912+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created office Kigali Main Office", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:35.984715+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "enabled currency RWF", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:36.018703+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created payment type Bank Transfer", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:36.217000+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created API user integration_api", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:37.485300+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "GL accounts synchronized from the ERP", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:37.707204+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "created loan product SME Asset Finance", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
+fineract-erp-bootstrap-1  | {"timestamp": "2026-10-31T00:44:37.707288+00:00", "level": "INFO", "service": "bootstrap", "logger": "bootstrap", "event": "Fineract is configured", "correlation_id": null, "external_reference": null, "client_uid": null, "loan_reference": null, "fineract_transaction_id": null, "erp_transaction_id": null, "status": null}
 fineract-erp-bootstrap-1 exited with code 0
 Aborting on container exit...
  Container fineract-erp-bootstrap-1  Stopping
  Container fineract-erp-bootstrap-1  Stopped
-make up  0.42s user 0.50s system 0% cpu 2:20.37 total

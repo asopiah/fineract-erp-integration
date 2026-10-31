@@ -159,7 +159,7 @@ SQLAlchemy 2.0 is used with typed mappings, and Alembic for the integration serv
 
 ## What happened to FIN-2026-000001?
 
-Recorded in the final evidence run on 30 October 2026 (UTC), by the trace scenario of `make test-stack`; `make
+Recorded in the final evidence run on 31 October 2026 (UTC), by the trace scenario of `make test-stack`; `make
 simulate` repeats it under a suffixed reference in [SIMULATIONS.md](SIMULATIONS.md). The partner sent a repayment
 with `X-Correlation-ID: partner-FIN-2026-000001` while the ERP was briefly unavailable.
 
@@ -181,17 +181,17 @@ docker compose logs --no-log-prefix integration-service mock-erp | grep partner-
 
 | time (UTC) | service | event | status | fineract_transaction_id | erp_transaction_id |
 | --- | --- | --- | --- | --- | --- |
-| 23:55:49.724 | integration-service | operation fineract_pending | FINERACT_PENDING | | |
-| 23:55:50.120 | integration-service | submitted to Fineract | FINERACT_PENDING | | |
-| 23:55:50.123 | integration-service | operation fineract_done | FINERACT_DONE | 47 | |
-| 23:55:50.124 | integration-service | operation erp_pending | ERP_PENDING | | |
-| 23:55:50.129 | integration-service | deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable | ERP_PENDING | | |
-| 23:55:52.212 | mock-erp | journal entry posted | POSTED | | JE-000034 |
-| 23:55:52.216 | integration-service | operation completed | COMPLETED | | JE-000034 |
+| 00:47:41.425 | integration-service | operation fineract_pending | FINERACT_PENDING | | |
+| 00:47:41.740 | integration-service | submitted to Fineract | FINERACT_PENDING | | |
+| 00:47:41.742 | integration-service | operation fineract_done | FINERACT_DONE | 47 | |
+| 00:47:41.744 | integration-service | operation erp_pending | ERP_PENDING | | |
+| 00:47:41.748 | integration-service | deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable | ERP_PENDING | | |
+| 00:47:43.838 | mock-erp | journal entry posted | POSTED | | JE-000034 |
+| 00:47:43.846 | integration-service | operation completed | COMPLETED | | JE-000034 |
 
 **Reading it:**
 
-* Fineract recorded the repayment in 0.4 s (its transaction 47, split 383,400 principal and 75,000 interest).
+* Fineract recorded the repayment in 0.3 s (its transaction 47, split 383,400 principal and 75,000 interest).
 * The ERP was down, so the posting was deferred; the partner received 202 `ERP_PENDING`.
 * 2.1 s later, recovery posted entry `JE-000034`.
 

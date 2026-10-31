@@ -1,0 +1,10 @@
+{"last_name":"Uwase","client_uid":"SME-000001","first_name":"Amina","external_reference":"CLI-0001"}
+LN-2026-000001
+{"approved_on":"2026-01-15","loan_reference":"LN-2026-000001","external_reference":"APR-0001"}
+{"type":"DISBURSEMENT","amount":"5000000","outstanding_after":"5000000","erp_entry_number":"JE-000001"}
+{"amount":"458400","principal_portion":"383400","interest_portion":"75000","erp_entry_number":"JE-000002"}
+[{"account_code":"1100","debit":"458400.000000","credit":"0.000000"},{"account_code":"1200","debit":"0.000000","credit":"383400.000000"},{"account_code":"4000","debit":"0.000000","credit":"75000.000000"}]
+200
+IDEMPOTENCY_CONFLICT
+{"status":"ACTIVE","outstanding":"5042399"}
+{"MATCHED":2}

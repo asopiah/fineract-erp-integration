@@ -74,7 +74,7 @@ fresh transaction, sees the committed winner, and resolves: identical definition
 * **If all retries were lost**, which needs three consecutive losses, the caller gets Fineract's generic 409
   concurrency error and can simply resend.
 
-Evidence: 5 rounds of 10 concurrent identical creates. In the recorded run, 28 inserts lost the race and were
+Evidence: 5 rounds of 10 concurrent identical creates. In the recorded run, 33 inserts lost the race and were
 retried; all 50 requests returned 200, and each round produced exactly one account
 (`../evidence/java-race-retries.txt`).
 
@@ -165,4 +165,4 @@ A scripted demo of behaviours 1–4 against the running Fineract, with the 403 a
 the *Fineract GL patch* simulation (`make simulate-gl-patch`, evidence in [SIMULATIONS.md](../SIMULATIONS.md)).
 
 Recorded runs: `../evidence/java-unit-tests.log`, `../evidence/java-integration-tests.log`,
-`../evidence/java-regression-tests.log` and `../evidence/build-dockerfile.log`.
+`../evidence/java-regression-tests.log`, and the from-source build in `../evidence/stack-up.log`.

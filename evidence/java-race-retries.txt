@@ -1,6 +1,10 @@
 GL account create race: 5 rounds x 10 identical concurrent creates (GLAccountExternalIdIntegrationTest#concurrentIdenticalCreatesResolveToOneAccount),
-run against the Fineract image built by fineract-customization/Dockerfile on a freshly created database.
+run on 31 October 2026 against the Fineract image built from source by `make up` (fineract-customization/Dockerfile) on a fresh database.
 Result: all 50 requests HTTP 200, one account id per round (see java-integration-tests.log).
 
-Inserts that lost the unique-constraint race and were resolved by Fineract's command retry:
-  28 unique constraint "acc_gl_account_gl_code_key"
+Inserts that lost the unique-constraint race and were resolved by Fineract's command retry
+(counted from the Fineract log during `make test-java-it`; the log had none before the run):
+  33 unique constraint "acc_gl_account_gl_code_key"
+
+Both racers insert the same GL code, so PostgreSQL rejects the loser on the GL code constraint before it reaches
+acc_gl_external_id. The patch recognises any unique violation by SQL state, so either constraint hands over to the retry.

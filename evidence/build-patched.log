@@ -1,3 +1,5 @@
+patch already applied
+cd upstream/fineract && ./gradlew :fineract-provider:jibDockerBuild -x test -Djib.to.image=fineract-gl-sync:1.15.0-jib
 > Task :buildSrc:extractPluginRequests UP-TO-DATE
 > Task :buildSrc:generatePluginAdapters UP-TO-DATE
 > Task :buildSrc:compileJava UP-TO-DATE
@@ -21,21 +23,21 @@ project version: 1.15.0
 > Task :spotlessInternalRegisterDependencies UP-TO-DATE
 > Task :fineract-command-audit:processResources UP-TO-DATE
 > Task :fineract-document:processResources NO-SOURCE
-> Task :fineract-command-jdbc:processResources UP-TO-DATE
-> Task :fineract-avro-schemas:spotlessJson UP-TO-DATE
-> Task :fineract-avro-schemas:spotlessJsonApply UP-TO-DATE
-> Task :fineract-avro-schemas:buildJavaSdk UP-TO-DATE
-> Task :fineract-command:compileJava UP-TO-DATE
 > Task :fineract-validation:compileJava UP-TO-DATE
-> Task :fineract-avro-schemas:compileJava UP-TO-DATE
-> Task :fineract-command:processResources UP-TO-DATE
-> Task :fineract-command:classes UP-TO-DATE
+> Task :fineract-command:compileJava UP-TO-DATE
+> Task :fineract-avro-schemas:spotlessJson UP-TO-DATE
 > Task :fineract-validation:processResources UP-TO-DATE
 > Task :fineract-validation:classes UP-TO-DATE
+> Task :fineract-command:processResources UP-TO-DATE
+> Task :fineract-command:classes UP-TO-DATE
 > Task :fineract-command:jar UP-TO-DATE
+> Task :fineract-validation:jar UP-TO-DATE
+> Task :fineract-avro-schemas:spotlessJsonApply UP-TO-DATE
+> Task :fineract-avro-schemas:buildJavaSdk UP-TO-DATE
+> Task :fineract-avro-schemas:compileJava UP-TO-DATE
 > Task :fineract-avro-schemas:processResources UP-TO-DATE
 > Task :fineract-avro-schemas:classes UP-TO-DATE
-> Task :fineract-validation:jar UP-TO-DATE
+> Task :fineract-command-jdbc:processResources UP-TO-DATE
 > Task :fineract-avro-schemas:jar UP-TO-DATE
 > Task :fineract-command-audit:compileJava UP-TO-DATE
 > Task :fineract-command-audit:classes UP-TO-DATE
@@ -48,118 +50,112 @@ project version: 1.15.0
 > Task :fineract-core:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-core with 40 managed classes from 1 modules
 
-> Task :fineract-rates:generateStaticWeavingPersistenceXml
-Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
-
 > Task :fineract-tax:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-tax with 44 managed classes from 2 modules
 
 > Task :fineract-tax:processResources NO-SOURCE
-> Task :fineract-rates:processResources UP-TO-DATE
-> Task :fineract-report:processResources NO-SOURCE
+
+> Task :fineract-rates:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-rates with 42 managed classes from 2 modules
 
 > Task :fineract-cob:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-cob with 42 managed classes from 2 modules
 
-> Task :fineract-cob:processResources NO-SOURCE
-
 > Task :fineract-charge:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-charge with 47 managed classes from 3 modules
 
-> Task :fineract-charge:processResources UP-TO-DATE
 > Task :fineract-core:compileJava UP-TO-DATE
 > Task :fineract-core:processResources NO-SOURCE
 > Task :fineract-core:classes UP-TO-DATE
+> Task :fineract-charge:processResources UP-TO-DATE
+> Task :fineract-cob:processResources NO-SOURCE
+> Task :fineract-report:processResources NO-SOURCE
+> Task :fineract-rates:processResources UP-TO-DATE
 > Task :fineract-core:jar UP-TO-DATE
 > Task :fineract-tax:compileJava UP-TO-DATE
 > Task :fineract-tax:classes UP-TO-DATE
 > Task :fineract-tax:jar UP-TO-DATE
-> Task :fineract-cob:compileJava UP-TO-DATE
-> Task :fineract-cob:classes UP-TO-DATE
-> Task :fineract-cob:jar UP-TO-DATE
-> Task :fineract-charge:compileJava UP-TO-DATE
-> Task :fineract-charge:classes UP-TO-DATE
-> Task :fineract-charge:jar UP-TO-DATE
-
-> Task :fineract-accounting:generateStaticWeavingPersistenceXml
-Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
-
-> Task :fineract-rates:compileJava UP-TO-DATE
-> Task :fineract-rates:classes UP-TO-DATE
-> Task :fineract-rates:jar UP-TO-DATE
-> Task :fineract-accounting:compileJava UP-TO-DATE
-> Task :fineract-accounting:processResources UP-TO-DATE
-> Task :fineract-accounting:classes UP-TO-DATE
 
 > Task :fineract-branch:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-branch with 59 managed classes from 5 modules
 
+> Task :fineract-accounting:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-accounting with 55 managed classes from 4 modules
+
+> Task :fineract-accounting:processResources UP-TO-DATE
 > Task :fineract-branch:processResources UP-TO-DATE
-> Task :fineract-document:compileJava UP-TO-DATE
-> Task :fineract-document:classes UP-TO-DATE
-> Task :fineract-document:jar UP-TO-DATE
+> Task :fineract-charge:compileJava UP-TO-DATE
+> Task :fineract-charge:classes UP-TO-DATE
+> Task :fineract-charge:jar UP-TO-DATE
+> Task :fineract-accounting:compileJava UP-TO-DATE
+> Task :fineract-accounting:classes UP-TO-DATE
+> Task :fineract-cob:compileJava UP-TO-DATE
+> Task :fineract-cob:classes UP-TO-DATE
+> Task :fineract-cob:jar UP-TO-DATE
+> Task :fineract-rates:compileJava UP-TO-DATE
+> Task :fineract-rates:classes UP-TO-DATE
+> Task :fineract-rates:jar UP-TO-DATE
 > Task :fineract-report:compileJava UP-TO-DATE
 > Task :fineract-report:classes UP-TO-DATE
 > Task :fineract-report:jar UP-TO-DATE
-> Task :fineract-mix:compileJava UP-TO-DATE
-> Task :fineract-mix:classes UP-TO-DATE
-> Task :fineract-mix:jar UP-TO-DATE
+> Task :fineract-document:compileJava UP-TO-DATE
+> Task :fineract-document:classes UP-TO-DATE
+> Task :fineract-document:jar UP-TO-DATE
 > Task :fineract-accounting:jar
-> Task :fineract-branch:compileJava UP-TO-DATE
+> Task :fineract-branch:compileJava FROM-CACHE
 > Task :fineract-branch:classes UP-TO-DATE
 > Task :fineract-branch:jar UP-TO-DATE
 
 > Task :fineract-security:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-security with 42 managed classes from 2 modules
 
+> Task :fineract-mix:compileJava UP-TO-DATE
+> Task :fineract-mix:classes UP-TO-DATE
+> Task :fineract-mix:jar UP-TO-DATE
 > Task :fineract-security:compileJava UP-TO-DATE
 > Task :fineract-security:processResources NO-SOURCE
 > Task :fineract-security:classes UP-TO-DATE
 > Task :fineract-security:jar UP-TO-DATE
 
-> Task :fineract-savings:generateStaticWeavingPersistenceXml
-Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
-
-> Task :fineract-savings:compileJava UP-TO-DATE
-> Task :fineract-savings:processResources UP-TO-DATE
-> Task :fineract-savings:classes UP-TO-DATE
-> Task :fineract-savings:jar UP-TO-DATE
-
 > Task :fineract-loan:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-loan with 114 managed classes from 7 modules
-
-> Task :fineract-loan:compileJava UP-TO-DATE
-> Task :fineract-loan:processResources UP-TO-DATE
-> Task :fineract-loan:classes UP-TO-DATE
-> Task :fineract-loan:jar UP-TO-DATE
 
 > Task :fineract-investor:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-investor with 122 managed classes from 8 modules
 
-> Task :fineract-investor:compileJava UP-TO-DATE
-> Task :fineract-investor:processResources UP-TO-DATE
-> Task :fineract-investor:classes UP-TO-DATE
-> Task :fineract-investor:jar UP-TO-DATE
-
 > Task :fineract-progressive-loan:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-progressive-loan with 117 managed classes from 8 modules
 
-> Task :fineract-progressive-loan:compileJava UP-TO-DATE
+> Task :fineract-investor:processResources UP-TO-DATE
 > Task :fineract-progressive-loan:processResources UP-TO-DATE
-> Task :fineract-progressive-loan:classes UP-TO-DATE
-> Task :fineract-progressive-loan:jar UP-TO-DATE
+
+> Task :fineract-savings:generateStaticWeavingPersistenceXml
+Generated EclipseLink static weaving persistence.xml for :fineract-savings with 82 managed classes from 7 modules
 
 > Task :fineract-working-capital-loan:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-working-capital-loan with 139 managed classes from 8 modules
-
-> Task :fineract-working-capital-loan:compileJava UP-TO-DATE
 
 > Task :fineract-loan-origination:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-loan-origination with 142 managed classes from 9 modules
 
 > Task :fineract-working-capital-loan:processResources UP-TO-DATE
-> Task :fineract-working-capital-loan:classes UP-TO-DATE
 > Task :fineract-loan-origination:processResources UP-TO-DATE
+> Task :fineract-savings:compileJava FROM-CACHE
+> Task :fineract-savings:processResources UP-TO-DATE
+> Task :fineract-savings:classes UP-TO-DATE
+> Task :fineract-savings:jar UP-TO-DATE
+> Task :fineract-loan:compileJava FROM-CACHE
+> Task :fineract-loan:processResources UP-TO-DATE
+> Task :fineract-loan:classes UP-TO-DATE
+> Task :fineract-loan:jar UP-TO-DATE
+> Task :fineract-investor:compileJava FROM-CACHE
+> Task :fineract-investor:classes UP-TO-DATE
+> Task :fineract-investor:jar UP-TO-DATE
+> Task :fineract-progressive-loan:compileJava FROM-CACHE
+> Task :fineract-progressive-loan:classes UP-TO-DATE
+> Task :fineract-progressive-loan:jar UP-TO-DATE
+> Task :fineract-working-capital-loan:compileJava FROM-CACHE
+> Task :fineract-working-capital-loan:classes UP-TO-DATE
 > Task :fineract-working-capital-loan:jar UP-TO-DATE
 > Task :fineract-loan-origination:compileJava UP-TO-DATE
 > Task :fineract-loan-origination:classes UP-TO-DATE
@@ -168,19 +164,19 @@ Generated EclipseLink static weaving persistence.xml for :fineract-loan-originat
 > Task :fineract-provider:generateStaticWeavingPersistenceXml
 Generated EclipseLink static weaving persistence.xml for :fineract-provider with 273 managed classes from 15 modules
 
-> Task :fineract-provider:compileJava UP-TO-DATE
+> Task :fineract-provider:compileJava FROM-CACHE
 > Task :fineract-provider:generateGitProperties
 > Task :fineract-provider:generateRebelMain UP-TO-DATE
-> Task :fineract-provider:processResources UP-TO-DATE
+> Task :fineract-provider:processResources
 > Task :fineract-provider:classes
 > Task :fineract-provider:prepareInputYaml UP-TO-DATE
 > Task :fineract-provider:resolve
-> Task :fineract-provider:resolveMainClassName UP-TO-DATE
+> Task :fineract-provider:resolveMainClassName
 > Task :fineract-provider:bootJar
 
 > Task :fineract-provider:jibDockerBuild
 
-Containerizing application to Docker daemon as [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m...
+Containerizing application to Docker daemon as [36mfineract-gl-sync:1.15.0-jib[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m...
 Base image 'azul/zulu-openjdk-alpine:21' does not use a specific image digest - build may not be reproducible
 [1mExecuting tasks:[0m
 [1m[                              ] 0.0% complete[0m
@@ -223,84 +219,84 @@ Base image 'azul/zulu-openjdk-alpine:21' does not use a specific image digest - 
 [6A[0J
 [1A[1mExecuting tasks:[0m
 [1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
 [1m> building dependencies layer[0m
 [1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
-[1m[0m
-[6A[0J
-[1A[1mExecuting tasks:[0m
-[1m[==                            ] 5.0% complete[0m
-[1m> building dependencies layer[0m
-[1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
 [1m> building resources layer[0m
 [1m[0m
 [7A[0J
 [1A[1mExecuting tasks:[0m
 [1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
 [1m> building dependencies layer[0m
 [1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
 [1m> building resources layer[0m
 [1m> building classes layer[0m
 [1m[0m
 [8A[0J
 [1A[1mExecuting tasks:[0m
 [1m[==                            ] 5.0% complete[0m
+[1m> pulling base image manifest[0m
 [1m> building dependencies layer[0m
 [1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
 [1m> building resources layer[0m
 [1m> building classes layer[0m
 [1m> building jvm arg files layer[0m
 [1m[0m
 [9A[0J
 [1A[1mExecuting tasks:[0m
+[1m[==                            ] 5.0% complete[0m
+[1m> building dependencies layer[0m
+[1m> building project dependencies layer[0m
+[1m> building resources layer[0m
+[1m> building classes layer[0m
+[1m> building jvm arg files layer[0m
+[1m> pulling base image manifest and container config[0m
+[1m[0m
+[9A[0J
+[1A[1mExecuting tasks:[0m
 [1m[===                           ] 9.0% complete[0m
 [1m> building dependencies layer[0m
 [1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
 [1m> building resources layer[0m
 [1m> building classes layer[0m
+[1m> pulling base image manifest and container config[0m
 [1m[0m
 [8A[0J
 [1A[1mExecuting tasks:[0m
 [1m[====                          ] 13.0% complete[0m
 [1m> building project dependencies layer[0m
-[1m> pulling base image manifest and container config[0m
 [1m> building resources layer[0m
 [1m> building classes layer[0m
+[1m> pulling base image manifest and container config[0m
 [1m[0m
 [7A[0J
 [1A[1mExecuting tasks:[0m
 [1m[=====                         ] 17.0% complete[0m
 [1m> building project dependencies layer[0m
+[1m> building classes layer[0m
 [1m> pulling base image manifest and container config[0m
-[1m> building resources layer[0m
 [1m[0m
 [6A[0J
 [1A[1mExecuting tasks:[0m
 [1m[======                        ] 21.0% complete[0m
+[1m> building classes layer[0m
 [1m> pulling base image manifest and container config[0m
-[1m> building resources layer[0m
 [1m[0m
 [5A[0J
 [1A[1mExecuting tasks:[0m
-[1m[========                      ] 25.0% complete[0m
-[1m> pulling base image manifest and container config[0m
-[1m[0m
-[4A[0J
-[1A[1mExecuting tasks:[0m
-[1m[=========                     ] 30.0% complete[0m
+[1m[========                      ] 26.0% complete[0m
 [1m> pulling base image manifest[0m
+[1m> building classes layer[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1AThe base image requires auth. Trying again for azul/zulu-openjdk-alpine:21...
 [1mExecuting tasks:[0m
-[1m[=========                     ] 30.0% complete[0m
+[1m[========                      ] 26.0% complete[0m
 [1m> pulling base image manifest[0m
+[1m> building classes layer[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry-1.docker.io
 
 Got output:
@@ -308,10 +304,11 @@ Got output:
 credentials not found in native keychain
 
 [1mExecuting tasks:[0m
-[1m[=========                     ] 30.0% complete[0m
+[1m[========                      ] 26.0% complete[0m
 [1m> pulling base image manifest[0m
+[1m> building classes layer[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: registry.hub.docker.com
 
 Got output:
@@ -319,10 +316,11 @@ Got output:
 credentials not found in native keychain
 
 [1mExecuting tasks:[0m
-[1m[=========                     ] 30.0% complete[0m
+[1m[========                      ] 26.0% complete[0m
 [1m> pulling base image manifest[0m
+[1m> building classes layer[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: index.docker.io
 
 Got output:
@@ -330,10 +328,11 @@ Got output:
 credentials not found in native keychain
 
 [1mExecuting tasks:[0m
-[1m[=========                     ] 30.0% complete[0m
+[1m[========                      ] 26.0% complete[0m
 [1m> pulling base image manifest[0m
+[1m> building classes layer[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1AThe credential helper (docker-credential-osxkeychain) has nothing for server URL: docker.io
 
 Got output:
@@ -341,6 +340,12 @@ Got output:
 credentials not found in native keychain
 
 [1mExecuting tasks:[0m
+[1m[========                      ] 26.0% complete[0m
+[1m> pulling base image manifest[0m
+[1m> building classes layer[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
 [1m[=========                     ] 30.0% complete[0m
 [1m> pulling base image manifest[0m
 [1m[0m
@@ -350,7 +355,7 @@ credentials not found in native keychain
 [1m> pulling base image manifest and container config[0m
 [1m[0m
 [4A[0J
-[1AUsing base image with digest: sha256:79fcb5d91dc3864f72739c3861a057ff51289c84c92b2b2a6ea056673200db8e
+[1AUsing base image with digest: sha256:267044fc1df96fe360e7b8af20fb2c68e2d31764116646ba576cbcd86164b84f
 [1mExecuting tasks:[0m
 [1m[=========                     ] 30.0% complete[0m
 [1m> pulling base image manifest and container config[0m
@@ -373,7 +378,7 @@ credentials not found in native keychain
 [4A[0J
 [1A[1mExecuting tasks:[0m
 [1m[==========                    ] 33.8% complete[0m
-[1m> pull container configuration sha256:f23f898eb...[0m
+[1m> pull container configuration sha256:e12f04481...[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
@@ -399,26 +404,440 @@ credentials not found in native keychain
 [1A[1mExecuting tasks:[0m
 [1m[============                  ] 40.0% complete[0m
 [1m> checking base image layer sha256:d3531b7a4f21...[0m
+[1m> checking base image layer sha256:949c0aa8920f...[0m
 [1m[0m
-[4A[0J
+[5A[0J
 [1A[1mExecuting tasks:[0m
 [1m[============                  ] 40.0% complete[0m
 [1m> checking base image layer sha256:d3531b7a4f21...[0m
-[1m> checking base image layer sha256:40e66a5ed501...[0m
-[1m> scheduling building manifests[0m
+[1m> checking base image layer sha256:949c0aa8920f...[0m
 [1m[0m
-[6A[0J
+[5A[0J
 [1A[1mExecuting tasks:[0m
 [1m[============                  ] 40.0% complete[0m
 [1m> checking base image layer sha256:d3531b7a4f21...[0m
-[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> checking base image layer sha256:949c0aa8920f...[0m
 [1m> scheduling building manifests[0m
 [1m[0m
 [6A[0J
 [1A[1mExecuting tasks:[0m
 [1m[===============               ] 50.0% complete[0m
-[1m> checking base image layer sha256:40e66a5ed501...[0m
+[1m> checking base image layer sha256:949c0aa8920f...[0m
 [1m> scheduling building manifests[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 50.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===============               ] 51.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 51.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 52.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 53.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[================              ] 54.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 55.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 56.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 57.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.0% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=================             ] 58.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.5% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 58.8% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.1% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.2% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.3% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.4% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.6% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.7% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
+[1m[0m
+[5A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==================            ] 59.9% complete[0m
+[1m> scheduling building manifests[0m
+[1m> pulling base image layer sha256:949c0aa8920f8...[0m
 [1m[0m
 [5A[0J
 [1A[1mExecuting tasks:[0m
@@ -460,7 +879,37 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[========================      ] 80.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.7% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -470,7 +919,47 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[========================      ] 80.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 81.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[========================      ] 81.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 81.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 81.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[========================      ] 81.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 81.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 81.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.0% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -480,7 +969,47 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[=========================     ] 82.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 82.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.2% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -490,7 +1019,32 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[=========================     ] 84.1% complete[0m
+[1m[=========================     ] 83.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 83.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.4% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -500,7 +1054,57 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 84.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[=========================     ] 85.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[==========================    ] 85.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.7% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -510,17 +1114,82 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[==========================    ] 85.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 86.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 86.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[==========================    ] 86.4% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[==========================    ] 87.2% complete[0m
+[1m[==========================    ] 86.5% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[==========================    ] 88.0% complete[0m
+[1m[==========================    ] 86.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 86.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 87.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 88.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[==========================    ] 88.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 88.4% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -530,7 +1199,52 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[===========================   ] 88.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 88.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 88.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[===========================   ] 89.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.6% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -540,7 +1254,62 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[===========================   ] 89.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[===========================   ] 90.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 90.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.1% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -550,17 +1319,62 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[===========================   ] 91.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 91.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 91.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[============================  ] 91.9% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================  ] 92.3% complete[0m
+[1m[============================  ] 92.1% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================  ] 92.6% complete[0m
+[1m[============================  ] 92.2% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.7% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -570,12 +1384,32 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[============================  ] 92.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.0% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[============================  ] 93.1% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================  ] 93.5% complete[0m
+[1m[============================  ] 93.3% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.6% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -585,7 +1419,22 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================  ] 94.0% complete[0m
+[1m[============================  ] 93.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 93.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.1% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.2% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -595,7 +1444,27 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================  ] 94.8% complete[0m
+[1m[============================  ] 94.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.5% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.7% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================  ] 94.9% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.1% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -605,7 +1474,22 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[============================= ] 95.6% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.8% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
+[1m[============================= ] 95.9% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -615,37 +1499,42 @@ credentials not found in native keychain
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
+[1m[============================= ] 96.4% complete[0m
+[1m> loading to Docker daemon[0m
+[1m[0m
+[4A[0J
+[1A[1mExecuting tasks:[0m
 [1m[============================= ] 96.8% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================= ] 97.2% complete[0m
+[1m[============================= ] 97.3% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================= ] 97.9% complete[0m
+[1m[============================= ] 97.7% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[============================= ] 98.3% complete[0m
+[1m[============================= ] 98.1% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[==============================] 98.8% complete[0m
+[1m[==============================] 98.5% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[==============================] 99.3% complete[0m
+[1m[==============================] 99.2% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
 [1A[1mExecuting tasks:[0m
-[1m[==============================] 99.8% complete[0m
+[1m[==============================] 99.7% complete[0m
 [1m> loading to Docker daemon[0m
 [1m[0m
 [4A[0J
@@ -658,7 +1547,17 @@ credentials not found in native keychain
 [1m[==============================] 100.0% complete[0m
 [1m[0m
 [3A[0J
-[1ABuilt image to Docker daemon as [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m
+[1ABuilt image to Docker daemon as [36mfineract-gl-sync:1.15.0-jib[0m, [36mfineract-gl-sync:1.15.0[0m, [36mfineract-gl-sync[0m
+[1mExecuting tasks:[0m
+[1m[==============================] 100.0% complete[0m
+[1m[0m
+[3A[0J
+[1A
+[33mA new version of jib-gradle-plugin (3.5.4) is available (currently using 3.5.3). Update your build configuration to use the latest features and fixes!
+https://github.com/GoogleContainerTools/jib/blob/master/jib-gradle-plugin/CHANGELOG.md[0m
+
+Please see https://github.com/GoogleContainerTools/jib/blob/master/docs/privacy.md for info on disabling this update check.
+
 [1mExecuting tasks:[0m
 [1m[==============================] 100.0% complete[0m
 [1m[0m
@@ -671,6 +1570,6 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 22s
-96 actionable tasks: 20 executed, 76 up-to-date
-EXIT=0
+BUILD SUCCESSFUL in 1m 38s
+96 actionable tasks: 22 executed, 7 from cache, 67 up-to-date
+make fineract-image FINERACT_IMAGE=fineract-gl-sync:1.15.0-jib  1.21s user 0.39s system 1% cpu 1:40.25 total
