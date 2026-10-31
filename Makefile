@@ -63,10 +63,12 @@ fineract-image: fineract-patch ## Build the customized Fineract image with the h
 test-java: fineract-patch ## Java unit tests for the customization (always re-run, never cached)
 	$(GRADLE) :fineract-core:test --rerun $(GL_UNIT_TESTS) :fineract-accounting:test --rerun $(GL_UNIT_TESTS)
 
+# One Gradle worker: on a first build, Fineract generates two large API clients and running both at once can exhaust
+# the build's memory.
 .PHONY: test-java-it
 test-java-it: fineract-patch ## Java integration tests against the running stack
 	cd $(FINERACT_DIR) && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=$${FINERACT_HOST_PORT:-58080} \
-		./gradlew :integration-tests:test --rerun $(GL_IT_TESTS) -PcargoDisabled --max-workers=2
+		./gradlew :integration-tests:test --rerun $(GL_IT_TESTS) -PcargoDisabled --max-workers=1
 
 # Proves the patch broke nothing that worked before: upstream's GL tests run next to ours. Upstream's tests need
 # Fineract's "test" Spring profile (see docker/fineract-test-profile.yml), so Fineract is restarted with it for the run
@@ -75,7 +77,7 @@ test-java-it: fineract-patch ## Java integration tests against the running stack
 test-java-regression: fineract-patch ## Upstream's GL integration tests + ours against Fineract in its "test" profile
 	docker compose $(TEST_PROFILE) up -d --wait fineract
 	cd $(FINERACT_DIR) && BACKEND_PROTOCOL=http BACKEND_HOST=localhost BACKEND_PORT=$${FINERACT_HOST_PORT:-58080} \
-		./gradlew :integration-tests:test --rerun $(GL_UPSTREAM_IT_TESTS) $(GL_IT_TESTS) -PcargoDisabled --max-workers=2; \
+		./gradlew :integration-tests:test --rerun $(GL_UPSTREAM_IT_TESTS) $(GL_IT_TESTS) -PcargoDisabled --max-workers=1; \
 		status=$$?; cd $(CURDIR) && docker compose up -d --wait fineract; exit $$status
 
 # --- Python ------------------------------------------------------------------------------------------------------
