@@ -364,6 +364,49 @@ def concurrent_different_references(stack: Stack) -> Evidence:
     )
 
 
+def fineract_last_line_of_defence(stack: Stack) -> Evidence:
+    evidence = Evidence(
+        "I2c Fineract alone, the last line of defence",
+        "Part I2: 10 simultaneous disbursements sent straight to Fineract, bypassing the integration service",
+    )
+    loan = stack.open_loan()
+    payment_type = next(
+        item["id"] for item in stack.fineract.get("/paymenttypes").json() if item["name"] == "Bank Transfer"
+    )
+    references = [stack.reference("RAW") for _ in range(10)]
+
+    def disburse_directly(index: int) -> int:
+        body = {
+            "externalId": references[index],
+            "actualDisbursementDate": SUBMITTED.isoformat(),
+            "transactionAmount": "5000000",
+            "paymentTypeId": payment_type,
+            "dateFormat": "yyyy-MM-dd",
+            "locale": "en",
+        }
+        return stack.fineract.post(f"/loans/external-id/{loan}", params={"command": "disburse"}, json=body).status_code
+
+    statuses = _simultaneously(10, disburse_directly)
+    disbursements = stack.fineract_transactions(loan, "disbursement")
+
+    evidence.initial_state = {"loan": loan, "Fineract": "approved, not disbursed"}
+    evidence.request = "10 x POST /loans/external-id/{loan}?command=disburse to Fineract, each with its own externalId"
+    evidence.response = {"Fineract statuses": sorted(statuses)}
+    evidence.fineract_state = {"disbursements": len(disbursements), "state": stack.fineract_state(loan)["status"]}
+    evidence.erp_state = "untouched: the integration service was bypassed"
+    evidence.integration_state = "untouched: the integration service was bypassed"
+    evidence.expected = "Exactly one disbursement: Fineract's loan state refuses the rest, with no help from us"
+    evidence.check("one request succeeded", statuses.count(200) == 1)
+    evidence.check("exactly one disbursement in Fineract", len(disbursements) == 1)
+    evidence.actual = _verdict(evidence)
+    evidence.explanation = (
+        "The integration's own layers (idempotency, the once-per-loan index, the lookup by external id) are bypassed "
+        "here on purpose. What remains is Fineract's loan state: once a single-tranche loan is disbursed, another "
+        "disbursement is refused. That is the last line of defence named in I2, shown on its own."
+    )
+    return evidence
+
+
 def concurrent_repayments(stack: Stack) -> Evidence:
     evidence = Evidence("I3 Concurrent repayments", "Part I3: 10 different references at once, plus duplicates of one")
     loan = stack.open_loan(disburse=True)
@@ -848,6 +891,7 @@ SCENARIOS: dict[str, Callable[[Stack], Evidence]] = {
     "duplicates": sequential_duplicates,
     "concurrent-same": concurrent_same_reference,
     "concurrent-different": concurrent_different_references,
+    "fineract-alone": fineract_last_line_of_defence,
     "concurrent-repayments": concurrent_repayments,
     "erp-down": erp_down_after_fineract,
     "fineract-down": fineract_down,

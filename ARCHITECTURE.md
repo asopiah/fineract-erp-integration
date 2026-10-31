@@ -228,7 +228,7 @@ unknown outcome too: deferred with backoff, never concluded.
 | 1. `UNIQUE (type, external_reference)` + fingerprint | The same reference processed twice. In-flight duplicates get 202, finished ones 200. | Different references for one loan pass |
 | 2. Partial unique index, one active approval/disbursement per loan | Different references disbursing one loan (409) | Lives only in our database, and a FAILED row frees the slot |
 | 3. Lookup by external id before submit; Fineract's unique `external_id` on clients, loans and loan transactions | Resubmitting what may already have been applied | Dedupes one reference only |
-| 4. **Fineract's loan state** (the last line of defence) | A second disbursement of a single-tranche loan, whatever the integration believes | It is the system of record: it decides |
+| 4. **Fineract's loan state** (the last line of defence) | A second disbursement of a single-tranche loan, whatever the integration believes. Shown on its own by simulation I2c: 10 disbursements sent straight to Fineract, one accepted. | It is the system of record: it decides |
 
 **Leases: one worker per operation at a time.** The request that created an operation and the recovery sweep could
 both try to work on it. A lease decides who may, without holding a database lock during HTTP calls:

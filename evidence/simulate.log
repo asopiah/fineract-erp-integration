@@ -12,15 +12,15 @@ A GL code and external id Fineract has never seen; a user who may only read GL a
 ```json
 {
   "POST /glaccounts (admin) x2, identical": {
-    "name": "Equipment 340D0A",
-    "glCode": "8210-340D0A",
+    "name": "Equipment 341659",
+    "glCode": "8593-341659",
     "type": 1,
     "usage": 1,
     "manualEntriesAllowed": false,
-    "externalId": "GL-PATCH-340D0A"
+    "externalId": "GL-PATCH-341659"
   },
   "POST /glaccounts (admin), same externalId, other name": {
-    "name": "Renamed 340D0A"
+    "name": "Renamed 341659"
   },
   "POST /glaccounts as a read-only user": "new externalId",
   "POST /users as integration_api": "outside its role"
@@ -34,15 +34,15 @@ A GL code and external id Fineract has never seen; a user who may only read GL a
   "create": [
     200,
     {
-      "resourceId": 16,
-      "resourceExternalId": "GL-PATCH-340D0A"
+      "resourceId": 20,
+      "resourceExternalId": "GL-PATCH-341659"
     }
   ],
   "identical replay": [
     200,
     {
-      "resourceId": 16,
-      "resourceExternalId": "GL-PATCH-340D0A"
+      "resourceId": 20,
+      "resourceExternalId": "GL-PATCH-341659"
     }
   ],
   "different definition": [
@@ -52,9 +52,9 @@ A GL code and external id Fineract has never seen; a user who may only read GL a
   "lookup by external id": [
     200,
     {
-      "id": 16,
-      "glCode": "8210-340D0A",
-      "externalId": "GL-PATCH-340D0A"
+      "id": 20,
+      "glCode": "8593-341659",
+      "externalId": "GL-PATCH-341659"
     }
   ],
   "read-only user creates": [
@@ -73,8 +73,8 @@ A GL code and external id Fineract has never seen; a user who may only read GL a
 {
   "acc_gl_account rows with this external_id": [
     [
-      16,
-      "8210-340D0A"
+      20,
+      "8593-341659"
     ]
   ],
   "unique constraint": [
@@ -145,7 +145,7 @@ Checks: 7/7 passed
 
 ```json
 {
-  "client_uid": "SME-340D0A-001",
+  "client_uid": "SME-341659-001",
   "in_fineract": false
 }
 ```
@@ -155,8 +155,8 @@ Checks: 7/7 passed
 ```json
 {
   "POST /api/clients": {
-    "external_reference": "CLI-340D0A-002",
-    "client_uid": "SME-340D0A-001",
+    "external_reference": "CLI-341659-002",
+    "client_uid": "SME-341659-001",
     "first_name": "Amina",
     "last_name": "Uwase",
     "activation_date": "2026-01-10"
@@ -173,27 +173,27 @@ Checks: 7/7 passed
     201,
     {
       "last_name": "Uwase",
-      "client_uid": "SME-340D0A-001",
+      "client_uid": "SME-341659-001",
       "first_name": "Amina",
-      "external_reference": "CLI-340D0A-002"
+      "external_reference": "CLI-341659-002"
     }
   ],
   "replay": [
     200,
     {
       "last_name": "Uwase",
-      "client_uid": "SME-340D0A-001",
+      "client_uid": "SME-341659-001",
       "first_name": "Amina",
-      "external_reference": "CLI-340D0A-002"
+      "external_reference": "CLI-341659-002"
     }
   ],
   "new reference, same client_uid": [
     409,
     "CLIENT_UID_TAKEN"
   ],
-  "GET /api/clients/SME-340D0A-001": {
-    "external_reference": "CLI-340D0A-002",
-    "client_uid": "SME-340D0A-001",
+  "GET /api/clients/SME-341659-001": {
+    "external_reference": "CLI-341659-002",
+    "client_uid": "SME-341659-001",
     "first_name": "Amina",
     "last_name": "Uwase",
     "fineract": {
@@ -211,7 +211,7 @@ Checks: 7/7 passed
 
 ```json
 {
-  "externalId": "SME-340D0A-001",
+  "externalId": "SME-341659-001",
   "displayName": "Amina Uwase",
   "active": true
 }
@@ -260,15 +260,15 @@ A new ERP account, unknown to Fineract
 ```json
 {
   "ERP POST /api/accounts x4": {
-    "code": "7210",
-    "name": "Equipment 340D0A",
+    "code": "7593",
+    "name": "Equipment 341659",
     "type": "ASSET",
     "currency": "RWF",
-    "external_reference": "GL-7210-340D0A"
+    "external_reference": "GL-7593-341659"
   },
   "POST /api/accounts/sync x4": {
     "external_references": [
-      "GL-7210-340D0A"
+      "GL-7593-341659"
     ]
   }
 }
@@ -286,9 +286,9 @@ A new ERP account, unknown to Fineract
   ],
   "sync 1 (Fineract down)": [
     {
-      "external_reference": "GL-7210-340D0A",
-      "code": "7210",
-      "name": "Equipment 340D0A",
+      "external_reference": "GL-7593-341659",
+      "code": "7593",
+      "name": "Equipment 341659",
       "erp_type": "ASSET",
       "status": "FAILED",
       "attempts": 1,
@@ -309,7 +309,7 @@ A new ERP account, unknown to Fineract
 {
   "GL accounts with this externalId": 1,
   "glCode": [
-    "7210"
+    "7593"
   ]
 }
 ```
@@ -361,8 +361,8 @@ Checks: 5/5 passed
 
 ```json
 {
-  "client_uid": "SME-340D0A-004",
-  "loan_reference": "LN-2026-000040"
+  "client_uid": "SME-341659-004",
+  "loan_reference": "LN-2026-000068"
 }
 ```
 
@@ -487,28 +487,28 @@ POST clients, loans, approve, disburse, 3 x repayments of 458400, payoff of Fine
 ```json
 [
   {
-    "reference": "DISB-340D0A-008",
-    "entry": "JE-000105",
+    "reference": "DISB-341659-008",
+    "entry": "JE-000175",
     "total": "5000000.000000"
   },
   {
-    "reference": "REP-340D0A-009",
-    "entry": "JE-000106",
+    "reference": "REP-341659-009",
+    "entry": "JE-000176",
     "total": "458400.000000"
   },
   {
-    "reference": "REP-340D0A-010",
-    "entry": "JE-000107",
+    "reference": "REP-341659-010",
+    "entry": "JE-000177",
     "total": "458400.000000"
   },
   {
-    "reference": "REP-340D0A-011",
-    "entry": "JE-000108",
+    "reference": "REP-341659-011",
+    "entry": "JE-000178",
     "total": "458400.000000"
   },
   {
-    "reference": "REP-340D0A-012",
-    "entry": "JE-000109",
+    "reference": "REP-341659-012",
+    "entry": "JE-000179",
     "total": "4125599.000000"
   }
 ]
@@ -558,7 +558,7 @@ Checks: 4/4 passed
 
 **2. Request**
 
-POST /api/loans/LN-2026-000041/disburse x4 with external_reference DISB-340D0A-017
+POST /api/loans/LN-2026-000069/disburse x4 with external_reference DISB-341659-017
 
 **3. Response**
 
@@ -623,7 +623,7 @@ Checks: 3/3 passed
 
 ```json
 {
-  "loan": "LN-2026-000042",
+  "loan": "LN-2026-000070",
   "status": "Approved",
   "disbursements": 0
 }
@@ -631,7 +631,7 @@ Checks: 3/3 passed
 
 **2. Request**
 
-10 simultaneous POST /api/loans/LN-2026-000042/disburse
+10 simultaneous POST /api/loans/LN-2026-000070/disburse
 
 **3. Response**
 
@@ -701,7 +701,7 @@ Checks: 2/2 passed
 
 ```json
 {
-  "loan": "LN-2026-000043",
+  "loan": "LN-2026-000071",
   "status": "Approved",
   "disbursements": 0
 }
@@ -709,7 +709,7 @@ Checks: 2/2 passed
 
 **2. Request**
 
-10 simultaneous POST /api/loans/LN-2026-000043/disburse
+10 simultaneous POST /api/loans/LN-2026-000071/disburse
 
 **3. Response**
 
@@ -771,6 +771,74 @@ Layers: (1) unique (type, external_reference) — same reference waits on one op
 
 Checks: 2/2 passed
 
+## I2c Fineract alone, the last line of defence — PASS
+
+*Covers: Part I2: 10 simultaneous disbursements sent straight to Fineract, bypassing the integration service*
+
+**1. Initial state**
+
+```json
+{
+  "loan": "LN-2026-000072",
+  "Fineract": "approved, not disbursed"
+}
+```
+
+**2. Request**
+
+10 x POST /loans/external-id/{loan}?command=disburse to Fineract, each with its own externalId
+
+**3. Response**
+
+```json
+{
+  "Fineract statuses": [
+    200,
+    403,
+    403,
+    403,
+    403,
+    403,
+    403,
+    403,
+    403,
+    403
+  ]
+}
+```
+
+**4. Fineract state**
+
+```json
+{
+  "disbursements": 1,
+  "state": "Active"
+}
+```
+
+**5. ERP state**
+
+untouched: the integration service was bypassed
+
+**6. Integration state**
+
+untouched: the integration service was bypassed
+
+**7. Expected result**
+
+Exactly one disbursement: Fineract's loan state refuses the rest, with no help from us
+
+**8. Actual result**
+
+- ✔ one request succeeded
+- ✔ exactly one disbursement in Fineract
+
+**9. Explanation**
+
+The integration's own layers (idempotency, the once-per-loan index, the lookup by external id) are bypassed here on purpose. What remains is Fineract's loan state: once a single-tranche loan is disbursed, another disbursement is refused. That is the last line of defence named in I2, shown on its own.
+
+Checks: 2/2 passed
+
 ## I3 Concurrent repayments — PASS
 
 *Covers: Part I3: 10 different references at once, plus duplicates of one*
@@ -790,7 +858,7 @@ Checks: 2/2 passed
 
 **2. Request**
 
-13 simultaneous POST /api/loans/LN-2026-000044/repayments (10 references, the first sent 4 times)
+13 simultaneous POST /api/loans/LN-2026-000073/repayments (10 references, the first sent 4 times)
 
 **3. Response**
 
@@ -871,7 +939,7 @@ ERP unavailable (injected); loan active
 
 **2. Request**
 
-POST /api/loans/LN-2026-000045/repayments REP-340D0A-057
+POST /api/loans/LN-2026-000074/repayments REP-341659-071
 
 **3. Response**
 
@@ -880,7 +948,7 @@ POST /api/loans/LN-2026-000045/repayments REP-340D0A-057
   "while ERP down": [
     202,
     {
-      "external_reference": "REP-340D0A-057",
+      "external_reference": "REP-341659-071",
       "operation": "REPAYMENT",
       "status": "ERP_PENDING",
       "detail": "recorded in Fineract; the ERP journal entry is being posted"
@@ -892,14 +960,14 @@ POST /api/loans/LN-2026-000045/repayments REP-340D0A-057
       "type": "REPAYMENT",
       "amount": "458400",
       "fee_portion": "0",
-      "loan_reference": "LN-2026-000045",
+      "loan_reference": "LN-2026-000074",
       "penalty_portion": "0",
-      "erp_entry_number": "JE-000125",
+      "erp_entry_number": "JE-000195",
       "interest_portion": "75000",
       "transaction_date": "2026-02-15",
       "outstanding_after": "4616600",
       "principal_portion": "383400",
-      "external_reference": "REP-340D0A-057",
+      "external_reference": "REP-341659-071",
       "overpayment_portion": "0"
     }
   ]
@@ -920,7 +988,7 @@ POST /api/loans/LN-2026-000045/repayments REP-340D0A-057
 ```json
 {
   "during": null,
-  "after": "JE-000125"
+  "after": "JE-000195"
 }
 ```
 
@@ -967,7 +1035,7 @@ Fineract unreachable (injected connection refused); loan approved
 
 **2. Request**
 
-POST /api/loans/LN-2026-000046/disburse DISB-340D0A-062, then the same request again
+POST /api/loans/LN-2026-000075/disburse DISB-341659-076, then the same request again
 
 **3. Response**
 
@@ -978,8 +1046,8 @@ POST /api/loans/LN-2026-000046/disburse DISB-340D0A-062, then the same request a
     {
       "error": {
         "code": "FINERACT_UNAVAILABLE",
-        "message": "Fineract did not process the request: GET /loans/external-id/LN-2026-000046/transactions/external-id/DISB-340D0A-062 not delivered: ConnectError('injected fault: Fineract unavailable')",
-        "correlation_id": "97d58f01-5de2-4442-858a-a73c4a8e7008"
+        "message": "Fineract did not process the request: GET /loans/external-id/LN-2026-000075/transactions/external-id/DISB-341659-076 not delivered: ConnectError('injected fault: Fineract unavailable')",
+        "correlation_id": "c56677a2-e508-4555-a5ce-10412a9fd71b"
       }
     }
   ],
@@ -1001,7 +1069,7 @@ POST /api/loans/LN-2026-000046/disburse DISB-340D0A-062, then the same request a
 ```json
 {
   "during": null,
-  "after": "JE-000126"
+  "after": "JE-000196"
 }
 ```
 
@@ -1048,7 +1116,7 @@ Fineract processes the command but the answer is lost (injected read timeout)
 
 **2. Request**
 
-POST /api/loans/LN-2026-000047/disburse DISB-340D0A-067 (X-Correlation-ID sim-j3-340D0A)
+POST /api/loans/LN-2026-000076/disburse DISB-341659-081 (X-Correlation-ID sim-j3-341659)
 
 **3. Response**
 
@@ -1059,14 +1127,14 @@ POST /api/loans/LN-2026-000047/disburse DISB-340D0A-067 (X-Correlation-ID sim-j3
     "type": "DISBURSEMENT",
     "amount": "5000000",
     "fee_portion": "0",
-    "loan_reference": "LN-2026-000047",
+    "loan_reference": "LN-2026-000076",
     "penalty_portion": "0",
-    "erp_entry_number": "JE-000127",
+    "erp_entry_number": "JE-000197",
     "interest_portion": "0",
     "transaction_date": "2026-01-15",
     "outstanding_after": "5000000",
     "principal_portion": "0",
-    "external_reference": "DISB-340D0A-067",
+    "external_reference": "DISB-341659-081",
     "overpayment_portion": "0"
   }
 ]
@@ -1084,7 +1152,7 @@ POST /api/loans/LN-2026-000047/disburse DISB-340D0A-067 (X-Correlation-ID sim-j3
 
 ```json
 {
-  "entry": "JE-000127"
+  "entry": "JE-000197"
 }
 ```
 
@@ -1095,7 +1163,7 @@ POST /api/loans/LN-2026-000047/disburse DISB-340D0A-067 (X-Correlation-ID sim-j3
   "operation": "COMPLETED",
   "executor log trail": [
     "FINERACT_PENDING: operation fineract_pending",
-    "FINERACT_PENDING: Fineract attempt 1 failed: POST /loans/external-id/LN-2026-000047 outcome unknown: ReadTimeout('injected fault: response lost after Fineract processed it')",
+    "FINERACT_PENDING: Fineract attempt 1 failed: POST /loans/external-id/LN-2026-000076 outcome unknown: ReadTimeout('injected fault: response lost after Fineract processed it')",
     "FINERACT_PENDING: already in Fineract, not submitting again",
     "FINERACT_DONE: operation fineract_done",
     "ERP_PENDING: operation erp_pending",
@@ -1132,7 +1200,7 @@ The ERP commits journal entries, then holds the answer past the integration's 5 
 
 **2. Request**
 
-POST /api/loans/LN-2026-000048/repayments REP-340D0A-073
+POST /api/loans/LN-2026-000077/repayments REP-341659-087
 
 **3. Response**
 
@@ -1140,7 +1208,7 @@ POST /api/loans/LN-2026-000048/repayments REP-340D0A-073
 [
   202,
   {
-    "external_reference": "REP-340D0A-073",
+    "external_reference": "REP-341659-087",
     "operation": "REPAYMENT",
     "status": "ERP_PENDING",
     "detail": "recorded in Fineract; the ERP journal entry is being posted"
@@ -1160,7 +1228,7 @@ POST /api/loans/LN-2026-000048/repayments REP-340D0A-073
 
 ```json
 {
-  "during": "JE-000129",
+  "during": "JE-000199",
   "entries with this reference after the retry": 1
 }
 ```
@@ -1203,7 +1271,7 @@ The integration service exits right after Fineract confirms (injected); compose 
 
 **2. Request**
 
-POST /api/loans/LN-2026-000049/disburse DISB-340D0A-078
+POST /api/loans/LN-2026-000078/disburse DISB-341659-092
 
 **3. Response**
 
@@ -1227,7 +1295,7 @@ POST /api/loans/LN-2026-000049/disburse DISB-340D0A-078
 ```json
 {
   "during": null,
-  "after": "JE-000130"
+  "after": "JE-000200"
 }
 ```
 
@@ -1272,11 +1340,11 @@ Two transactions through the integration, plus three seeded directly in one syst
 {
   "POST /api/reconciliation": {
     "external_references": [
-      "DISB-340D0A-083",
-      "REP-340D0A-084",
-      "TELLER-340D0A-085",
-      "MANUAL-340D0A-086",
-      "TELLER-340D0A-087"
+      "DISB-341659-097",
+      "REP-341659-098",
+      "TELLER-341659-099",
+      "MANUAL-341659-100",
+      "TELLER-341659-101"
     ]
   }
 }
@@ -1290,11 +1358,11 @@ Two transactions through the integration, plus three seeded directly in one syst
     "from_date": null,
     "to_date": null,
     "external_references": [
-      "DISB-340D0A-083",
-      "MANUAL-340D0A-086",
-      "REP-340D0A-084",
-      "TELLER-340D0A-085",
-      "TELLER-340D0A-087"
+      "DISB-341659-097",
+      "MANUAL-341659-100",
+      "REP-341659-098",
+      "TELLER-341659-099",
+      "TELLER-341659-101"
     ]
   },
   "summary": {
@@ -1305,8 +1373,8 @@ Two transactions through the integration, plus three seeded directly in one syst
   },
   "items": [
     {
-      "external_reference": "DISB-340D0A-083",
-      "loan_reference": "LN-2026-000050",
+      "external_reference": "DISB-341659-097",
+      "loan_reference": "LN-2026-000079",
       "outcome": "MATCHED",
       "note": null,
       "fineract": {
@@ -1316,28 +1384,28 @@ Two transactions through the integration, plus three seeded directly in one syst
         "reversed": false
       },
       "erp": {
-        "entry_number": "JE-000131",
+        "entry_number": "JE-000201",
         "type": "DISBURSEMENT",
         "entry_date": "2026-01-15",
         "amount": "5000000"
       }
     },
     {
-      "external_reference": "MANUAL-340D0A-086",
+      "external_reference": "MANUAL-341659-100",
       "loan_reference": null,
       "outcome": "MISSING_IN_FINERACT",
       "note": null,
       "fineract": null,
       "erp": {
-        "entry_number": "JE-000133",
+        "entry_number": "JE-000203",
         "type": "REPAYMENT",
         "entry_date": "2026-03-15",
         "amount": "75000"
       }
     },
     {
-      "external_reference": "REP-340D0A-084",
-      "loan_reference": "LN-2026-000050",
+      "external_reference": "REP-341659-098",
+      "loan_reference": "LN-2026-000079",
       "outcome": "MATCHED",
       "note": null,
       "fineract": {
@@ -1347,15 +1415,15 @@ Two transactions through the integration, plus three seeded directly in one syst
         "reversed": false
       },
       "erp": {
-        "entry_number": "JE-000132",
+        "entry_number": "JE-000202",
         "type": "REPAYMENT",
         "entry_date": "2026-02-15",
         "amount": "458400"
       }
     },
     {
-      "external_reference": "TELLER-340D0A-085",
-      "loan_reference": "LN-2026-000050",
+      "external_reference": "TELLER-341659-099",
+      "loan_reference": "LN-2026-000079",
       "outcome": "MISSING_IN_ERP",
       "note": null,
       "fineract": {
@@ -1367,8 +1435,8 @@ Two transactions through the integration, plus three seeded directly in one syst
       "erp": null
     },
     {
-      "external_reference": "TELLER-340D0A-087",
-      "loan_reference": "LN-2026-000050",
+      "external_reference": "TELLER-341659-101",
+      "loan_reference": "LN-2026-000079",
       "outcome": "AMOUNT_MISMATCH",
       "note": null,
       "fineract": {
@@ -1378,7 +1446,7 @@ Two transactions through the integration, plus three seeded directly in one syst
         "reversed": false
       },
       "erp": {
-        "entry_number": "JE-000134",
+        "entry_number": "JE-000204",
         "type": "REPAYMENT",
         "entry_date": "2026-03-20",
         "amount": "90000"
@@ -1443,8 +1511,8 @@ Checks: 5/5 passed
 
 ```json
 {
-  "loan": "LN-2026-000051",
-  "repayment": "REP-340D0A-093",
+  "loan": "LN-2026-000080",
+  "repayment": "REP-341659-107",
   "Fineract after the repayment": {
     "status": "Active",
     "principal_outstanding": 4616600.0,
@@ -1460,10 +1528,10 @@ Checks: 5/5 passed
 
 ```json
 {
-  "POST /api/loans/LN-2026-000051/repayments/REP-340D0A-093/reversal x2": {
-    "external_reference": "REV-340D0A-094"
+  "POST /api/loans/LN-2026-000080/repayments/REP-341659-107/reversal x2": {
+    "external_reference": "REV-341659-108"
   },
-  "then": "REV-340D0A-094-B"
+  "then": "REV-341659-108-B"
 }
 ```
 
@@ -1474,11 +1542,11 @@ Checks: 5/5 passed
   "reversal": [
     201,
     {
-      "loan_reference": "LN-2026-000051",
+      "loan_reference": "LN-2026-000080",
       "reversed_amount": "458400",
-      "erp_entry_number": "JE-000137",
-      "external_reference": "REV-340D0A-094",
-      "repayment_reference": "REP-340D0A-093"
+      "erp_entry_number": "JE-000207",
+      "external_reference": "REV-341659-108",
+      "repayment_reference": "REP-341659-107"
     }
   ],
   "replay": 200,
@@ -1495,7 +1563,7 @@ Checks: 5/5 passed
 {
   "repayment": {
     "manuallyReversed": true,
-    "reversalExternalId": "REV-340D0A-094",
+    "reversalExternalId": "REV-341659-108",
     "amount": 458400.0
   },
   "after": {
@@ -1531,7 +1599,7 @@ Checks: 5/5 passed
     }
   ],
   "reversing entry": [
-    "JE-000137",
+    "JE-000207",
     [
       {
         "account_code": "1100",
@@ -1558,10 +1626,10 @@ Checks: 5/5 passed
 ```json
 {
   "reconciliation": {
-    "external_reference": "REP-340D0A-093",
-    "loan_reference": "LN-2026-000051",
+    "external_reference": "REP-341659-107",
+    "loan_reference": "LN-2026-000080",
     "outcome": "MATCHED",
-    "note": "reversed in Fineract; the ERP entry is reversed by JE-000137",
+    "note": "reversed in Fineract; the ERP entry is reversed by JE-000207",
     "fineract": {
       "type": "REPAYMENT",
       "transaction_date": "2026-02-15",
@@ -1569,7 +1637,7 @@ Checks: 5/5 passed
       "reversed": true
     },
     "erp": {
-      "entry_number": "JE-000136",
+      "entry_number": "JE-000206",
       "type": "REPAYMENT",
       "entry_date": "2026-02-15",
       "amount": "458400"
@@ -1609,7 +1677,7 @@ ERP unavailable for one call, so the trail shows a deferral and recovery
 
 **2. Request**
 
-POST /api/loans/LN-2026-000052/repayments FIN-2026-340D0A-095, then GET /api/transactions/FIN-2026-340D0A-095
+POST /api/loans/LN-2026-000081/repayments FIN-2026-341659-109, then GET /api/transactions/FIN-2026-341659-109
 
 **3. Response**
 
@@ -1618,30 +1686,30 @@ POST /api/loans/LN-2026-000052/repayments FIN-2026-340D0A-095, then GET /api/tra
   "first answer": [
     202,
     {
-      "external_reference": "FIN-2026-340D0A-095",
+      "external_reference": "FIN-2026-341659-109",
       "operation": "REPAYMENT",
       "status": "ERP_PENDING",
       "detail": "recorded in Fineract; the ERP journal entry is being posted"
     }
   ],
   "lookup": {
-    "external_reference": "FIN-2026-340D0A-095",
+    "external_reference": "FIN-2026-341659-109",
     "type": "REPAYMENT",
-    "loan_reference": "LN-2026-000052",
-    "client_uid": "SME-340D0A-096",
+    "loan_reference": "LN-2026-000081",
+    "client_uid": "SME-341659-110",
     "status": "COMPLETED",
-    "correlation_id": "partner-FIN-2026-340D0A-095",
+    "correlation_id": "partner-FIN-2026-341659-109",
     "attempts": 0,
     "next_attempt_at": null,
     "error": null,
     "requested": {
       "amount": "458400",
       "transaction_date": "2026-02-15",
-      "external_reference": "FIN-2026-340D0A-095"
+      "external_reference": "FIN-2026-341659-109"
     },
     "recorded": {
-      "external_reference": "FIN-2026-340D0A-095",
-      "loan_reference": "LN-2026-000052",
+      "external_reference": "FIN-2026-341659-109",
+      "loan_reference": "LN-2026-000081",
       "type": "REPAYMENT",
       "transaction_date": "2026-02-15",
       "amount": "458400",
@@ -1651,10 +1719,10 @@ POST /api/loans/LN-2026-000052/repayments FIN-2026-340D0A-095, then GET /api/tra
       "penalty_portion": "0",
       "overpayment_portion": "0",
       "outstanding_after": "4616600",
-      "erp_entry_number": "JE-000139"
+      "erp_entry_number": "JE-000209"
     },
-    "created_at": "2026-10-31T18:54:59.974040Z",
-    "updated_at": "2026-10-31T18:55:02.396470Z"
+    "created_at": "2026-10-31T19:24:56.569557Z",
+    "updated_at": "2026-10-31T19:24:59.002822Z"
   }
 }
 ```
@@ -1673,67 +1741,67 @@ POST /api/loans/LN-2026-000052/repayments FIN-2026-340D0A-095, then GET /api/tra
 {
   "log trail": [
     {
-      "timestamp": "2026-10-31T18:54:59.976623+00:00",
+      "timestamp": "2026-10-31T19:24:56.571755+00:00",
       "service": "integration-service",
       "event": "operation fineract_pending",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "FINERACT_PENDING",
       "fineract_transaction_id": null,
       "erp_transaction_id": null
     },
     {
-      "timestamp": "2026-10-31T18:55:00.297581+00:00",
+      "timestamp": "2026-10-31T19:24:56.880136+00:00",
       "service": "integration-service",
       "event": "submitted to Fineract",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "FINERACT_PENDING",
       "fineract_transaction_id": null,
       "erp_transaction_id": null
     },
     {
-      "timestamp": "2026-10-31T18:55:00.299433+00:00",
+      "timestamp": "2026-10-31T19:24:56.882972+00:00",
       "service": "integration-service",
       "event": "operation fineract_done",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "FINERACT_DONE",
-      "fineract_transaction_id": 188,
+      "fineract_transaction_id": 288,
       "erp_transaction_id": null
     },
     {
-      "timestamp": "2026-10-31T18:55:00.300729+00:00",
+      "timestamp": "2026-10-31T19:24:56.884627+00:00",
       "service": "integration-service",
       "event": "operation erp_pending",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "ERP_PENDING",
       "fineract_transaction_id": null,
       "erp_transaction_id": null
     },
     {
-      "timestamp": "2026-10-31T18:55:00.305651+00:00",
+      "timestamp": "2026-10-31T19:24:56.890879+00:00",
       "service": "integration-service",
       "event": "deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable (injected fault)",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "ERP_PENDING",
       "fineract_transaction_id": null,
       "erp_transaction_id": null
     },
     {
-      "timestamp": "2026-10-31T18:55:02.389490+00:00",
+      "timestamp": "2026-10-31T19:24:58.994761+00:00",
       "service": "mock-erp",
       "event": "journal entry posted",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "POSTED",
       "fineract_transaction_id": null,
-      "erp_transaction_id": "JE-000139"
+      "erp_transaction_id": "JE-000209"
     },
     {
-      "timestamp": "2026-10-31T18:55:02.395183+00:00",
+      "timestamp": "2026-10-31T19:24:59.001208+00:00",
       "service": "integration-service",
       "event": "operation completed",
-      "correlation_id": "partner-FIN-2026-340D0A-095",
+      "correlation_id": "partner-FIN-2026-341659-109",
       "status": "COMPLETED",
       "fineract_transaction_id": null,
-      "erp_transaction_id": "JE-000139"
+      "erp_transaction_id": "JE-000209"
     }
   ]
 }

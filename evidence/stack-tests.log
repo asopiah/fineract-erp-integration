@@ -6,23 +6,24 @@ rootdir: /Users/sopia/workspace/assessments/fineract-erp-integration/integration
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.15.1
-collecting ... collected 145 items / 129 deselected / 16 selected
+collecting ... collected 146 items / 129 deselected / 17 selected
 
-tests/stack/test_simulations.py::test_simulation[gl-patch] PASSED        [  6%]
-tests/stack/test_simulations.py::test_simulation[client] PASSED          [ 12%]
-tests/stack/test_simulations.py::test_simulation[gl-sync] PASSED         [ 18%]
-tests/stack/test_simulations.py::test_simulation[lifecycle] PASSED       [ 25%]
-tests/stack/test_simulations.py::test_simulation[duplicates] PASSED      [ 31%]
-tests/stack/test_simulations.py::test_simulation[concurrent-same] PASSED [ 37%]
-tests/stack/test_simulations.py::test_simulation[concurrent-different] PASSED [ 43%]
-tests/stack/test_simulations.py::test_simulation[concurrent-repayments] PASSED [ 50%]
-tests/stack/test_simulations.py::test_simulation[erp-down] PASSED        [ 56%]
-tests/stack/test_simulations.py::test_simulation[fineract-down] PASSED   [ 62%]
-tests/stack/test_simulations.py::test_simulation[fineract-timeout] PASSED [ 68%]
-tests/stack/test_simulations.py::test_simulation[erp-timeout] PASSED     [ 75%]
-tests/stack/test_simulations.py::test_simulation[crash] PASSED           [ 81%]
-tests/stack/test_simulations.py::test_simulation[reconciliation] PASSED  [ 87%]
-tests/stack/test_simulations.py::test_simulation[reversal] PASSED        [ 93%]
+tests/stack/test_simulations.py::test_simulation[gl-patch] PASSED        [  5%]
+tests/stack/test_simulations.py::test_simulation[client] PASSED          [ 11%]
+tests/stack/test_simulations.py::test_simulation[gl-sync] PASSED         [ 17%]
+tests/stack/test_simulations.py::test_simulation[lifecycle] PASSED       [ 23%]
+tests/stack/test_simulations.py::test_simulation[duplicates] PASSED      [ 29%]
+tests/stack/test_simulations.py::test_simulation[concurrent-same] PASSED [ 35%]
+tests/stack/test_simulations.py::test_simulation[concurrent-different] PASSED [ 41%]
+tests/stack/test_simulations.py::test_simulation[fineract-alone] PASSED  [ 47%]
+tests/stack/test_simulations.py::test_simulation[concurrent-repayments] PASSED [ 52%]
+tests/stack/test_simulations.py::test_simulation[erp-down] PASSED        [ 58%]
+tests/stack/test_simulations.py::test_simulation[fineract-down] PASSED   [ 64%]
+tests/stack/test_simulations.py::test_simulation[fineract-timeout] PASSED [ 70%]
+tests/stack/test_simulations.py::test_simulation[erp-timeout] PASSED     [ 76%]
+tests/stack/test_simulations.py::test_simulation[crash] PASSED           [ 82%]
+tests/stack/test_simulations.py::test_simulation[reconciliation] PASSED  [ 88%]
+tests/stack/test_simulations.py::test_simulation[reversal] PASSED        [ 94%]
 tests/stack/test_simulations.py::test_simulation[trace] PASSED           [100%]
 
-================ 16 passed, 129 deselected in 88.93s (0:01:28) =================
+================ 17 passed, 129 deselected in 100.52s (0:01:40) ================

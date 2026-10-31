@@ -242,6 +242,7 @@ One simulation at a time: `make simulate-<name>` (`make simulations` lists them)
 | I1 Sequential duplicates | `duplicates` | | J5 Crash | `crash` |
 | I2a Concurrent, same reference | `concurrent-same` | | K Reconciliation | `reconciliation` |
 | I2b Concurrent, different references | `concurrent-different` | | Trace one reference | `trace` |
+| I2c Fineract alone, our service bypassed | `fineract-alone` | | | |
 | I3 Concurrent repayments | `concurrent-repayments` | | Stretch: repayment reversal | `reversal` |
 
 The Postman collection runs the lifecycle too: `npx newman run postman/collection.json`.
