@@ -120,7 +120,9 @@ transient failure. A business key with a definition check is the right tool here
 ## Build
 
 `docker compose up` builds the image from `Dockerfile` when it is missing: it clones the tag, verifies the commit,
-applies the patch and builds with Gradle (about 15–20 minutes the first time).
+applies the patch and builds with Gradle (about 15–20 minutes the first time). Gradle's downloads and build cache are
+kept in a BuildKit cache mount, so a rebuild after a patch change takes about a minute: in a measured run, 52 s
+instead of 13 min 27 s, recompiling only `fineract-accounting`.
 
 With JDK 21 installed, `make fineract-image` builds the same code faster with Fineract's own Jib setup (about 8
 minutes). It clones the tag into `upstream/fineract`, applies the patch, and tags the image `fineract-gl-sync:1.15.0`.

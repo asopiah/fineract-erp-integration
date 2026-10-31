@@ -16,7 +16,10 @@ COPY gl-account-external-id.patch /tmp/
 RUN git apply /tmp/gl-account-external-id.patch
 
 # gradle.properties asks for a 12 GB heap; a container build gets a size it can actually have.
-RUN sed -i 's/-Xmx12g/-Xmx3g/' gradle.properties \
+# Gradle's downloads and build cache live in a BuildKit cache mount that outlasts the build, so a rebuild after a
+# patch change downloads nothing and recompiles only the modules the change touches. The first build is unaffected.
+RUN --mount=type=cache,target=/root/.gradle,sharing=locked \
+    sed -i 's/-Xmx12g/-Xmx3g/' gradle.properties \
     && ./gradlew --no-daemon :fineract-provider:bootJar -x test \
     && cp "fineract-provider/build/libs/fineract-provider-${FINERACT_TAG}.jar" /fineract-provider.jar
 

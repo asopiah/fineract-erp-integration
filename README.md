@@ -258,6 +258,7 @@ make down    # stops everything and deletes the data, so the next `make up` star
 | Fineract exits or restarts during the first start | Docker needs about 6 GB of memory (Docker Desktop → Settings → Resources). |
 | A code change doesn't show up | `docker compose up -d --build --wait <service>`. For the Java patch: `make fineract-image`, then `docker compose up -d --wait fineract`. Compose doesn't rebuild an image it already has. |
 | You want a clean slate | `make down && make up` |
+| Docker runs out of disk | `docker builder prune` frees the build cache, including Gradle's (the next Fineract build is a full one again). |
 | Something failed and you want to know why | `docker compose logs <service>`. Each log line is JSON with a `correlation_id`; every API response carries the same id in `X-Correlation-ID`. |
 
 ## Read next
