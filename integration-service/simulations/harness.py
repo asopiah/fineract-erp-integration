@@ -27,6 +27,7 @@ ERP_URL = os.environ.get("STACK_ERP_URL", "http://localhost:58001")
 FINERACT_URL = os.environ.get("STACK_FINERACT_URL", "http://localhost:58080/fineract-provider/api/v1")
 INTEGRATION_DB = os.environ.get("STACK_INTEGRATION_DB", "postgresql://postgres:postgres@localhost:55432/integration")
 ERP_DB = os.environ.get("STACK_ERP_DB", "postgresql://postgres:postgres@localhost:55432/mock_erp")
+FINERACT_DB = os.environ.get("STACK_FINERACT_DB", "postgresql://postgres:postgres@localhost:55432/fineract_default")
 
 ACTIVATION = date(2026, 1, 10)
 SUBMITTED = date(2026, 1, 15)
@@ -46,6 +47,15 @@ class Stack:
         )
         self.run = uuid.uuid4().hex[:6].upper()
         self._sequence = itertools.count(1)
+
+    def fineract_as(self, username: str, password: str) -> httpx.Client:
+        """Fineract under another user's credentials, to show what that user may and may not do."""
+        return httpx.Client(
+            base_url=FINERACT_URL,
+            auth=(username, password),
+            headers={"Fineract-Platform-TenantId": "default"},
+            timeout=30,
+        )
 
     def reference(self, prefix: str) -> str:
         return f"{prefix}-{self.run}-{next(self._sequence):03d}"

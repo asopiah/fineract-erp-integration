@@ -12,7 +12,10 @@ from typing import Any
 import httpx
 
 from simulations.evidence import Evidence
-from simulations.harness import REPOSITORY, SUBMITTED, Stack, wait_until
+from simulations.harness import FINERACT_DB, REPOSITORY, SUBMITTED, Stack, wait_until
+
+# The bootstrap's default password for integration_api (BOOTSTRAP_API_PASSWORD), reused for the simulation's users.
+INTEGRATION_API_PASSWORD = "Integration#2026"
 
 
 def client_identity(stack: Stack) -> Evidence:
@@ -63,6 +66,126 @@ def client_identity(stack: Stack) -> Evidence:
         "lookup reads Fineract by external id, so Fineract's numeric id never reaches the partner."
     )
     return evidence
+
+
+def fineract_gl_patch(stack: Stack) -> Evidence:
+    evidence = Evidence("Fineract GL patch", "Part A behaviours 1-4, directly against the customized Fineract")
+    external_id = f"GL-PATCH-{stack.run}"
+    account = {
+        "name": f"Equipment {stack.run}",
+        "glCode": f"8{int(stack.run, 16) % 1000:03d}-{stack.run}",
+        "type": 1,
+        "usage": 1,
+        "manualEntriesAllowed": False,
+        "externalId": external_id,
+    }
+
+    created = stack.fineract.post("/glaccounts", json=account)
+    replayed = stack.fineract.post("/glaccounts", json=account)
+    conflict = stack.fineract.post("/glaccounts", json={**account, "name": f"Renamed {stack.run}"})
+    found = stack.fineract.get(f"/glaccounts/external-id/{external_id}")
+
+    reader = _fineract_user_with(stack, ["READ_GLACCOUNT"])
+    denied = reader.post("/glaccounts", json={**account, "externalId": f"{external_id}-R", "glCode": "R" + stack.run})
+    reader_lookup = reader.get(f"/glaccounts/external-id/{external_id}")
+    integration_api = stack.fineract_as("integration_api", INTEGRATION_API_PASSWORD)
+    api_lookup = integration_api.get(f"/glaccounts/external-id/{external_id}")
+    api_creates_user = integration_api.post("/users", json={"username": f"x{stack.run}".lower()})
+
+    rows = stack.sql("SELECT id, gl_code FROM acc_gl_account WHERE external_id = %s", external_id, database=FINERACT_DB)
+    constraint = stack.sql(
+        "SELECT conname FROM pg_constraint WHERE conname = 'acc_gl_external_id'", database=FINERACT_DB
+    )
+    migration = stack.sql(
+        "SELECT filename, id FROM databasechangelog WHERE filename LIKE %s ORDER BY id",
+        "%0001_gl_account_external_id.xml",
+        database=FINERACT_DB,
+    )
+    permissions = stack.sql(
+        "SELECT p.code FROM m_role r JOIN m_role_permission rp ON rp.role_id = r.id "
+        "JOIN m_permission p ON p.id = rp.permission_id WHERE r.name = 'Integration API' ORDER BY p.code",
+        database=FINERACT_DB,
+    )
+
+    evidence.initial_state = "A GL code and external id Fineract has never seen; a user who may only read GL accounts"
+    evidence.request = {
+        "POST /glaccounts (admin) x2, identical": account,
+        "POST /glaccounts (admin), same externalId, other name": {"name": f"Renamed {stack.run}"},
+        "POST /glaccounts as a read-only user": "new externalId",
+        "POST /users as integration_api": "outside its role",
+    }
+    evidence.response = {
+        "create": [created.status_code, created.json()],
+        "identical replay": [replayed.status_code, replayed.json()],
+        "different definition": [conflict.status_code, conflict.json().get("userMessageGlobalisationCode")],
+        "lookup by external id": [found.status_code, {k: found.json().get(k) for k in ("id", "glCode", "externalId")}],
+        "read-only user creates": [denied.status_code, denied.json().get("userMessageGlobalisationCode")],
+        "read-only user looks up": reader_lookup.status_code,
+        "integration_api looks up": api_lookup.status_code,
+        "integration_api creates a user": api_creates_user.status_code,
+    }
+    evidence.fineract_state = {
+        "acc_gl_account rows with this external_id": [list(row) for row in rows],
+        "unique constraint": [row[0] for row in constraint],
+        "Liquibase changeSets applied": [list(row) for row in migration],
+        "Integration API role permissions": [row[0] for row in permissions],
+    }
+    evidence.expected = (
+        "Created once; the identical replay returns the same id; a different definition gets 409; the account is "
+        "found by its external id; a user without CREATE_GLACCOUNT gets 403; integration_api can do its job and "
+        "nothing else"
+    )
+    evidence.check("created", created.status_code == 200)
+    evidence.check(
+        "replay returns the same account",
+        replayed.status_code == 200 and replayed.json()["resourceId"] == created.json()["resourceId"],
+    )
+    evidence.check(
+        "different definition is a 409",
+        conflict.status_code == 409
+        and conflict.json().get("userMessageGlobalisationCode") == "error.msg.glaccount.external.id.conflict",
+    )
+    evidence.check("one row, found by external id", len(rows) == 1 and found.json().get("externalId") == external_id)
+    evidence.check("unique constraint and migration present", len(constraint) == 1 and len(migration) == 2)
+    evidence.check(
+        "create needs CREATE_GLACCOUNT",
+        denied.status_code == 403 and reader_lookup.status_code == 200,
+    )
+    evidence.check(
+        "integration_api has least privilege", api_lookup.status_code == 200 and api_creates_user.status_code == 403
+    )
+    evidence.actual = _verdict(evidence)
+    evidence.explanation = (
+        "The rules run inside Fineract's own GLACCOUNT/CREATE command, so the permission check, the audit trail and "
+        "the command retry still apply. The external id is unique in the database (acc_gl_external_id, added by the "
+        "patch's Liquibase changeSets), and a replay is compared field by field with the stored account. The same "
+        "behaviours, including 10 concurrent creates, are pinned by the JUnit integration test."
+    )
+    return evidence
+
+
+def _fineract_user_with(stack: Stack, permissions: list[str]) -> httpx.Client:
+    """A fresh Fineract role and user holding exactly ``permissions``."""
+    role = stack.fineract.post("/roles", json={"name": f"Reader {stack.run}", "description": "simulation"})
+    role_id = role.json()["resourceId"]
+    stack.fineract.put(f"/roles/{role_id}/permissions", json={"permissions": dict.fromkeys(permissions, True)})
+    username = f"reader_{stack.run}".lower()
+    stack.fineract.post(
+        "/users",
+        json={
+            "username": username,
+            "firstname": "GL",
+            "lastname": "Reader",
+            "email": "gl.reader@example.com",
+            "officeId": 1,
+            "roles": [role_id],
+            "sendPasswordToEmail": False,
+            "password": INTEGRATION_API_PASSWORD,
+            "repeatPassword": INTEGRATION_API_PASSWORD,
+            "passwordNeverExpires": True,
+        },
+    ).raise_for_status()
+    return stack.fineract_as(username, INTEGRATION_API_PASSWORD)
 
 
 def gl_account_sync(stack: Stack) -> Evidence:
@@ -592,6 +715,7 @@ def trace_one_reference(stack: Stack) -> Evidence:
 
 
 SCENARIOS: dict[str, Callable[[Stack], Evidence]] = {
+    "gl-patch": fineract_gl_patch,
     "client": client_identity,
     "gl-sync": gl_account_sync,
     "lifecycle": loan_lifecycle,
