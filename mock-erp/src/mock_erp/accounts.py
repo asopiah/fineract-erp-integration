@@ -24,7 +24,12 @@ def create_account(session: Session, request: AccountIn) -> tuple[Account, bool]
         ensure_same_request(existing.request_fingerprint, request_fingerprint, request.external_reference)
         return existing, False
     if session.scalar(select(Account.id).where(Account.code == request.code)) is not None:
-        raise _code_taken(request.code)
+        # The code may belong to this very account, committed by a concurrent request since the lookup above.
+        winner = _find_by_reference(session, request.external_reference)
+        if winner is None:
+            raise _code_taken(request.code)
+        ensure_same_request(winner.request_fingerprint, request_fingerprint, request.external_reference)
+        return winner, False
 
     account = Account(
         code=request.code,
