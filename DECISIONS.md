@@ -25,6 +25,17 @@ The options were a new endpoint, an extension of the existing GL command handler
 
 The details, including the edge cases, are in [fineract-customization/README.md](fineract-customization/README.md).
 
+## Fineract 1.15.0, not 1.16.x
+
+The brief asks for an official release tag, pinned. 1.15.0 was the newest release that had been out for a while when
+the work started: 1.16.0 had been out for eight days, and 1.16.1 for one. 1.16 also moves the build to JDK 25 and
+Gradle 9, and the brief warns that builds are version-sensitive. Everything here is verified on 1.15.0.
+
+The patch is ready for the move: it applies cleanly to 1.16.1 (`git apply --check`). Its schema change sits in
+Fineract's `db/custom-changelog` extension point, so it can't collide with upstream's numbered changelogs. Upgrading
+means changing the tag, the commit and the JDK, then rerunning `make test-java`, `make test-java-regression` and
+`make test-stack`.
+
 ## GL sync: an explicit call, create-only
 
 The brief leaves the trigger open. The sync runs when something calls `POST /api/accounts/sync`: the bootstrap does,
@@ -35,7 +46,10 @@ before it creates the loan product, and an operator can at any time.
 * **Why not polling on a timer:** the chart changes rarely, and a new account matters only once a product maps it,
   which is a deliberate configuration step anyway.
 * **Create-only**, as the brief says. Each account is a `gl_account_syncs` row with its own status, so one failing
-  account doesn't block the others, and recovery retries transient failures.
+  account doesn't block the others, and recovery retries transient failures, re-reading the account from the ERP.
+* **One currency.** Fineract GL accounts carry no currency, so an ERP account in another currency than the loan
+  product's (RWF) is refused: FAILED, not retried, with the reason. Otherwise it would sync silently and receive RWF
+  postings.
 
 ## Synchronous calls, no queue
 
@@ -145,17 +159,18 @@ SQLAlchemy 2.0 is used with typed mappings, and Alembic for the integration serv
 
 ## What happened to FIN-2026-000001?
 
-Recorded in the final evidence run (simulation *Tracing FIN-2026-000001* in [SIMULATIONS.md](SIMULATIONS.md)). The
-partner sent a repayment with `X-Correlation-ID: partner-FIN-2026-000001` while the ERP was briefly unavailable.
+Recorded in the final evidence run on 30 October 2026 (UTC), by the trace scenario of `make test-stack`; `make
+simulate` repeats it under a suffixed reference in [SIMULATIONS.md](SIMULATIONS.md). The partner sent a repayment
+with `X-Correlation-ID: partner-FIN-2026-000001` while the ERP was briefly unavailable.
 
 **Step 1: one API call.** `GET /api/transactions/FIN-2026-000001` returns the status, Fineract's record, the ERP
 entry, and the correlation id to search the logs for:
 
 ```json
-{"external_reference": "FIN-2026-000001", "type": "REPAYMENT", "loan_reference": "LN-2026-000012",
+{"external_reference": "FIN-2026-000001", "type": "REPAYMENT", "loan_reference": "LN-2026-000013",
  "status": "COMPLETED", "correlation_id": "partner-FIN-2026-000001", "attempts": 0, "error": null,
  "recorded": {"amount": "458400", "principal_portion": "383400", "interest_portion": "75000",
-              "outstanding_after": "4616600", "erp_entry_number": "JE-000032"}}
+              "outstanding_after": "4616600", "erp_entry_number": "JE-000034"}}
 ```
 
 **Step 2: the logs.** Filter every service's JSON logs on that correlation id (or on `external_reference`):
@@ -166,19 +181,19 @@ docker compose logs --no-log-prefix integration-service mock-erp | grep partner-
 
 | time (UTC) | service | event | status | fineract_transaction_id | erp_transaction_id |
 | --- | --- | --- | --- | --- | --- |
-| 02:01:28.770 | integration-service | operation fineract_pending | FINERACT_PENDING | | |
-| 02:01:29.391 | integration-service | submitted to Fineract | FINERACT_PENDING | | |
-| 02:01:29.413 | integration-service | operation fineract_done | FINERACT_DONE | 44 | |
-| 02:01:29.421 | integration-service | operation erp_pending | ERP_PENDING | | |
-| 02:01:29.438 | integration-service | deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable | ERP_PENDING | | |
-| 02:01:31.675 | mock-erp | journal entry posted | POSTED | | JE-000032 |
-| 02:01:31.681 | integration-service | operation completed | COMPLETED | | JE-000032 |
+| 23:55:49.724 | integration-service | operation fineract_pending | FINERACT_PENDING | | |
+| 23:55:50.120 | integration-service | submitted to Fineract | FINERACT_PENDING | | |
+| 23:55:50.123 | integration-service | operation fineract_done | FINERACT_DONE | 47 | |
+| 23:55:50.124 | integration-service | operation erp_pending | ERP_PENDING | | |
+| 23:55:50.129 | integration-service | deferred to recovery (attempt 1, next in 2.0s): ERP is unavailable | ERP_PENDING | | |
+| 23:55:52.212 | mock-erp | journal entry posted | POSTED | | JE-000034 |
+| 23:55:52.216 | integration-service | operation completed | COMPLETED | | JE-000034 |
 
 **Reading it:**
 
-* Fineract recorded the repayment in 0.6 s (its transaction 44, split 383,400 principal and 75,000 interest).
+* Fineract recorded the repayment in 0.4 s (its transaction 47, split 383,400 principal and 75,000 interest).
 * The ERP was down, so the posting was deferred; the partner received 202 `ERP_PENDING`.
-* 2.2 s later, recovery posted entry `JE-000032`.
+* 2.1 s later, recovery posted entry `JE-000034`.
 
 The ERP's own log line carries the same correlation id because the integration forwards it, and recovery logs under
 the partner's original id because it is stored on the operation. Every line also carries `external_reference`,

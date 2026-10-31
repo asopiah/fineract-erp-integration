@@ -73,7 +73,7 @@ repeat gets the `200` replay.
 ### `POST /api/accounts/sync` — GL accounts from the ERP into Fineract
 
 Body (optional): `{"external_references": ["GL-1200"]}` limits the sync to those accounts. The call is create-only;
-repeating it is harmless.
+repeating it is harmless. An account whose currency is not RWF is `FAILED` with the reason and never retried.
 
 ```json
 [{"external_reference": "GL-1200", "code": "1200", "name": "Loan Receivable", "erp_type": "ASSET",

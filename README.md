@@ -98,33 +98,114 @@ docker compose up bootstrap
 
 ### 3. Walk through a loan
 
+Each step below is one call to the partner API. Run them in order in one terminal. The outputs shown are from a
+fresh stack; if you ran the simulations first, the loan and entry numbers will be higher.
+
+**Set up** two shell variables, so the commands stay short:
+
 ```bash
 API=localhost:58090/api
 AUTH=(-H 'Authorization: Bearer integration-local-token' -H 'Content-Type: application/json')
-
-# A client, then a loan application for 5,000,000 RWF
-curl -s "${AUTH[@]}" $API/clients -d '{"external_reference": "CLI-0001", "client_uid": "SME-000001",
-  "first_name": "Amina", "last_name": "Uwase", "activation_date": "2026-01-10"}' | jq -c
-LOAN=$(curl -s "${AUTH[@]}" $API/loans -d '{"external_reference": "APP-0001", "client_uid": "SME-000001",
-  "principal": "5000000", "annual_interest_rate": "18", "term_months": 12,
-  "submitted_on": "2026-01-15", "expected_disbursement_on": "2026-01-15"}' | jq -r .loan_reference)
-
-# Approve, disburse, repay
-curl -s "${AUTH[@]}" $API/loans/$LOAN/approve -d '{"external_reference": "APR-0001", "approved_on": "2026-01-15"}' | jq -c
-curl -s "${AUTH[@]}" $API/loans/$LOAN/disburse \
-  -d '{"external_reference": "DISB-0001", "amount": "5000000", "transaction_date": "2026-01-15"}' | jq -c
-curl -s "${AUTH[@]}" $API/loans/$LOAN/repayments \
-  -d '{"external_reference": "REP-0001", "amount": "458400", "transaction_date": "2026-02-15"}' | jq -c
-
-# The loan as Fineract holds it, and the books compared
-curl -s "${AUTH[@]}" $API/loans/$LOAN | jq -c '{status, outstanding}'
-curl -s "${AUTH[@]}" $API/reconciliation -d '{"external_references": ["DISB-0001", "REP-0001"]}' | jq -c .summary
 ```
 
-The repayment comes back with Fineract's split (principal and interest) and the ERP entry that mirrors it, and
-reconciliation reports `{"MATCHED": 2}`. Send any of these requests again: it answers `200` with the same body
-instead of doing it twice. [API.md](API.md) documents every endpoint. Interactive docs are at
-<http://localhost:58090/docs> and <http://localhost:58001/docs>.
+**Step 1 — Create a client.** The partner names the client with its own id (`client_uid`). Fineract's numeric ids
+never appear in this API.
+
+```bash
+curl -s "${AUTH[@]}" $API/clients -d '{
+  "external_reference": "CLI-0001", "client_uid": "SME-000001",
+  "first_name": "Amina", "last_name": "Uwase", "activation_date": "2026-01-10"}' | jq -c
+```
+```
+{"last_name":"Uwase","client_uid":"SME-000001","first_name":"Amina","external_reference":"CLI-0001"}
+```
+
+**Step 2 — Apply for a loan** of 5,000,000 RWF at 18 % over 12 months. The service issues a `loan_reference`; the
+command saves it in `LOAN` for the next steps.
+
+```bash
+LOAN=$(curl -s "${AUTH[@]}" $API/loans -d '{
+  "external_reference": "APP-0001", "client_uid": "SME-000001",
+  "principal": "5000000", "annual_interest_rate": "18", "term_months": 12,
+  "submitted_on": "2026-01-15", "expected_disbursement_on": "2026-01-15"}' | jq -r .loan_reference)
+echo $LOAN
+```
+```
+LN-2026-000001
+```
+
+**Step 3 — Approve it.**
+
+```bash
+curl -s "${AUTH[@]}" $API/loans/$LOAN/approve -d '{
+  "external_reference": "APR-0001", "approved_on": "2026-01-15"}' | jq -c
+```
+```
+{"approved_on":"2026-01-15","loan_reference":"LN-2026-000001","external_reference":"APR-0001"}
+```
+
+**Step 4 — Disburse it.** Fineract records the disbursement, then the ERP gets a journal entry built from Fineract's
+record (`erp_entry_number`).
+
+```bash
+curl -s "${AUTH[@]}" $API/loans/$LOAN/disburse -d '{
+  "external_reference": "DISB-0001", "amount": "5000000", "transaction_date": "2026-01-15"}' \
+  | jq -c '{type, amount, outstanding_after, erp_entry_number}'
+```
+```
+{"type":"DISBURSEMENT","amount":"5000000","outstanding_after":"5000000","erp_entry_number":"JE-000001"}
+```
+
+**Step 5 — Repay the first instalment.** Fineract decides how the payment splits into principal and interest; the
+service copies that split into the ERP entry, never computing it itself.
+
+```bash
+curl -s "${AUTH[@]}" $API/loans/$LOAN/repayments -d '{
+  "external_reference": "REP-0001", "amount": "458400", "transaction_date": "2026-02-15"}' \
+  | jq -c '{amount, principal_portion, interest_portion, erp_entry_number}'
+```
+```
+{"amount":"458400","principal_portion":"383400","interest_portion":"75000","erp_entry_number":"JE-000002"}
+```
+
+**Step 6 — Look at the ERP entry.** Debit Bank, credit Loan Receivable with the principal and Interest Income with
+the interest:
+
+```bash
+curl -s -H 'Authorization: Bearer erp-local-token' localhost:58001/api/journal-entries/REP-0001 | jq -c .lines
+```
+```
+[{"account_code":"1100","debit":"458400.000000","credit":"0.000000"},{"account_code":"1200","debit":"0.000000","credit":"383400.000000"},{"account_code":"4000","debit":"0.000000","credit":"75000.000000"}]
+```
+
+**Step 7 — Send the repayment again.** Same reference, same body: the service answers `200` with the original result
+and records nothing new. Change the amount and it refuses with `409`.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' "${AUTH[@]}" $API/loans/$LOAN/repayments -d '{
+  "external_reference": "REP-0001", "amount": "458400", "transaction_date": "2026-02-15"}'
+curl -s "${AUTH[@]}" $API/loans/$LOAN/repayments -d '{
+  "external_reference": "REP-0001", "amount": "500000", "transaction_date": "2026-02-15"}' | jq -r .error.code
+```
+```
+200
+IDEMPOTENCY_CONFLICT
+```
+
+**Step 8 — Check the loan and the books.** The loan's balances come live from Fineract; reconciliation compares
+Fineract with the ERP, reference by reference.
+
+```bash
+curl -s "${AUTH[@]}" $API/loans/$LOAN | jq -c '{status, outstanding: .outstanding.total}'
+curl -s "${AUTH[@]}" $API/reconciliation -d '{"external_references": ["DISB-0001", "REP-0001"]}' | jq -c .summary
+```
+```
+{"status":"ACTIVE","outstanding":"5042399"}
+{"MATCHED":2}
+```
+
+[API.md](API.md) documents every endpoint. Interactive docs: <http://localhost:58090/docs> (integration service) and
+<http://localhost:58001/docs> (ERP).
 
 | Service | URL | Credentials |
 | --- | --- | --- |
@@ -146,17 +227,20 @@ These are local development credentials.
 | `make test-stack` | Every simulation as an automated test against the running stack | Python 3.12, stack up |
 | `make simulate` | Runs every simulation and **rewrites** [SIMULATIONS.md](SIMULATIONS.md) with the evidence | Python 3.12, stack up |
 
+Every push also runs `make test-python` and `make test-java` in GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+
 One simulation at a time: `make simulate-<name>` (`make simulations` lists them).
 
 | Brief | Name | | Brief | Name |
 | --- | --- | --- | --- | --- |
-| Client identity | `client` | | J1 ERP down | `erp-down` |
-| GL sync | `gl-sync` | | J2 Fineract down | `fineract-down` |
-| Loan lifecycle | `lifecycle` | | J3 Fineract timeout | `fineract-timeout` |
-| I1 Sequential duplicates | `duplicates` | | J4 ERP timeout | `erp-timeout` |
-| I2a Concurrent, same reference | `concurrent-same` | | J5 Crash | `crash` |
-| I2b Concurrent, different references | `concurrent-different` | | K Reconciliation | `reconciliation` |
-| I3 Concurrent repayments | `concurrent-repayments` | | Trace one reference | `trace` |
+| Part A, the Fineract patch | `gl-patch` | | J1 ERP down | `erp-down` |
+| Client identity | `client` | | J2 Fineract down | `fineract-down` |
+| GL sync | `gl-sync` | | J3 Fineract timeout | `fineract-timeout` |
+| Loan lifecycle | `lifecycle` | | J4 ERP timeout | `erp-timeout` |
+| I1 Sequential duplicates | `duplicates` | | J5 Crash | `crash` |
+| I2a Concurrent, same reference | `concurrent-same` | | K Reconciliation | `reconciliation` |
+| I2b Concurrent, different references | `concurrent-different` | | Trace one reference | `trace` |
+| I3 Concurrent repayments | `concurrent-repayments` | |  |  |
 
 The Postman collection runs the lifecycle too: `npx newman run postman/collection.json`.
 
@@ -203,7 +287,7 @@ upstream/fineract/        Fineract's source, cloned by `make` for Java builds; n
 
 | Piece | Version |
 | --- | --- |
-| Apache Fineract | tag `1.15.0`, commit `d5636847ac556c30b437254c353f05526d172b97` (verified on every clone) |
+| Apache Fineract | tag `1.15.0`, commit `d5636847ac556c30b437254c353f05526d172b97` (verified on every clone). Why not 1.16.x: see [DECISIONS.md](DECISIONS.md#fineract-1150-not-116x). |
 | JDK | 21: Temurin 21.0.5 in the Docker build, OpenJDK 21.0.9 for local builds. Runtime image `azul/zulu-openjdk-alpine:21`, as in Fineract's own build. |
 | Build tool | Gradle 8.14.5, the wrapper in the tag |
 | PostgreSQL | 18.3 |
