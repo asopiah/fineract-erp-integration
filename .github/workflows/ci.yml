@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    name: Python (lint, types, tests)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Starts the compose PostgreSQL, then runs Ruff, mypy --strict and both services' tests against it.
+      - run: make test-python
+
+  java:
+    name: Java (Fineract patch unit tests)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-fineract-1.15.0-${{ hashFiles('fineract-customization/gl-account-external-id.patch') }}
+          restore-keys: gradle-fineract-1.15.0-
+      # Clones Fineract 1.15.0 (commit verified), applies the patch, runs the customization's unit tests.
+      - run: make test-java
