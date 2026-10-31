@@ -50,7 +50,7 @@ and a background sweep finishes it.
 | --- | --- |
 | 1. Core (A–G) | **Done.** Every part runs against the live stack. |
 | 2. Reliability (H–K) | **Done.** I1–I3, J1–J5 and K run as automated tests and produce the evidence in [SIMULATIONS.md](SIMULATIONS.md). |
-| 3. Stretch (L) | Not taken as a tier. A few pieces exist because the core needed them: the dead-letter view (`GET /api/admin/operations`), fee, penalty and overpayment lines in the accounting mapping (unit-tested), reversal-aware reconciliation (unit-tested) and the scheduled recovery sweep. |
+| 3. Stretch (L) | Partly. **Repayment reversal, end to end and live**: undone in Fineract, mirrored by a reversing ERP entry, matched by reconciliation (`make simulate-reversal`). Also the dead-letter view (`GET /api/admin/operations`), fee, penalty and overpayment lines in the accounting mapping (unit-tested) and the scheduled recovery sweep. |
 
 ## Run it
 
@@ -240,7 +240,7 @@ One simulation at a time: `make simulate-<name>` (`make simulations` lists them)
 | I1 Sequential duplicates | `duplicates` | | J5 Crash | `crash` |
 | I2a Concurrent, same reference | `concurrent-same` | | K Reconciliation | `reconciliation` |
 | I2b Concurrent, different references | `concurrent-different` | | Trace one reference | `trace` |
-| I3 Concurrent repayments | `concurrent-repayments` | |  |  |
+| I3 Concurrent repayments | `concurrent-repayments` | | Stretch: repayment reversal | `reversal` |
 
 The Postman collection runs the lifecycle too: `npx newman run postman/collection.json`.
 

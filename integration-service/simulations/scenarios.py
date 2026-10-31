@@ -727,6 +727,85 @@ TRAIL_FIELDS = (
 )
 
 
+def repayment_reversal(stack: Stack) -> Evidence:
+    evidence = Evidence("Repayment reversal", "Stretch: a reversal undone in Fineract and mirrored in the ERP, once")
+    loan = stack.open_loan(disburse=True)
+    repayment, reversal = stack.reference("REP"), stack.reference("REV")
+    before_repayment = stack.fineract_state(loan)
+    _expect_status(stack.repay(loan, repayment, 458_400, date(2026, 2, 15)), 201)
+    repaid = stack.fineract_state(loan)
+    path = f"/api/loans/{loan}/repayments/{repayment}/reversal"
+
+    reversed_ = stack.post(path, {"external_reference": reversal})
+    replay = stack.post(path, {"external_reference": reversal})
+    second = stack.post(path, {"external_reference": f"{reversal}-B"})
+
+    in_fineract = stack.fineract.get(f"/loans/external-id/{loan}/transactions/external-id/{repayment}").json()
+    after = stack.fineract_state(loan)
+    original, reversing = stack.erp_entry(repayment), stack.erp_entry(f"{repayment}:REVERSAL")
+    report = stack.api.post("/api/reconciliation", json={"external_references": [repayment]}).json()
+
+    evidence.initial_state = {"loan": loan, "repayment": repayment, "Fineract after the repayment": repaid}
+    evidence.request = {f"POST {path} x2": {"external_reference": reversal}, "then": f"{reversal}-B"}
+    evidence.response = {
+        "reversal": [reversed_.status_code, reversed_.json()],
+        "replay": replay.status_code,
+        "second reversal": [second.status_code, second.json().get("error", {}).get("code")],
+    }
+    evidence.fineract_state = {
+        "repayment": {k: in_fineract.get(k) for k in ("manuallyReversed", "reversalExternalId", "amount")},
+        "after": after,
+    }
+    evidence.erp_state = {
+        "repayment entry": original and original["lines"],
+        "reversing entry": reversing and [reversing["entry_number"], reversing["lines"]],
+    }
+    evidence.integration_state = {"reconciliation": report["items"][0] if report.get("items") else report}
+    evidence.expected = (
+        "Fineract marks the repayment reversed under our reference; the ERP gets one entry with every line swapped; a "
+        "replay changes nothing; a second reversal is refused; reconciliation reports MATCHED"
+    )
+    evidence.check("reversed (201), replay (200)", reversed_.status_code == 201 and replay.status_code == 200)
+    evidence.check(
+        "Fineract holds the reversal",
+        in_fineract.get("manuallyReversed") is True and in_fineract.get("reversalExternalId") == reversal,
+    )
+    evidence.check(
+        "outstanding back to before the repayment",
+        after["principal_outstanding"] == before_repayment["principal_outstanding"] != repaid["principal_outstanding"],
+    )
+    evidence.check(
+        "reversing entry swaps every line",
+        original is not None
+        and reversing is not None
+        and [(x["account_code"], x["debit"], x["credit"]) for x in reversing["lines"]]
+        == [(x["account_code"], x["credit"], x["debit"]) for x in original["lines"]],
+    )
+    evidence.check("second reversal refused", second.status_code == 409)
+    evidence.check("reconciliation MATCHED", report.get("summary") == {"MATCHED": 1})
+    evidence.actual = _verdict(evidence)
+    evidence.explanation = "\n\n".join(
+        [
+            (
+                "The reversal is an operation like any other, with the same lookup-before-submit rule. Fineract's undo "
+                "keeps the repayment, marks it reversed and stores our reference on it (`reversalExternalId`), so a "
+                "lost answer is resolved by looking the repayment up, never by undoing it twice."
+            ),
+            (
+                "The reversing journal entry is the repayment's own entry with debits and credits swapped, posted as "
+                "`{repayment}:REVERSAL`. The ERP is unique on that reference, so there is one reversing entry per "
+                "repayment whatever the reversal is called."
+            ),
+        ]
+    )
+    return evidence
+
+
+def _expect_status(response: httpx.Response, status: int) -> None:
+    if response.status_code != status:
+        raise AssertionError(f"{response.request.url}: {response.status_code} {response.text}")
+
+
 def trace_one_reference(stack: Stack) -> Evidence:
     evidence = Evidence(
         "Tracing FIN-2026-000001", "Section 9: what happened to one reference, from logs and one API call"
@@ -776,6 +855,7 @@ SCENARIOS: dict[str, Callable[[Stack], Evidence]] = {
     "erp-timeout": erp_timeout_after_write,
     "crash": crash_before_erp,
     "reconciliation": reconciliation,
+    "reversal": repayment_reversal,
     "trace": trace_one_reference,
 }
 

@@ -71,6 +71,22 @@ def journal_entry_for(
     )
 
 
+def reversal_journal_reference(repayment_reference: str) -> str:
+    """The ERP reference of a repayment's reversing entry: one per repayment, so the ERP refuses a second."""
+    return f"{repayment_reference}:REVERSAL"
+
+
+def reversing_entry(original: JournalEntryDraft, external_reference: str, memo: str) -> JournalEntryDraft:
+    """The original entry with every debit and credit swapped, so the two together net to zero."""
+    return JournalEntryDraft(
+        external_reference=external_reference,
+        entry_date=original.entry_date,
+        transaction_type=f"{original.transaction_type}_REVERSAL",
+        memo=memo,
+        lines=tuple(JournalLine(line.account_code, debit=line.credit, credit=line.debit) for line in original.lines),
+    )
+
+
 def _disbursement_lines(transaction: FineractLoanTransaction, ledger: LedgerAccounts) -> tuple[JournalLine, ...]:
     _ensure_positive(transaction)
     return (

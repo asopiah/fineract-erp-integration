@@ -18,6 +18,8 @@ from integration_service.api.schemas import (
     PendingOut,
     ReconciliationReport,
     ReconciliationRequest,
+    ReversalOut,
+    ReversalRequest,
     TransactionOut,
     TransactionView,
 )
@@ -30,6 +32,7 @@ from integration_service.commands import (
     ExternalReference,
     LoanReference,
     MakeRepayment,
+    ReverseRepayment,
 )
 from integration_service.errors import ApiError, ErrorCode
 from integration_service.models import GlAccountSync
@@ -146,6 +149,25 @@ def make_repayment(
 ) -> JSONResponse:
     """Each external reference is applied once; Fineract decides the principal/interest split."""
     return _respond(services.partner.repay(loan_reference, command))
+
+
+@router.post(
+    "/loans/{loan_reference}/repayments/{repayment_reference}/reversal",
+    tags=["loans"],
+    status_code=201,
+    responses=_command_responses(
+        ReversalOut, "Reference reused with another payload, or the repayment is already reversed."
+    ),
+)
+def reverse_repayment(
+    body: ReversalRequest,
+    services: ServicesDep,
+    repayment_reference: ExternalReference,
+    loan_reference: LoanReference = LoanReferencePath,
+) -> JSONResponse:
+    """Undoes the repayment in Fineract and posts the reversing ERP entry. One reversal per repayment."""
+    command = ReverseRepayment(external_reference=body.external_reference, repayment_reference=repayment_reference)
+    return _respond(services.partner.reverse_repayment(loan_reference, command))
 
 
 # --- Transactions and reconciliation ---------------------------------------------------------------------------

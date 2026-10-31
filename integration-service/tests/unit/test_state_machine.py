@@ -51,7 +51,11 @@ def test_every_status_has_a_transition_entry() -> None:
 
 
 def test_only_money_movements_post_journals() -> None:
-    assert {t for t in OperationType if t.posts_journal} == {OperationType.DISBURSEMENT, OperationType.REPAYMENT}
+    assert {t for t in OperationType if t.posts_journal} == {
+        OperationType.DISBURSEMENT,
+        OperationType.REPAYMENT,
+        OperationType.REPAYMENT_REVERSAL,
+    }
 
 
 def test_approval_and_disbursement_are_once_per_loan() -> None:

@@ -55,6 +55,7 @@ class FineractLoanTransaction:
     overpayment: Decimal
     outstanding_after: Decimal
     reversed: bool
+    reversal_external_reference: str | None = None  # the reference the reversal was submitted with
 
 
 @dataclass(frozen=True)

@@ -13,7 +13,7 @@ brief was open are listed at the end, together with the disclosure of AI assista
 | Idempotency | `(type, external_reference)` plus a fingerprint of the normalized request | Same request replays, a different one is a 409, and it survives restarts | [↓](#idempotency) |
 | Retries | Look up before every resend; 3 tries in the request, then up to 20 in the background | A financial call is never repeated without first checking whether it happened | [↓](#retries-and-partial-failure) |
 | Partial failure | Each step is committed before the next call; recovery resumes from there | After any crash the row says exactly what is known | [↓](#retries-and-partial-failure) |
-| What I chose not to build | Stretch tier, automatic reversals, multi-currency, a broker | Each is out of the brief's core, or would add a second source of truth | [↓](#what-i-chose-not-to-build) |
+| What I chose not to build | Most of the stretch tier, disbursement reversals, multi-currency, a broker | Each is out of the brief's core, or would add a second source of truth | [↓](#what-i-chose-not-to-build) |
 | Known weaknesses | One instance assumed; local-grade security; reconciliation reads Fineract live | Stated plainly, with what production would need | [↓](#known-weaknesses) |
 
 ## Fineract customization: extend the CREATE command
@@ -153,7 +153,7 @@ settings (`INTEGRATION_*`).
 | Loan product | *SME Asset Finance*: RWF, whole francs, 18% a year declining balance, 12 monthly equal installments, single disbursement (`multiDisburseLoan=false`), mifos standard allocation, interest recalculation off. It maps 9 synced GL accounts: fund source, loan portfolio, transfers in suspense, overpayment liability, interest, fee, penalty and recovery income, and write-off. |
 | Office | *Kigali Main Office* (`externalId KGL-MAIN`), under Head Office. Clients and the API user belong to it. |
 | GL accounts | Created from the ERP with `manualEntriesAllowed=false`: the ERP owns the ledger, and Fineract posts only from loan transactions |
-| Least privilege | Role *Integration API* has 13 permissions: read/create GL account, read office, loan product and payment type, read/create/activate client, read/create/approve/disburse/repay loan. The bootstrap re-applies exactly this set on each run. `ACTIVATE_CLIENT` was found missing by a 403 in testing (clients are created active). |
+| Least privilege | Role *Integration API* has 14 permissions: read/create GL account, read office, loan product and payment type, read/create/activate client, read/create/approve/disburse/repay/adjust loan. The bootstrap re-applies exactly this set on each run. Two were found missing by a 403 in testing: `ACTIVATE_CLIENT` (clients are created active) and `ADJUST_LOAN` (Fineract's "undo", used to reverse a repayment). |
 | Reference data | The service resolves office, product and payment type by business key (external id or name), never by a configured numeric id |
 | Database | PostgreSQL: Fineract's default, and its 1.15 image ships the driver. One server with a database and an owner role per service keeps the stack light; nothing crosses databases, so splitting them later is a configuration change. |
 
@@ -262,11 +262,11 @@ patch).
 
 ## What I chose not to build
 
-* **Stretch tier (L).** Only the pieces the core needed: the dead-letter view, fee, penalty and overpayment lines in
-  the mapping, and reversal-aware reconciliation.
-* **Automatic reversal postings.** A reversal in Fineract shows in reconciliation as `AMOUNT_MISMATCH`, with a note.
-  Posting the reversing entry (`{reference}:REVERSAL` with opposite lines, derived from Fineract's reversal
-  transaction) is the documented next step.
+* **Most of the stretch tier (L).** Built: repayment reversal end to end, the dead-letter view, and fee, penalty and
+  overpayment lines in the mapping (unit-tested).
+* **Reversing a disbursement.** Fineract undoes a disbursement only by undoing the loan's whole disbursal, a
+  different business event; it is out of scope. A reversal made directly in Fineract, outside the API, still shows in
+  reconciliation as `AMOUNT_MISMATCH` with a note, for a human to post.
 * **ERP master data updates.** The sync is create-only, as the brief says. A renamed ERP account is not propagated.
 * **Multi-currency, fees and penalties in the product, and multi-tranche loans.**
 * **Partner webhooks, metrics, a message broker.** See *Synchronous calls, no queue*.

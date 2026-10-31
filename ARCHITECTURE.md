@@ -101,10 +101,18 @@ guessed journal.
 it as a liability to the client. The entry credits 2100 Overpayment Liability with it, the same account the loan
 product maps for overpayments, so both ledgers show the money is owed back.
 
-**Reversals.** A reversed Fineract transaction is never posted (the function refuses it). If the ERP already holds
-the entry, reconciliation reports it as `AMOUNT_MISMATCH` with a note, because Fineract now nets to zero and the ERP
-does not. The fix, not built here, is a reversing entry `{reference}:REVERSAL` with the lines swapped, derived from
-Fineract's reversal in the same way.
+**Reversals.** `POST /api/loans/{loan}/repayments/{repayment}/reversal` is an operation like the others
+(`REPAYMENT_REVERSAL`), with the same state machine and lookup-before-submit rule:
+
+1. Fineract undoes the repayment. It keeps the transaction, marks it reversed, and stores our reversal reference on
+   it (`reversalExternalId`), so a lost answer is resolved by looking the repayment up, never by undoing it twice.
+2. The ERP gets the repayment's own entry with every debit and credit swapped (`reversing_entry`, a pure function),
+   posted as `{repayment}:REVERSAL`. The ERP is unique on that reference: one reversing entry per repayment, whatever
+   the reversal is called.
+3. Reconciliation reports the pair as `MATCHED`: reversed in Fineract, entry plus reversing entry in the ERP.
+
+A reversal made directly in Fineract, outside the API, has no reversing entry, so reconciliation reports
+`AMOUNT_MISMATCH` with a note: Fineract nets to zero and the ERP does not.
 
 **The chart.** The ERP seeds these accounts, and the bootstrap maps the loan product to them through their external
 ids (`GL-1100` …):

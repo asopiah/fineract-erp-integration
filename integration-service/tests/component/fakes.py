@@ -177,6 +177,19 @@ class FakeFineract(Scripted):
 
         self._command("make_repayment", apply)
 
+    def reverse_repayment(
+        self, loan_reference: str, repayment_reference: str, reversal_reference: str, on: date
+    ) -> None:
+        def apply() -> None:
+            repayment = self.transactions[repayment_reference]
+            if repayment.reversed:  # Fineract: only an active repayment can be undone
+                raise RejectedError("fineract", "transaction is already reversed", status_code=403)
+            self.transactions[repayment_reference] = replace(
+                repayment, reversed=True, reversal_external_reference=reversal_reference
+            )
+
+        self._command("reverse_repayment", apply)
+
     def find_loan_transaction(self, loan_reference: str, external_reference: str) -> FineractLoanTransaction | None:
         return self._lookup("find_loan_transaction", lambda: self.transactions.get(external_reference))
 

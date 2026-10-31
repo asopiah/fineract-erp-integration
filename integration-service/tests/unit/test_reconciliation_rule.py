@@ -49,3 +49,10 @@ def test_different_types_are_reported_as_such() -> None:
 def test_a_reversal_nets_to_zero() -> None:
     assert compare(REVERSED, None)[0] is Outcome.MATCHED  # reversed and never posted: both sides are zero
     assert compare(REVERSED, ENTRY)[0] is Outcome.AMOUNT_MISMATCH  # the ERP entry still needs reversing
+
+
+def test_a_reversal_mirrored_in_the_erp_matches() -> None:
+    reversal = ErpJournalEntry("JE-000003", "REP-1:REVERSAL", date(2026, 2, 15), "REPAYMENT_REVERSAL", Decimal(458400))
+
+    assert compare(REVERSED, ENTRY, reversal)[0] is Outcome.MATCHED
+    assert compare(REVERSED, ENTRY)[0] is Outcome.AMOUNT_MISMATCH

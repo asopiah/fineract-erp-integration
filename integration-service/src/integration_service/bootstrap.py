@@ -44,6 +44,7 @@ INTEGRATION_PERMISSIONS = (
     "APPROVE_LOAN",
     "DISBURSE_LOAN",
     "REPAYMENT_LOAN",
+    "ADJUST_LOAN",  # Fineract's "undo", used to reverse a repayment
 )
 
 LOAN_PRODUCT_EXTERNAL_ID = "SME-ASSET-FINANCE"

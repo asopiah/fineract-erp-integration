@@ -187,6 +187,21 @@ class FineractGateway:
             params={"command": "repayment"},
         )
 
+    def reverse_repayment(
+        self, loan_reference: str, repayment_reference: str, reversal_reference: str, on: date
+    ) -> None:
+        """Fineract's "undo": the repayment stays on the loan, marked reversed, and keeps our reversal reference."""
+        self._api.post(
+            f"/loans/external-id/{loan_reference}/transactions/external-id/{repayment_reference}",
+            {
+                "transactionDate": on.isoformat(),
+                "transactionAmount": "0",
+                "reversalExternalId": reversal_reference,
+                **DATE_FORMAT,
+            },
+            params={"command": "undo"},
+        )
+
     def find_loan_transaction(self, loan_reference: str, external_reference: str) -> FineractLoanTransaction | None:
         transaction = self._api.get(
             f"/loans/external-id/{loan_reference}/transactions/external-id/{external_reference}"
@@ -267,6 +282,7 @@ def _loan_transaction(transaction: dict[str, Any]) -> FineractLoanTransaction:
         overpayment=_money(transaction.get("overpaymentPortion")),
         outstanding_after=_money(transaction.get("outstandingLoanBalance")),
         reversed=bool(transaction.get("manuallyReversed", False)),
+        reversal_external_reference=transaction.get("reversalExternalId"),
     )
 
 

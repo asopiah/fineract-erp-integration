@@ -19,11 +19,20 @@ from integration_service.commands import (
     CreateClient,
     DisburseLoan,
     MakeRepayment,
+    ReverseRepayment,
 )
+from integration_service.domain.fineract import LoanTransactionType
 from integration_service.domain.operations import OperationStatus, OperationType
 from integration_service.domain.references import loan_reference
 from integration_service.errors import ApiError, ErrorCode
-from integration_service.models import LOAN_REFERENCE_SEQUENCE, MONEY_REFERENCE_INDEX, Client, Loan, Operation
+from integration_service.models import (
+    LOAN_REFERENCE_SEQUENCE,
+    MONEY_REFERENCE_INDEX,
+    Client,
+    Loan,
+    LoanTransaction,
+    Operation,
+)
 from integration_service.services import operation_store
 from integration_service.services.executor import OperationExecutor
 from integration_service.services.operation_store import BusinessKeyTakenError, ReferenceReusedError, Reserve
@@ -120,6 +129,28 @@ class PartnerService:
         loan = self._loan_in_fineract(reference)
         return self._run(
             OperationType.REPAYMENT, command, client_uid=loan.client_uid, loan_reference=loan.loan_reference
+        )
+
+    def reverse_repayment(self, reference: str, command: ReverseRepayment) -> Outcome:
+        loan = self._loan_in_fineract(reference)
+        with self._session_factory() as session:
+            repayment = session.scalar(
+                select(LoanTransaction).where(LoanTransaction.external_reference == command.repayment_reference)
+            )
+        if (
+            repayment is None
+            or repayment.loan_reference != reference
+            or repayment.type is not LoanTransactionType.REPAYMENT
+        ):
+            raise ApiError(404, ErrorCode.NOT_FOUND, f"loan {reference} has no repayment {command.repayment_reference}")
+        if repayment.reversed_by not in (None, command.external_reference):
+            raise ApiError(
+                409,
+                ErrorCode.REPAYMENT_ALREADY_REVERSED,
+                f"repayment {command.repayment_reference} is already reversed by {repayment.reversed_by}",
+            )
+        return self._run(
+            OperationType.REPAYMENT_REVERSAL, command, client_uid=loan.client_uid, loan_reference=loan.loan_reference
         )
 
     # --- Shared flow ---------------------------------------------------------------------------------------------

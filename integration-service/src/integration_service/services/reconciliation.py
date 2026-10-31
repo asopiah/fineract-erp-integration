@@ -19,6 +19,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
+from integration_service.domain.accounting import reversal_journal_reference
 from integration_service.domain.erp import ErpJournalEntry
 from integration_service.domain.fineract import FineractLoanTransaction, LoanTransactionType
 from integration_service.domain.money import plain_decimal
@@ -50,7 +51,9 @@ class Criteria:
     external_references: frozenset[str] | None = None
 
 
-def compare(fineract: FineractSide | None, erp: ErpJournalEntry | None) -> tuple[Outcome, str | None]:
+def compare(
+    fineract: FineractSide | None, erp: ErpJournalEntry | None, erp_reversal: ErpJournalEntry | None = None
+) -> tuple[Outcome, str | None]:
     """The reconciliation rule for one external reference."""
     if fineract is None:
         return Outcome.MISSING_IN_FINERACT, None
@@ -62,6 +65,8 @@ def compare(fineract: FineractSide | None, erp: ErpJournalEntry | None) -> tuple
     if erp.transaction_type != transaction.type.value:
         return Outcome.TYPE_MISMATCH, f"Fineract {transaction.type.value}, ERP {erp.transaction_type}"
     if transaction.reversed:
+        if erp_reversal is not None and erp_reversal.total == erp.total:
+            return Outcome.MATCHED, f"reversed in Fineract; the ERP entry is reversed by {erp_reversal.entry_number}"
         return Outcome.AMOUNT_MISMATCH, "reversed in Fineract; the ERP entry still stands"
     if erp.total != transaction.amount:
         return Outcome.AMOUNT_MISMATCH, None
@@ -84,7 +89,13 @@ class Reconciler:
 
         items = []
         for reference in sorted(fineract_side.keys() | erp_side.keys()):
-            outcome, note = compare(fineract_side.get(reference), erp_side.get(reference))
+            fineract = fineract_side.get(reference)
+            reversal = (
+                self._erp.find_journal_entry(reversal_journal_reference(reference))
+                if fineract is not None and fineract.transaction.reversed
+                else None
+            )
+            outcome, note = compare(fineract, erp_side.get(reference), reversal)
             items.append(_item(reference, fineract_side.get(reference), erp_side.get(reference), outcome, note))
         return {
             "criteria": {

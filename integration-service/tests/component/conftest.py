@@ -7,7 +7,14 @@ from typing import Any, NoReturn, cast
 import pytest
 from sqlalchemy.orm import Session, sessionmaker
 
-from integration_service.commands import ApplyForLoan, ApproveLoan, CreateClient, DisburseLoan, MakeRepayment
+from integration_service.commands import (
+    ApplyForLoan,
+    ApproveLoan,
+    CreateClient,
+    DisburseLoan,
+    MakeRepayment,
+    ReverseRepayment,
+)
 from integration_service.database import create_session_factory
 from integration_service.domain.accounting import LedgerAccounts
 from integration_service.gateways.faults import FaultInjector
@@ -84,6 +91,10 @@ class System:
             external_reference=external_reference, amount=Decimal(amount), transaction_date=date(2026, 2, 15)
         )
         return self.partner.repay(loan_reference, command)
+
+    def reverse(self, loan_reference: str, repayment_reference: str, external_reference: str = "REV-1") -> Outcome:
+        command = ReverseRepayment(external_reference=external_reference, repayment_reference=repayment_reference)
+        return self.partner.reverse_repayment(loan_reference, command)
 
 
 @pytest.fixture

@@ -11,8 +11,21 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from integration_service.commands import ApplyForLoan, ApproveLoan, CreateClient, DisburseLoan, MakeRepayment
-from integration_service.domain.accounting import JournalEntryDraft, LedgerAccounts, journal_entry_for
+from integration_service.commands import (
+    ApplyForLoan,
+    ApproveLoan,
+    CreateClient,
+    DisburseLoan,
+    MakeRepayment,
+    ReverseRepayment,
+)
+from integration_service.domain.accounting import (
+    JournalEntryDraft,
+    LedgerAccounts,
+    journal_entry_for,
+    reversal_journal_reference,
+    reversing_entry,
+)
 from integration_service.domain.erp import ErpJournalEntry
 from integration_service.domain.fineract import (
     FineractClient,
@@ -238,6 +251,70 @@ class Repayment(MoneyMovement):
         )
 
 
+class RepaymentReversal(MoneyMovement):
+    """Undoes a repayment in Fineract, then posts the repayment's journal entry with debits and credits swapped.
+
+    Fineract keeps the reversed repayment and stores our reference on it (``reversalExternalId``), so the lookup that
+    precedes every submit also finds a reversal that was applied but not confirmed.
+    """
+
+    transaction_type = LoanTransactionType.REPAYMENT
+
+    def find(self, session: Session, operation: Operation) -> FineractLoanTransaction | None:
+        repayment = self._fineract.find_loan_transaction(_loan_reference(operation), _repayment_reference(operation))
+        return repayment if repayment is not None and repayment.reversed else None
+
+    def submit(self, session: Session, operation: Operation) -> None:
+        repayment = _transaction(session, _repayment_reference(operation))
+        self._fineract.reverse_repayment(
+            repayment.loan_reference,
+            repayment.external_reference,
+            operation.external_reference,
+            repayment.transaction_date,
+        )
+
+    def contradiction(self, operation: Operation, record: FineractLoanTransaction) -> str | None:
+        if record.reversal_external_reference not in (None, operation.external_reference):
+            return (
+                f"repayment {record.external_reference} was reversed by {record.reversal_external_reference}, "
+                f"not {operation.external_reference}"
+            )
+        return None
+
+    def stored_contradiction(
+        self, session: Session, operation: Operation, record: FineractLoanTransaction
+    ) -> str | None:
+        return self.contradiction(operation, record)
+
+    def record(self, session: Session, operation: Operation, record: FineractLoanTransaction) -> None:
+        _transaction(session, _repayment_reference(operation)).reversed_by = operation.external_reference
+
+    def journal_entry(self, session: Session, operation: Operation) -> JournalEntryDraft:
+        """One reversing entry per repayment, whatever the reversal is called: the ERP refuses a second one."""
+        repayment = _transaction(session, _repayment_reference(operation))
+        original = journal_entry_for(
+            _recorded(repayment), repayment.external_reference, repayment.loan_reference, self._ledger
+        )
+        return reversing_entry(
+            original,
+            reversal_journal_reference(repayment.external_reference),
+            f"Reversal {operation.external_reference} of repayment {repayment.external_reference}",
+        )
+
+    def record_journal(self, session: Session, operation: Operation, entry: ErpJournalEntry) -> None:
+        _transaction(session, _repayment_reference(operation)).reversal_entry_number = entry.entry_number
+
+    def result(self, session: Session, operation: Operation) -> dict[str, Any]:
+        repayment = _transaction(session, _repayment_reference(operation))
+        return {
+            "external_reference": operation.external_reference,
+            "loan_reference": repayment.loan_reference,
+            "repayment_reference": repayment.external_reference,
+            "reversed_amount": plain_decimal(repayment.amount),
+            "erp_entry_number": repayment.reversal_entry_number,
+        }
+
+
 def build_handlers(fineract: FineractGateway, ledger: LedgerAccounts) -> dict[OperationType, OperationHandler[Any]]:
     return {
         OperationType.CLIENT_CREATION: ClientCreation(fineract),
@@ -245,6 +322,7 @@ def build_handlers(fineract: FineractGateway, ledger: LedgerAccounts) -> dict[Op
         OperationType.LOAN_APPROVAL: LoanApproval(fineract),
         OperationType.DISBURSEMENT: Disbursement(fineract, ledger),
         OperationType.REPAYMENT: Repayment(fineract, ledger),
+        OperationType.REPAYMENT_REVERSAL: RepaymentReversal(fineract, ledger),
     }
 
 
@@ -323,3 +401,7 @@ def _transaction(session: Session, external_reference: str) -> LoanTransaction:
     return session.execute(
         select(LoanTransaction).where(LoanTransaction.external_reference == external_reference)
     ).scalar_one()
+
+
+def _repayment_reference(operation: Operation) -> str:
+    return ReverseRepayment.model_validate(operation.request).repayment_reference

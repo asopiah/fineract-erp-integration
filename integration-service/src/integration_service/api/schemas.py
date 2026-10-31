@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from integration_service.commands import ExternalReference
 
@@ -77,6 +77,22 @@ class TransactionOut(BaseModel):
     overpayment_portion: str
     outstanding_after: str
     erp_entry_number: str | None = Field(examples=["JE-000002"])
+
+
+class ReversalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    external_reference: ExternalReference = Field(examples=["REV-0001"])
+
+
+class ReversalOut(BaseModel):
+    """A repayment undone in Fineract, and the ERP entry that reverses its journal entry."""
+
+    external_reference: str
+    loan_reference: str
+    repayment_reference: str
+    reversed_amount: str
+    erp_entry_number: str | None = Field(examples=["JE-000003"])
 
 
 class Outstanding(BaseModel):

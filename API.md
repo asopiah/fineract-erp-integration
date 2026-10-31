@@ -27,7 +27,7 @@ Every error has one shape:
 | --- | --- |
 | 401 | `UNAUTHORIZED` |
 | 404 | `NOT_FOUND` |
-| 409 | `IDEMPOTENCY_CONFLICT`, `CLIENT_UID_TAKEN`, `LOAN_ALREADY_APPROVED`, `LOAN_ALREADY_DISBURSED`, `CLIENT_NOT_READY`, `LOAN_NOT_READY`, `NOT_RESUMABLE` |
+| 409 | `IDEMPOTENCY_CONFLICT`, `CLIENT_UID_TAKEN`, `LOAN_ALREADY_APPROVED`, `LOAN_ALREADY_DISBURSED`, `REPAYMENT_ALREADY_REVERSED`, `CLIENT_NOT_READY`, `LOAN_NOT_READY`, `NOT_RESUMABLE` |
 | 422 | `VALIDATION_ERROR` (with `details` per field); `FINERACT_REJECTED` (Fineract refused it; `details.fineract_code` has Fineract's reason code) |
 | 503 | `FINERACT_UNAVAILABLE` (nothing reached Fineract: safe to retry the same request), `ERP_UNAVAILABLE` |
 | 500 | `INTERNAL_ERROR` (the logs carry the details under the returned correlation id) |
@@ -136,6 +136,18 @@ The portions are copied from Fineract's transaction, which reports `0` principal
 `{"external_reference": "REP-0001", "amount": "458400", "transaction_date": "2026-02-15"}` returns a transaction with
 Fineract's split, for example `"principal_portion": "383400", "interest_portion": "75000"`, and the ERP entry that
 mirrors it.
+
+### `POST /api/loans/{loan_reference}/repayments/{repayment_reference}/reversal`
+
+`{"external_reference": "REV-0001"}` undoes the repayment in Fineract and posts the reversing ERP entry:
+
+```json
+{"external_reference": "REV-0001", "loan_reference": "LN-2026-000001", "repayment_reference": "REP-0001",
+ "reversed_amount": "458400", "erp_entry_number": "JE-000003"}
+```
+
+One reversal per repayment: a second one, under another reference, gets `409 REPAYMENT_ALREADY_REVERSED`. An
+unknown repayment, or one on another loan, is `404`.
 
 ### `GET /api/loans/{loan_reference}`
 

@@ -9,6 +9,8 @@ from integration_service.domain.accounting import (
     LedgerAccounts,
     UnmappableTransactionError,
     journal_entry_for,
+    reversal_journal_reference,
+    reversing_entry,
 )
 from integration_service.domain.fineract import FineractLoanTransaction, LoanTransactionType
 
@@ -94,3 +96,20 @@ def test_mapping_is_deterministic() -> None:
     posted = transaction(LoanTransactionType.REPAYMENT, "458400", principal="383400", interest="75000")
 
     assert journal_entry_for(posted, "R", "L", LEDGER) == journal_entry_for(posted, "R", "L", LEDGER)
+
+
+def test_a_reversing_entry_swaps_every_line_and_nets_to_zero() -> None:
+    repayment = journal_entry_for(
+        transaction(LoanTransactionType.REPAYMENT, "458400", principal="383400", interest="75000"),
+        "REP-1",
+        "LN-2026-000001",
+        LedgerAccounts(),
+    )
+
+    reversal = reversing_entry(repayment, reversal_journal_reference("REP-1"), "Reversal REV-1")
+
+    assert reversal.external_reference == "REP-1:REVERSAL"
+    assert reversal.is_balanced
+    assert [(line.account_code, line.debit, line.credit) for line in reversal.lines] == [
+        (line.account_code, line.credit, line.debit) for line in repayment.lines
+    ]

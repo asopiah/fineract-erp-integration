@@ -149,6 +149,8 @@ class LoanTransaction(Base):
     outstanding_after: Mapped[Decimal] = mapped_column(MONEY)
     fineract_transaction_id: Mapped[int] = mapped_column(Integer)
     erp_entry_number: Mapped[str | None] = mapped_column(String(32))
+    reversed_by: Mapped[str | None] = mapped_column(String(100))
+    reversal_entry_number: Mapped[str | None] = mapped_column(String(32))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

@@ -19,11 +19,12 @@ class OperationType(StrEnum):
     LOAN_APPROVAL = "LOAN_APPROVAL"
     DISBURSEMENT = "DISBURSEMENT"
     REPAYMENT = "REPAYMENT"
+    REPAYMENT_REVERSAL = "REPAYMENT_REVERSAL"
 
     @property
     def posts_journal(self) -> bool:
         """Money movements are mirrored into the ERP; lifecycle events are not."""
-        return self in (OperationType.DISBURSEMENT, OperationType.REPAYMENT)
+        return self in (OperationType.DISBURSEMENT, OperationType.REPAYMENT, OperationType.REPAYMENT_REVERSAL)
 
     @property
     def once_per_loan(self) -> bool:

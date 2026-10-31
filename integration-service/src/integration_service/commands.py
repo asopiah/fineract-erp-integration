@@ -62,3 +62,7 @@ class DisburseLoan(Command):
 class MakeRepayment(Command):
     amount: Money
     transaction_date: date
+
+
+class ReverseRepayment(Command):
+    repayment_reference: ExternalReference
