@@ -123,7 +123,8 @@ transient failure. A business key with a definition check is the right tool here
 ## Build
 
 `docker compose up` builds the image from `Dockerfile` when it is missing: it clones the tag, verifies the commit,
-applies the patch and builds with Gradle (about 15–20 minutes the first time). Gradle's downloads and build cache are
+applies the patch, runs the customization's unit tests (a patch that breaks them never becomes an image) and builds
+with Gradle (about 15–20 minutes the first time). Gradle's downloads and build cache are
 kept in a BuildKit cache mount, so a rebuild after a patch change takes about a minute: in a measured run, 52 s
 instead of 13 min 27 s, recompiling only `fineract-accounting`.
 
